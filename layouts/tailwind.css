@@ -1,2 +1,98 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: #B4EDF0;
+  --color-base-200: #FCE49D;
+  --color-base-300: #FEBB8E;
+  --color-base-content: #254A2D;
+  
+  --color-primary: #393E76;
+  --color-primary-content: #B4EDF0;
+  
+  --color-secondary: #8E588A;
+  --color-secondary-content: #FCE49D;
+  
+  --color-accent: #DC7A91;
+  --color-accent-content: #254A2D;
+  
+  --color-neutral: #393E76;
+  --color-neutral-content: #FCE49D;
+  
+  --color-info: #393E76;
+  --color-info-content: #B4EDF0;
+  
+  --color-success: #254A2D;
+  --color-success-content: #FCE49D;
+  
+  --color-warning: #FEBB8E;
+  --color-warning-content: #254A2D;
+  
+  --color-error: #FE978E;
+  --color-error-content: #254A2D;
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.375rem;
+  --radius-box: 1rem;
+
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  --border: 1px;
+
+  --depth: 0;
+  --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+  name: "dark";
+  default: false;
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: #254A2D;
+  --color-base-200: #393E76;
+  --color-base-300: #8E588A;
+  --color-base-content: #FCE49D;
+  
+  --color-primary: #DC7A91;
+  --color-primary-content: #254A2D;
+  
+  --color-secondary: #FE978E;
+  --color-secondary-content: #254A2D;
+  
+  --color-accent: #FEBB8E;
+  --color-accent-content: #254A2D;
+  
+  --color-neutral: #393E76;
+  --color-neutral-content: #FCE49D;
+  
+  --color-info: #B4EDF0;
+  --color-info-content: #254A2D;
+  
+  --color-success: #B4EDF0;
+  --color-success-content: #254A2D;
+  
+  --color-warning: #FEBB8E;
+  --color-warning-content: #254A2D;
+  
+  --color-error: #FE978E;
+  --color-error-content: #254A2D;
+
+  --radius-selector: 0.5rem;
+  --radius-field: 0.375rem;
+  --radius-box: 1rem;
+
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  --border: 1px;
+
+  --depth: 0;
+  --noise: 0;
+}
