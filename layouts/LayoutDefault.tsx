@@ -6,40 +6,40 @@ import { Link } from "../components/Link.js";
 
 export default function LayoutDefault({ children }: { children: React.ReactNode }) {
   return (
-    <div className={"flex max-w-5xl m-auto"}>
-      <Sidebar>
+    <div className={"min-h-screen"}>
+      <Header>
         <Logo />
-        <Link href="/">Welcome</Link>
-      </Sidebar>
+        <nav className={"flex items-center gap-6"}>
+          <Link href="/">Home</Link>
+        </nav>
+      </Header>
       <Content>{children}</Content>
     </div>
   );
 }
 
-function Sidebar({ children }: { children: React.ReactNode }) {
+function Header({ children }: { children: React.ReactNode }) {
   return (
-    <div id="sidebar" className={"p-5 flex flex-col shrink-0 border-r-2 border-r-gray-200"}>
-      {children}
-    </div>
+    <header className={"border-b border-gray-200"}>
+      <div className={"max-w-5xl mx-auto px-5 py-4 flex items-center justify-between"}>
+        {children}
+      </div>
+    </header>
   );
 }
 
 function Content({ children }: { children: React.ReactNode }) {
   return (
-    <div id="page-container">
-      <div id="page-content" className={"p-5 pb-12 min-h-screen"}>
-        {children}
-      </div>
-    </div>
+    <main className={"max-w-5xl mx-auto px-5 py-8"}>
+      {children}
+    </main>
   );
 }
 
 function Logo() {
   return (
-    <div className={"p-5 mb-2"}>
-      <a href="/">
-        <img src={logoUrl} height={64} width={64} alt="logo" />
-      </a>
-    </div>
+    <a href="/" className={"flex items-center"}>
+      <img src={logoUrl} height={40} width={40} alt="logo" />
+    </a>
   );
 }
