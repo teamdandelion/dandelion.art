@@ -4,7 +4,11 @@ import "./tailwind.css";
 import logoUrl from "../assets/logo.svg";
 import { Link } from "../components/Link.js";
 
-export default function LayoutDefault({ children }: { children: React.ReactNode }) {
+export default function LayoutDefault({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <div className={"min-h-screen"}>
       <Header>
@@ -21,7 +25,11 @@ export default function LayoutDefault({ children }: { children: React.ReactNode 
 function Header({ children }: { children: React.ReactNode }) {
   return (
     <header className={"border-b border-gray-200"}>
-      <div className={"max-w-5xl mx-auto px-5 py-4 flex items-center justify-between"}>
+      <div
+        className={
+          "max-w-5xl mx-auto px-5 py-4 flex items-center justify-between"
+        }
+      >
         {children}
       </div>
     </header>
@@ -29,11 +37,7 @@ function Header({ children }: { children: React.ReactNode }) {
 }
 
 function Content({ children }: { children: React.ReactNode }) {
-  return (
-    <main className={"max-w-5xl mx-auto px-5 py-8"}>
-      {children}
-    </main>
-  );
+  return <main className={"max-w-5xl mx-auto px-5 py-8"}>{children}</main>;
 }
 
 function Logo() {
