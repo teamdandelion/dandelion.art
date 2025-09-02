@@ -12,8 +12,8 @@ export interface PodProps {
 }
 
 export const defaultStemPodProps: PodProps = {
-  width: 6,
-  height: 16,
+  width: 4,
+  height: 12,
   topTaper: 0.3,
   topCurve: 0.9,
   topCurveHeight: 0.7,

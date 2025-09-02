@@ -11,7 +11,7 @@ export interface StemProps {
 
 export const defaultStemProps: StemProps = {
   length: 120,
-  width: 1.5,
+  width: 1,
   rigidity: 0.93,
   podProps: defaultStemPodProps,
   flowField: new FlowField(1, 1),
