@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Run TypeScript compiler
+echo "🔍 Checking TypeScript..."
+bun tsc --noEmit || exit 1
+
+# Run lint-staged for formatting
+echo "✨ Running formatters..."
+bunx lint-staged

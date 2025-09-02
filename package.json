@@ -7,7 +7,8 @@
     "format": "biome format --write .",
     "preview:wrangler": "wrangler pages dev",
     "deploy:wrangler": "wrangler pages deploy",
-    "deploy": "run-s build deploy:wrangler"
+    "deploy": "run-s build deploy:wrangler",
+    "prepare": "husky"
   },
   "dependencies": {
     "vike": "^0.4.237",
@@ -18,17 +19,19 @@
     "vike-cloudflare": "^0.1.7"
   },
   "devDependencies": {
-    "typescript": "^5.9.2",
-    "vite": "^7.1.3",
     "@biomejs/biome": "2.2.2",
+    "@cloudflare/workers-types": "^4.20250823.0",
+    "@tailwindcss/vite": "^4.1.12",
     "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.7",
-    "tailwindcss": "^4.1.12",
-    "@tailwindcss/vite": "^4.1.12",
     "daisyui": "^5.0.50",
-    "@cloudflare/workers-types": "^4.20250823.0",
-    "wrangler": "^4.32.0",
-    "npm-run-all2": "^8.0.4"
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.6",
+    "npm-run-all2": "^8.0.4",
+    "tailwindcss": "^4.1.12",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3",
+    "wrangler": "^4.32.0"
   },
   "type": "module"
 }
