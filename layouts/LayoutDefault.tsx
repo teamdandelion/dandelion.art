@@ -3,6 +3,7 @@ import "./style.css";
 import "./tailwind.css";
 import logoUrl from "../assets/logo.svg";
 import { Link } from "../components/Link.js";
+import { ThemeToggle } from "../components/ThemeToggle.js";
 
 export default function LayoutDefault({
   children,
@@ -10,12 +11,15 @@ export default function LayoutDefault({
   children: React.ReactNode;
 }) {
   return (
-    <div className={"min-h-screen"}>
+    <div className={"min-h-screen bg-base-100"}>
       <Header>
         <Logo />
-        <nav className={"flex items-center gap-6"}>
-          <Link href="/">Home</Link>
-        </nav>
+        <div className={"flex items-center gap-6"}>
+          <nav className={"flex items-center gap-6"}>
+            <Link href="/">Home</Link>
+          </nav>
+          <ThemeToggle />
+        </div>
       </Header>
       <Content>{children}</Content>
     </div>
@@ -24,7 +28,7 @@ export default function LayoutDefault({
 
 function Header({ children }: { children: React.ReactNode }) {
   return (
-    <header className={"border-b border-gray-200"}>
+    <header className={"border-b border-base-300 bg-base-200"}>
       <div
         className={
           "max-w-5xl mx-auto px-5 py-4 flex items-center justify-between"
