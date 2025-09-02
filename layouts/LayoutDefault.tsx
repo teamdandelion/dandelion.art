@@ -31,7 +31,7 @@ function Header({ children }: { children: React.ReactNode }) {
     <header className={"border-b border-base-300 bg-base-200"}>
       <div
         className={
-          "max-w-5xl mx-auto px-5 py-4 flex items-center justify-between"
+          "max-w-5xl mx-auto px-5 py-2 flex items-center justify-between"
         }
       >
         {children}
@@ -47,7 +47,7 @@ function Content({ children }: { children: React.ReactNode }) {
 function Logo() {
   return (
     <a href="/" className={"flex items-center"}>
-      <img src={logoUrl} height={40} width={40} alt="logo" />
+      <img src={logoUrl} height={28} width={28} alt="logo" />
     </a>
   );
 }
