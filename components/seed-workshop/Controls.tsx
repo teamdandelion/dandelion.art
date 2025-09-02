@@ -7,7 +7,7 @@ import { CollapsibleSection } from "./controls/CollapsibleSection";
 interface ControlsProps {
   onChange: (props: SeedProps) => void;
   currentProps: SeedProps;
-  svgRef: React.RefObject<SVGSVGElement>;
+  svgRef: React.RefObject<SVGSVGElement | null>;
 }
 
 export function Controls({ onChange, currentProps, svgRef }: ControlsProps) {

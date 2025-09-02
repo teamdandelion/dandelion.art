@@ -3,7 +3,7 @@ import { Seed, createSeed } from "../../components/seed/Seed";
 import { Controls } from "../../components/seed-workshop/Controls";
 import { FlowField } from "../../lib/flowField";
 
-export default function Page(): JSX.Element {
+export default function Page() {
   const [seedProps, setSeedProps] = useState(() =>
     createSeed({
       flowField: new FlowField(1.6, 1),

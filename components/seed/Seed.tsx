@@ -1,7 +1,7 @@
 import { FlowField } from "../../lib/flowField";
 import { Parachute, ParachuteProps, defaultParachuteProps } from "./Parachute";
-import { Stem, StemProps, defaultStemProps } from "./Stem";
 import { FlowFieldDebug } from "./FlowFieldDebug";
+import { Stem, StemProps, defaultStemProps } from "./Stem";
 
 export interface SeedProps {
   flowField: FlowField;
