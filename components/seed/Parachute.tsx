@@ -29,9 +29,15 @@ export const defaultParachuteProps: ParachuteProps = {
 };
 
 export function Parachute(props: ParachuteProps) {
-  const generateArm = (startAngle: number, armLength: number) => {
+  const rootRadius = 1; // Radius for the root offset circle
+
+  const generateArm = (
+    startPoint: { x: number; y: number },
+    startAngle: number,
+    armLength: number,
+  ) => {
     return props.flowField.followPath(
-      { x: 0, y: 0 },
+      startPoint,
       startAngle,
       props.numSteps,
       armLength / props.numSteps,
@@ -45,7 +51,19 @@ export function Parachute(props: ParachuteProps) {
       props.armLength * Math.pow(props.armLengthDecay, distFromCenter);
     const angle =
       (i * props.angleRange) / props.numArms + props.angleOffset * Math.PI;
-    const { points, angle: endAngle } = generateArm(angle, armLength);
+
+    // Calculate root offset for more natural convergence
+    const rootAngle = (i * 2 * Math.PI) / props.numArms;
+    const startPoint = {
+      x: Math.cos(rootAngle) * rootRadius,
+      y: Math.sin(rootAngle) * rootRadius,
+    };
+
+    const { points, angle: endAngle } = generateArm(
+      startPoint,
+      angle,
+      armLength,
+    );
 
     // Create individual line segments with varying widths
     const segments = points.slice(1).map((point, index) => {
@@ -84,5 +102,10 @@ export function Parachute(props: ParachuteProps) {
     );
   });
 
-  return <>{arms}</>;
+  return (
+    <>
+      {arms}
+      <circle cx={0} cy={0} r={rootRadius * 0.85} fill="black" />
+    </>
+  );
 }
