@@ -5,10 +5,9 @@ export default function Page() {
       <div className="flex flex-col md:flex-row gap-8 items-start">
         <div className="w-full md:w-1/2">
           <p>
-            Hi! I'm Dandelion Mané. Welcome to my personal site! I'm a software
+            I'm Dandelion Mané. Welcome to my personal site! I'm a software
             engineer, a generative artist, a social dancer, and a spiritually
-            curious human. I've made this website to share art, thoughts, and a
-            bit of my vibe.
+            curious human.
           </p>
           <p className="mt-4">
             This page is under construction, and I'm still deciding exactly how
