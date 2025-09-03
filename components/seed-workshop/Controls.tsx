@@ -28,7 +28,7 @@ export function Controls({ onChange, currentProps, svgRef }: ControlsProps) {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+    <div className="flex flex-col gap-4">
       <CollapsibleSection title="Parachute" defaultExpanded>
         <ParachuteControls
           value={currentProps.parachuteProps}
@@ -79,17 +79,7 @@ export function Controls({ onChange, currentProps, svgRef }: ControlsProps) {
         />
       </CollapsibleSection>
 
-      <button
-        onClick={handleDownload}
-        style={{
-          padding: "8px 16px",
-          background: "#4CAF50",
-          color: "white",
-          border: "none",
-          borderRadius: "4px",
-          cursor: "pointer",
-        }}
-      >
+      <button onClick={handleDownload} className="btn btn-primary btn-sm">
         Download SVG
       </button>
     </div>

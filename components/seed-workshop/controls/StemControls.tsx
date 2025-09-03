@@ -10,7 +10,7 @@ interface StemControlsProps {
 export function StemControls({ value, onChange }: StemControlsProps) {
   return (
     <section>
-      <h3 style={{ color: "white", marginBottom: "8px" }}>Stem</h3>
+      <h3 className="text-base-content font-semibold mb-2">Stem</h3>
       <Slider
         label="Length"
         value={value.length}

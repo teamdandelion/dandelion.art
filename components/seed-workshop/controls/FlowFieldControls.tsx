@@ -14,7 +14,7 @@ export function FlowFieldControls({
 }: FlowFieldControlsProps) {
   return (
     <section>
-      <h3 style={{ color: "white", marginBottom: "8px" }}>Flow Field</h3>
+      <h3 className="text-base-content font-semibold mb-2">Flow Field</h3>
       <Slider
         label="Intensity"
         value={value.intensity}
@@ -39,20 +39,14 @@ export function FlowFieldControls({
         max={2}
         step={0.05}
       />
-      <label
-        style={{
-          color: "white",
-          display: "flex",
-          gap: "8px",
-          alignItems: "center",
-        }}
-      >
+      <label className="flex items-center gap-2 text-base-content cursor-pointer">
         <input
           type="checkbox"
           checked={showField}
           onChange={(e) => onChange({ showField: e.target.checked })}
+          className="checkbox checkbox-primary checkbox-sm"
         />
-        Show Field
+        <span className="text-sm">Show Field</span>
       </label>
     </section>
   );

@@ -16,23 +16,15 @@ export function CollapsibleSection({
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   return (
-    <div style={{ marginLeft: indent ? "16px" : "0" }}>
+    <div className={indent ? "ml-4" : ""}>
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        style={{
-          background: "none",
-          border: "none",
-          color: "white",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          padding: "4px 0",
-          width: "100%",
-          textAlign: "left",
-        }}
+        className="btn btn-ghost btn-sm w-full justify-start text-base-content hover:bg-base-300 px-2"
       >
-        <span style={{ transform: `rotate(${isExpanded ? 90 : 0}deg)` }}>
+        <span
+          className="transition-transform duration-200"
+          style={{ transform: `rotate(${isExpanded ? 90 : 0}deg)` }}
+        >
           ▸
         </span>
         {title}

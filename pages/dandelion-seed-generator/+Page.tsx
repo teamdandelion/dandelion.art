@@ -13,48 +13,28 @@ export default function Page() {
   const svgRef = useRef<SVGSVGElement>(null);
 
   return (
-    <div style={{ display: "flex", height: "calc(100vh - 60px)" }}>
-      <main
-        style={{
-          flex: 1,
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "20px",
-        }}
-      >
-        <svg
-          ref={svgRef}
-          width="600"
-          height="600"
-          viewBox="-20 -80 50 200"
-          preserveAspectRatio="xMidYMid meet"
-          style={{
-            background: "white",
-            borderRadius: 8,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-          }}
-        >
-          <Seed {...seedProps} />
-        </svg>
+    <div className="flex flex-col lg:flex-row h-[calc(100vh-3.5rem)]">
+      <main className="flex-1 flex items-center justify-center p-4 lg:p-8 bg-base-100">
+        <div className="w-full max-w-2xl aspect-square">
+          <svg
+            ref={svgRef}
+            className="w-full h-full bg-base-100 rounded-lg shadow-xl border border-base-300"
+            viewBox="-20 -80 50 200"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <Seed {...seedProps} />
+          </svg>
+        </div>
       </main>
 
-      <aside
-        style={{
-          width: "300px",
-          padding: "20px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "20px",
-          overflowY: "auto",
-          background: "#242424",
-        }}
-      >
-        <Controls
-          onChange={setSeedProps}
-          currentProps={seedProps}
-          svgRef={svgRef}
-        />
+      <aside className="w-full lg:w-80 bg-base-200 border-t lg:border-t-0 lg:border-l border-base-300">
+        <div className="h-full overflow-y-auto p-4 lg:p-6">
+          <Controls
+            onChange={setSeedProps}
+            currentProps={seedProps}
+            svgRef={svgRef}
+          />
+        </div>
       </aside>
     </div>
   );

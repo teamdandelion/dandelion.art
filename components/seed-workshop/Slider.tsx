@@ -16,9 +16,9 @@ export function Slider({
   step,
 }: SliderProps) {
   return (
-    <label>
-      <div style={{ color: "white", marginBottom: "4px" }}>{label}</div>
-      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+    <label className="block">
+      <div className="text-base-content text-sm mb-1">{label}</div>
+      <div className="flex items-center gap-2">
         <input
           type="range"
           min={min}
@@ -26,9 +26,9 @@ export function Slider({
           step={step}
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          style={{ flex: 1 }}
+          className="range range-xs range-primary flex-1"
         />
-        <span style={{ color: "white", minWidth: "36px", textAlign: "right" }}>
+        <span className="text-base-content text-sm min-w-[36px] text-right">
           {value.toFixed(step >= 1 ? 0 : step >= 0.1 ? 1 : 2)}
         </span>
       </div>
