@@ -14,13 +14,27 @@ export default function Page() {
 
   return (
     <div className="flex flex-col lg:flex-row h-[calc(100vh-3.5rem)]">
-      <main className="flex-1 flex items-center justify-center p-4 lg:p-8 bg-base-100">
+      <main className="flex-1 flex flex-col items-center justify-center p-4 lg:p-8 bg-base-100 relative">
+        {/* Main large preview */}
         <div className="w-full max-w-2xl aspect-square">
           <svg
             ref={svgRef}
             className="w-full h-full bg-base-100 rounded-lg shadow-xl border border-base-300"
             viewBox="-20 -80 50 200"
             preserveAspectRatio="xMidYMid meet"
+          >
+            <Seed {...seedProps} />
+          </svg>
+        </div>
+
+        {/* Header-sized preview - positioned absolutely */}
+        <div className="absolute top-4 left-4 flex items-center gap-2 p-2 bg-base-200 rounded-lg shadow-lg">
+          <svg
+            width="32"
+            height="32"
+            viewBox="-15 -70 40 140"
+            preserveAspectRatio="xMidYMid meet"
+            className="bg-base-100 rounded border border-base-300"
           >
             <Seed {...seedProps} />
           </svg>
