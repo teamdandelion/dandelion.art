@@ -1,5 +1,6 @@
 import type { Config } from "vike/types";
 import vikeReact from "vike-react/config";
+import vikeCloudflare from "vike-cloudflare/config";
 import Layout from "../layouts/LayoutDefault.js";
 
 // Default config (can be overridden by pages)
@@ -13,5 +14,5 @@ export default {
   title: "dandelion.art",
   description: "Dandelion Mané's personal site.",
 
-  extends: vikeReact,
+  extends: [vikeReact, vikeCloudflare],
 } satisfies Config;
