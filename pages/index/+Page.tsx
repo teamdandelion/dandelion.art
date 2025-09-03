@@ -1,5 +1,3 @@
-import qqlImage from "../../assets/art/qql-276.png";
-
 export default function Page() {
   return (
     <>
@@ -20,9 +18,11 @@ export default function Page() {
         </div>
         <div className="w-1/2">
           <img
-            src={qqlImage}
+            src="/art/qql-276.png"
             alt="QQL #276"
             className="w-full h-auto rounded-lg shadow-lg"
+            loading="eager"
+            fetchPriority="high"
           />
           <p className="text-sm text-center mt-2 text-base-content/70">
             <a

@@ -6,6 +6,7 @@ export default function HeadDefault() {
   return (
     <>
       <link rel="icon" href={logoUrl} />
+      <link rel="preload" as="image" href="/art/qql-276.png" />
       <script
         dangerouslySetInnerHTML={{
           __html: `
