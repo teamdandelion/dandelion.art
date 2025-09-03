@@ -12,8 +12,9 @@ export default function Page() {
           </p>
           <p className="mt-4">
             This page is under construction, and I'm still deciding exactly how
-            and what I'd like to share. For now, please enjoy this QQL, a
-            project on which I collaborated with Tyler Hobbs in 2022.
+            and what I'd like to share. For now, please enjoy this image from
+            QQL, a generative art project that I co-created with Tyler Hobbs in
+            2022.
           </p>
         </div>
         <div className="w-1/2">
@@ -32,9 +33,6 @@ export default function Page() {
               QQL #276
             </a>
             , by Tyler Hobbs and Dandelion Mané (2022)
-          </p>
-          <p className="text-xs text-center mt-0 text-base-content/70 italic">
-            Seed discovered by Michael Connery (2023)
           </p>
         </div>
       </div>
