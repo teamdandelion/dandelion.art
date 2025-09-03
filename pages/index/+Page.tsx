@@ -7,10 +7,15 @@ export default function Page() {
       <div className="flex gap-8 items-start">
         <div className="w-1/2">
           <p>
-            Hi! I'm Dandelion Mané. Welcome to my personal site! I'm a
-            spiritually curious human, a software enginer and generative artist,
-            a partner dancer, snowboarder, and avid reader. I've made this
-            website to share vibes, thoughts, and some art.
+            Hi! I'm Dandelion Mané. Welcome to my personal site! I'm a software
+            engineer, a generative artist, a partner dancer, and a spiritually
+            curious human. I've made this website to share art, thoughts, and a
+            bit of my vibe.
+          </p>
+          <p className="mt-4">
+            This page is under construction, and I'm still deciding exactly how
+            and what I'd like to share. For now, please enjoy this QQL, a
+            project on which I collaborated with Tyler Hobbs in 2022.
           </p>
         </div>
         <div className="w-1/2">
@@ -26,11 +31,7 @@ export default function Page() {
             >
               QQL #276
             </a>
-            , by{" "}
-            <a href="https://www.tylerxhobbs.com" className="link link-primary">
-              Tyler Hobbs
-            </a>{" "}
-            and Dandelion Mané (2022)
+            , by Tyler Hobbs and Dandelion Mané (2022)
           </p>
           <p className="text-xs text-center mt-0 text-base-content/70 italic">
             Seed discovered by Michael Connery (2023)
