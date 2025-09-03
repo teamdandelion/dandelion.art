@@ -1,9 +1,9 @@
 import "./style.css";
 
 import "./tailwind.css";
+import logoUrl from "../assets/logo.svg";
 import { Link } from "../components/Link.js";
 import { ThemeToggle } from "../components/ThemeToggle.js";
-import { DandelionLogo } from "../components/DandelionLogo.js";
 
 export default function LayoutDefault({
   children,
@@ -47,7 +47,7 @@ function Content({ children }: { children: React.ReactNode }) {
 function Logo() {
   return (
     <a href="/" className={"flex items-center"}>
-      <DandelionLogo />
+      <img src={logoUrl} height={28} width={28} alt="logo" />
     </a>
   );
 }

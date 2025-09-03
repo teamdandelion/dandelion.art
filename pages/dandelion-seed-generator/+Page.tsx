@@ -20,7 +20,7 @@ export default function Page() {
           <svg
             ref={svgRef}
             className="w-full h-full bg-base-100 rounded-lg shadow-xl border border-base-300"
-            viewBox="-20 -80 50 200"
+            viewBox="-25 -85 60 210"
             preserveAspectRatio="xMidYMid meet"
           >
             <Seed {...seedProps} />
@@ -32,7 +32,7 @@ export default function Page() {
           <svg
             width="32"
             height="32"
-            viewBox="-15 -70 40 140"
+            viewBox="-25 -85 60 210"
             preserveAspectRatio="xMidYMid meet"
             className="bg-base-100 rounded border border-base-300"
           >

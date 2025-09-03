@@ -11,7 +11,7 @@ export function DandelionLogo() {
     <svg
       width="32"
       height="32"
-      viewBox="-15 -70 40 140"
+      viewBox="-25 -85 60 210"
       preserveAspectRatio="xMidYMid meet"
       className="hover:scale-110 transition-transform duration-300"
     >
