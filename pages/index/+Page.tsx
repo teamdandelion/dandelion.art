@@ -2,8 +2,8 @@ export default function Page() {
   return (
     <>
       <h1 className={"font-bold text-3xl pb-4"}>dandelion.art</h1>
-      <div className="flex gap-8 items-start">
-        <div className="w-1/2">
+      <div className="flex flex-col md:flex-row gap-8 items-start">
+        <div className="w-full md:w-1/2">
           <p>
             Hi! I'm Dandelion Mané. Welcome to my personal site! I'm a software
             engineer, a generative artist, a social dancer, and a spiritually
@@ -17,7 +17,7 @@ export default function Page() {
             2022.
           </p>
         </div>
-        <div className="w-1/2">
+        <div className="w-full md:w-1/2">
           <img
             src="/art/qql-276.png"
             alt="QQL #276"
