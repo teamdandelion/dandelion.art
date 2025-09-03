@@ -47,7 +47,13 @@ function Content({ children }: { children: React.ReactNode }) {
 function Logo() {
   return (
     <a href="/" className={"flex items-center"}>
-      <img src={logoUrl} height={28} width={28} alt="logo" />
+      <img
+        src={logoUrl}
+        height={28}
+        width={28}
+        alt="logo"
+        className="[html[data-theme='dark']_&]:invert"
+      />
     </a>
   );
 }
