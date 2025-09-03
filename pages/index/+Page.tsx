@@ -6,7 +6,7 @@ export default function Page() {
         <div className="w-1/2">
           <p>
             Hi! I'm Dandelion Mané. Welcome to my personal site! I'm a software
-            engineer, a generative artist, a partner dancer, and a spiritually
+            engineer, a generative artist, a social dancer, and a spiritually
             curious human. I've made this website to share art, thoughts, and a
             bit of my vibe.
           </p>

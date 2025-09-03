@@ -1,6 +1,90 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
+/* Cringe Sans Font Family */
+@font-face {
+  font-family: "Cringe Sans";
+  src: url("/fonts/BNCringeSans-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Cringe Sans";
+  src: url("/fonts/BNCringeSans-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Cringe Sans";
+  src: url("/fonts/BNCringeSans-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Cringe Sans";
+  src: url("/fonts/BNCringeSans-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Cringe Sans";
+  src: url("/fonts/BNCringeSans-Black.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+}
+
+/* Josefin Sans Font Family */
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("/fonts/JosefinSans-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("/fonts/JosefinSans-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("/fonts/JosefinSans-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("/fonts/JosefinSans-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Josefin Sans";
+  src: url("/fonts/JosefinSans-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* Apply fonts globally */
+body {
+  font-family: "Josefin Sans", sans-serif;
+  font-size: 1.125rem; /* 18px base */
+  font-weight: 300; /* Light weight */
+}
+
+h1 {
+  font-family: "Cringe Sans", sans-serif;
+  font-size: 3rem; /* 48px */
+}
+
 @plugin "daisyui/theme" {
   name: "light";
   default: true;
