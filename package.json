@@ -14,7 +14,7 @@
   "dependencies": {
     "@astrojs/mdx": "^7.0.8",
     "@astrojs/react": "^6.0.4",
-    "@teamdandelion/polysome": "1.0.0",
+    "@teamdandelion/polysome": "1.1.0",
     "astro": "^7.2.6",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
