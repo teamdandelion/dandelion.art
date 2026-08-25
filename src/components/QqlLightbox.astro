@@ -1,4 +1,11 @@
-<dialog class="qql-lightbox" data-qql-lightbox aria-label="Expanded QQL artwork">
+<div
+  class="qql-lightbox"
+  data-qql-lightbox
+  role="dialog"
+  aria-modal="true"
+  aria-label="Expanded QQL artwork"
+  hidden
+>
   <figure class="qql-lightbox__figure">
     <img data-qql-lightbox-image alt="" />
     <button
@@ -12,19 +19,30 @@
       </svg>
     </button>
   </figure>
-</dialog>
+</div>
 
 <script>
-  const dialog = document.querySelector<HTMLDialogElement>("[data-qql-lightbox]");
-  const image = dialog?.querySelector<HTMLImageElement>("[data-qql-lightbox-image]");
-  const closeButton = dialog?.querySelector<HTMLButtonElement>("[data-qql-lightbox-close]");
+  const lightbox = document.querySelector<HTMLElement>("[data-qql-lightbox]");
+  const image = lightbox
+    ? lightbox.querySelector<HTMLImageElement>("[data-qql-lightbox-image]")
+    : null;
+  const closeButton = lightbox
+    ? lightbox.querySelector<HTMLButtonElement>("[data-qql-lightbox-close]")
+    : null;
 
-  if (dialog && image && closeButton) {
+  if (lightbox && image && closeButton) {
     let imageRequest = 0;
+    let previousFocus: HTMLElement | null = null;
 
-    const close = () => dialog.close();
+    const close = () => {
+      if (lightbox.hidden) return;
+      imageRequest++;
+      lightbox.hidden = true;
+      document.documentElement.classList.remove("qql-lightbox-open");
+      if (previousFocus) previousFocus.focus();
+    };
 
-    document.addEventListener("click", async (event) => {
+    document.addEventListener("click", (event) => {
       const target = event.target;
       if (!(target instanceof Element)) return;
 
@@ -38,36 +56,27 @@
       const request = ++imageRequest;
       image.src = preview.currentSrc || preview.src;
       image.alt = trigger.dataset.qqlLightboxAlt || preview.alt;
-      dialog.showModal();
+      previousFocus = trigger;
+      lightbox.hidden = false;
       document.documentElement.classList.add("qql-lightbox-open");
+      closeButton.focus();
 
       const highResolutionImage = new Image();
+      highResolutionImage.addEventListener("load", () => {
+        if (request === imageRequest && !lightbox.hidden) image.src = source;
+      });
       highResolutionImage.src = source;
-
-      try {
-        await highResolutionImage.decode();
-      } catch {
-        return;
-      }
-
-      if (request === imageRequest && dialog.open) {
-        image.src = source;
-      }
     });
 
     closeButton.addEventListener("click", close);
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && dialog.open) {
+      if (event.key === "Escape" && !lightbox.hidden) {
         event.preventDefault();
         close();
       }
     });
-    dialog.addEventListener("click", (event) => {
-      if (event.target === dialog) close();
-    });
-    dialog.addEventListener("close", () => {
-      imageRequest++;
-      document.documentElement.classList.remove("qql-lightbox-open");
+    lightbox.addEventListener("click", (event) => {
+      if (event.target === lightbox) close();
     });
   }
 </script>
@@ -78,26 +87,22 @@
   }
 
   .qql-lightbox {
+    position: fixed;
+    z-index: 100;
+    inset: 0;
     width: 100vw;
-    max-width: none;
     height: 100dvh;
-    max-height: none;
     margin: 0;
     padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right))
       max(0.75rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
     overflow: hidden;
-    border: 0;
-    background: transparent;
-  }
-
-  .qql-lightbox[open] {
-    display: grid;
-    place-items: center;
-  }
-
-  .qql-lightbox::backdrop {
     background: rgb(3 1 18 / 92%);
     backdrop-filter: blur(12px) saturate(85%);
+  }
+
+  .qql-lightbox:not([hidden]) {
+    display: grid;
+    place-items: center;
   }
 
   .qql-lightbox__figure {
@@ -174,7 +179,7 @@
   }
 
   @media (prefers-reduced-transparency: reduce) {
-    .qql-lightbox::backdrop {
+    .qql-lightbox {
       backdrop-filter: none;
     }
 
