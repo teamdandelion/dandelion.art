@@ -15,6 +15,16 @@
     grid-column: 1;
   }
 
+  .home-page > :global(ul) {
+    grid-column: 1;
+    list-style: disc;
+    padding-inline-start: 1.25rem;
+  }
+
+  .home-page > :global(ul li + li) {
+    margin-top: 0.5rem;
+  }
+
   .home-page > :global(.qql-feature) {
     grid-column: 2;
     grid-row: 1 / span 20;
@@ -27,6 +37,7 @@
     }
 
     .home-page > :global(p),
+    .home-page > :global(ul),
     .home-page > :global(.qql-feature) {
       grid-column: 1;
       grid-row: auto;

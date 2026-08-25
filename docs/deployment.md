@@ -16,6 +16,11 @@ Cloudflare's GitHub integration. A merge to `main` deploys the production
 version. The custom domain is attached to the Worker in Cloudflare rather than
 declared in `wrangler.toml`, so preview deployments cannot affect it.
 
+The `Workers preview comment` workflow updates one pull request comment after
+each Workers build, including the commit and branch preview URLs and a Pacific
+time timestamp. It finds the pull request from the build's commit SHA, avoiding
+a race when a branch is pushed immediately before its pull request is created.
+
 Keep **Preview URLs** enabled under the Worker's **Domains** settings. A preview
 build runs `wrangler versions upload`, which uploads a version but cannot enable
 the Worker's preview-routing setting on its own.

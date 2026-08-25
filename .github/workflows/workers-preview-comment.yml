@@ -1,0 +1,118 @@
+name: Workers preview comment
+
+on:
+  check_run:
+    types: [completed]
+
+permissions:
+  checks: read
+  contents: read
+  pull-requests: write
+
+jobs:
+  comment:
+    if: "${{ github.event.check_run.name == 'Workers Builds: dandelion-art' }}"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update pull request comment
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const marker = "<!-- workers-preview-comment -->";
+            const check = context.payload.check_run;
+            const { owner, repo } = context.repo;
+
+            const { data: pulls } =
+              await github.rest.repos.listPullRequestsAssociatedWithCommit({
+                owner,
+                repo,
+                commit_sha: check.head_sha,
+              });
+            const openPulls = pulls.filter((pull) => pull.state === "open");
+
+            if (openPulls.length === 0) {
+              core.info(`No open pull request contains ${check.head_sha}.`);
+              return;
+            }
+
+            const summary = check.output?.summary ?? "";
+            const previewUrl = (label) => {
+              const match = summary.match(
+                new RegExp(`${label}:\\s+(https:\\/\\/\\S+)`),
+              );
+              if (!match) return undefined;
+
+              const url = new URL(match[1]);
+              return url.protocol === "https:" &&
+                url.hostname.endsWith(".workers.dev")
+                ? url.href
+                : undefined;
+            };
+
+            const commitPreview = previewUrl("Preview URL");
+            const branchPreview = previewUrl("Preview Alias URL");
+            const succeeded = check.conclusion === "success";
+            const status = succeeded
+              ? "✅ Deployment successful"
+              : `❌ Deployment ${check.conclusion ?? "failed"}`;
+            const previews = [
+              commitPreview && `[Commit preview](${commitPreview})`,
+              branchPreview && `[Branch preview](${branchPreview})`,
+            ]
+              .filter(Boolean)
+              .join(" · ");
+            const updated = new Intl.DateTimeFormat("en-US", {
+              timeZone: "America/Los_Angeles",
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "2-digit",
+              timeZoneName: "short",
+            }).format(new Date(check.completed_at));
+            const commitUrl = `https://github.com/${owner}/${repo}/commit/${check.head_sha}`;
+            const details = check.details_url
+              ? `[View logs](${check.details_url})`
+              : "Logs unavailable";
+            const body = [
+              marker,
+              "## Deploying with ☁️ Cloudflare Workers",
+              "",
+              "| Status | Commit | Preview URL | Updated (PT) |",
+              "| --- | --- | --- | --- |",
+              `| ${status} | [\`${check.head_sha.slice(0, 7)}\`](${commitUrl}) | ${previews || details} | ${updated} |`,
+              "",
+            ].join("\n");
+
+            for (const pull of openPulls) {
+              const comments = await github.paginate(
+                github.rest.issues.listComments,
+                {
+                  owner,
+                  repo,
+                  issue_number: pull.number,
+                  per_page: 100,
+                },
+              );
+              const existing = comments.find(
+                (comment) =>
+                  comment.user?.login === "github-actions[bot]" &&
+                  comment.body?.includes(marker),
+              );
+
+              if (existing) {
+                await github.rest.issues.updateComment({
+                  owner,
+                  repo,
+                  comment_id: existing.id,
+                  body,
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: pull.number,
+                  body,
+                });
+              }
+            }
