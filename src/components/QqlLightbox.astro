@@ -18,10 +18,10 @@
   </button>
   <figure class="qql-lightbox__figure">
     <div class="qql-lightbox__stage" data-qql-lightbox-stage>
-      <img data-qql-lightbox-image alt="" />
+      <img data-qql-lightbox-image alt="" draggable="false" />
       <div class="qql-loupe" data-qql-loupe aria-hidden="true">
         <div class="qql-loupe__glass">
-          <img data-qql-loupe-image alt="" />
+          <img data-qql-loupe-image alt="" draggable="false" />
           <span class="qql-loupe__shine"></span>
         </div>
       </div>
@@ -62,8 +62,8 @@
     loupe &&
     loupeImage
   ) {
-    const magnification = 3;
-    const touchOffset = 72;
+    const magnification = 4;
+    const touchOffset = 100;
     let imageRequest = 0;
     let previousFocus: HTMLElement | null = null;
     let previousPageInert = false;
@@ -112,21 +112,21 @@
       const radius = lensSize / 2;
       const rawX = latestPointer.clientX - imageBounds.left;
       const rawY = latestPointer.clientY - imageBounds.top;
-      const sourceMargin = radius / magnification;
-      const sourceX = Math.min(
-        imageBounds.width - sourceMargin,
-        Math.max(sourceMargin, rawX),
-      );
-      const sourceY = Math.min(
-        imageBounds.height - sourceMargin,
-        Math.max(sourceMargin, rawY),
-      );
       const displayX = Math.min(imageBounds.width - radius, Math.max(radius, rawX));
       const offset = activePointerType === "mouse" ? 0 : touchOffset;
       const minDisplayY = Math.max(0, radius + 8 - imageBounds.top);
       const displayY = Math.min(
         imageBounds.height - radius,
         Math.max(minDisplayY, rawY - offset),
+      );
+      const sourceMargin = radius / magnification;
+      const sourceX = Math.min(
+        imageBounds.width - sourceMargin,
+        Math.max(sourceMargin, displayX),
+      );
+      const sourceY = Math.min(
+        imageBounds.height - sourceMargin,
+        Math.max(sourceMargin, displayY),
       );
 
       loupe.style.transform = `translate3d(${displayX - radius}px, ${displayY - radius}px, 0)`;
@@ -227,6 +227,9 @@
     };
     stage.addEventListener("pointerup", finishTouchLoupe);
     stage.addEventListener("pointercancel", finishTouchLoupe);
+    for (const eventName of ["contextmenu", "dragstart", "selectstart"]) {
+      stage.addEventListener(eventName, (event) => event.preventDefault());
+    }
     window.addEventListener("resize", () => {
       imageBounds = null;
       hideLoupe();
@@ -286,6 +289,7 @@
     max-height: 100%;
     touch-action: none;
     user-select: none;
+    -webkit-user-select: none;
     -webkit-touch-callout: none;
   }
 
@@ -304,6 +308,8 @@
       100dvh - max(1.5rem, env(safe-area-inset-top) + env(safe-area-inset-bottom)) - 2.4rem
     );
     object-fit: contain;
+    pointer-events: none;
+    -webkit-user-drag: none;
     box-shadow: 0 24px 80px rgb(0 0 0 / 38%);
   }
 
@@ -312,7 +318,7 @@
     z-index: 2;
     top: 0;
     left: 0;
-    width: clamp(9.25rem, 38vw, 10.75rem);
+    width: clamp(11.75rem, 48vw, 13.75rem);
     aspect-ratio: 1;
     pointer-events: none;
     contain: layout paint style;
@@ -335,14 +341,16 @@
       0 14px 38px rgb(0 0 0 / 46%);
     transform: scale(0);
     transition:
-      transform 210ms cubic-bezier(0.2, 0.9, 0.25, 1.15),
-      opacity 120ms ease-out;
+      transform 340ms cubic-bezier(0.22, 0.65, 0.2, 1),
+      opacity 260ms ease-out;
     will-change: transform, opacity;
   }
 
   .qql-loupe--active .qql-loupe__glass {
     opacity: 1;
     transform: scale(1);
+    transition-duration: 460ms, 300ms;
+    transition-timing-function: cubic-bezier(0.18, 0.85, 0.24, 1.08), ease-out;
   }
 
   .qql-loupe__glass > img {
@@ -351,6 +359,8 @@
     left: 0;
     max-width: none;
     object-fit: fill;
+    pointer-events: none;
+    -webkit-user-drag: none;
     transform-origin: 0 0;
     will-change: transform;
   }
