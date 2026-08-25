@@ -1,0 +1,74 @@
+{
+  "renderer": {
+    "repository": "https://github.com/qql-art/qqlrs",
+    "commit": "8648a907b03367f37aade95902dbb7eca3a7208a",
+    "width": 1600,
+    "chunks": "2x1"
+  },
+  "output": {
+    "format": "webp",
+    "quality": 95
+  },
+  "pairs": [
+    [
+      {
+        "id": 162,
+        "seed": "0x039cd535c7d3bcb04e93ad44491b30185ee0a4c5f6b4c05459d1ffff14e10326"
+      },
+      {
+        "id": 319,
+        "seed": "0x039cd535c7d3bcb04e93ad44491b30185ee0a4c5998c01991bb9ffff13660026"
+      }
+    ],
+    [
+      {
+        "id": 276,
+        "seed": "0x0b62e5caff1b4f9605e78c3ca8016c0a4b4e23cbdc7209719f18ffff141120ce"
+      },
+      {
+        "id": 272,
+        "seed": "0x9707fc434ea43dd8287d1863b1e060d61751d37105413112cc01ffff1415834f"
+      }
+    ],
+    [
+      {
+        "id": 279,
+        "seed": "0x8367a713bc14212ab1bb8c55a778e43e50b8b927c270918efb06ffff10c14b0b"
+      },
+      {
+        "id": 281,
+        "seed": "0x34a2438811b7dd3d14aca7f31542d4666e4c37ea295fdef31b84ffff16610a97"
+      }
+    ],
+    [
+      {
+        "id": 2,
+        "seed": "0xe03a5189dac8182085e4adf66281f679fff2291d52a252d295b02feda9118a49"
+      },
+      {
+        "id": 328,
+        "seed": "0xe25ecd59478ce509232e37c2e0810fd4c655b8b4c9f834cb5b5bffff19118a49"
+      }
+    ],
+    [
+      {
+        "id": 288,
+        "seed": "0x44266f38ea9ef4e85a77310518b1cb6d5a56349be9aceb0cef0cffff14e90057"
+      },
+      {
+        "id": 287,
+        "seed": "0x44266f38ea9ef4e85a77310518b1cb6d5a56349be2770bec3950ffff14a9c057"
+      }
+    ],
+    [
+      {
+        "id": 278,
+        "seed": "0x4dc6750a016db9a96fef40d852e1faee11733db643d0733c0d15ffff11412b50"
+      },
+      {
+        "id": 282,
+        "seed": "0x8814ce9a6715f8a1428f14fc9f57601d1d5bd653ab2bba65f416ffff1eed4b53"
+      }
+    ]
+  ]
+}

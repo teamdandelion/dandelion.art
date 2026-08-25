@@ -1,0 +1,43 @@
+<article class="qql-page">
+  <slot />
+</article>
+
+<style>
+  .qql-page > :global(h1),
+  .qql-page > :global(.qql-intro),
+  .qql-page > :global(.qql-links) {
+    width: min(100%, 44rem);
+  }
+
+  .qql-page > :global(.qql-intro) {
+    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+    line-height: 1.5;
+  }
+
+  .qql-page > :global(.qql-links) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.25rem;
+    margin-block: 1.5rem 4rem;
+    padding-top: 1rem;
+    border-top: 1px solid color-mix(in oklch, currentColor 22%, transparent);
+  }
+
+  .qql-page > :global(.qql-links a) {
+    display: inline-flex;
+    gap: 0.3em;
+    align-items: baseline;
+  }
+
+  .qql-page > :global(.qql-links a::after) {
+    content: "↗";
+    font-size: 0.75em;
+    opacity: 0.65;
+    transition: transform 150ms ease;
+  }
+
+  .qql-page > :global(.qql-links a:hover::after),
+  .qql-page > :global(.qql-links a:focus-visible::after) {
+    transform: translate(0.1em, -0.1em);
+  }
+</style>
