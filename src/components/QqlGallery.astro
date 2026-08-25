@@ -32,7 +32,13 @@ const artworks = ids.map((id) => {
   {
     artworks.map(({ id, image }) => (
       <figure>
-        <div class="qql-frame">
+        <button
+          type="button"
+          class="qql-frame"
+          data-qql-lightbox-src={image.src}
+          data-qql-lightbox-alt={`Generative artwork QQL #${id}`}
+          aria-label={`Expand QQL #${id}`}
+        >
           <Picture
             src={image}
             alt={`Generative artwork QQL #${id}`}
@@ -44,7 +50,7 @@ const artworks = ids.map((id) => {
             fetchpriority={prioritize ? "high" : "auto"}
             decoding="async"
           />
-        </div>
+        </button>
         <figcaption>QQL #{id}</figcaption>
       </figure>
     ))
@@ -65,9 +71,20 @@ const artworks = ids.map((id) => {
   }
 
   .qql-frame {
+    display: block;
+    width: 100%;
+    padding: 0;
     overflow: hidden;
+    color: inherit;
+    cursor: zoom-in;
     aspect-ratio: 4 / 5;
+    border: 0;
     background: color-mix(in oklch, var(--color-base-200) 75%, transparent);
+  }
+
+  .qql-frame:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
   }
 
   .qql-frame :global(picture),
