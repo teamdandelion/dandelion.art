@@ -21,9 +21,6 @@ each Workers build, including the commit and branch preview URLs and a Pacific
 time timestamp. It finds the pull request from the build's commit SHA, avoiding
 a race when a branch is pushed immediately before its pull request is created.
 
-The former Cloudflare Pages project has been retired. Do not reconnect Pages;
-both preview and production deployments belong to the Worker.
-
 Keep **Preview URLs** enabled under the Worker's **Domains** settings. A preview
 build runs `wrangler versions upload`, which uploads a version but cannot enable
 the Worker's preview-routing setting on its own.
