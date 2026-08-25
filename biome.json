@@ -29,6 +29,8 @@
       "!*.mjs",
       "!*.spec.ts",
       "!**/*.ts.build-*.mjs",
+      "!.astro",
+      "!**/*.astro",
       "!dist/*",
       "!node_modules/*",
       "!**/.DS_Store"
@@ -44,6 +46,9 @@
       "includes": ["**/*.css"],
       "linter": {
         "rules": {
+          "correctness": {
+            "noUnknownProperty": "off"
+          },
           "suspicious": {
             "noUnknownAtRules": "off"
           }

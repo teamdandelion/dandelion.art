@@ -1,0 +1,68 @@
+---
+import logoUrl from "../assets/logo.svg?url";
+import ThemeToggle from "../components/ThemeToggle.astro";
+import "../styles/style.css";
+import "../styles/tailwind.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = "dandelion.art",
+  description = "Dandelion Mané's personal site.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <link rel="icon" href={logoUrl} />
+    <link rel="preload" as="image" href="/art/qql-276.png" />
+    <title>{title}</title>
+    <script is:inline>
+      (() => {
+        const savedTheme = localStorage.getItem("theme");
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        const theme = savedTheme || (prefersDark ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+  </head>
+  <body>
+    <div class="min-h-screen bg-base-100">
+      <header class="border-b border-base-300 bg-base-200">
+        <div
+          class="max-w-5xl mx-auto px-5 py-2 flex items-center justify-between"
+        >
+          <a href="/" class="flex items-center">
+            <img
+              src={logoUrl}
+              height="28"
+              width="28"
+              alt="logo"
+              class="[html[data-theme='dark']_&]:invert"
+            />
+          </a>
+          <div class="flex items-center gap-6">
+            <nav class="flex items-center gap-6">
+              <a href="/" aria-current={Astro.url.pathname === "/" ? "page" : undefined}>
+                Home
+              </a>
+            </nav>
+            <ThemeToggle />
+          </div>
+        </div>
+      </header>
+      <main class="max-w-5xl mx-auto px-5 py-8">
+        <slot />
+      </main>
+    </div>
+  </body>
+</html>
