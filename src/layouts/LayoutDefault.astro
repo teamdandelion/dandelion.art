@@ -14,7 +14,8 @@ const {
   title = "dandelion.art",
   description = "Dandelion Mané's personal site.",
 } = Astro.props;
-const hasQqlLightbox = Astro.url.pathname === "/" || Astro.url.pathname === "/art/qql";
+const pathname = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const hasQqlLightbox = pathname === "/" || pathname === "/art/qql";
 ---
 
 <!doctype html>
