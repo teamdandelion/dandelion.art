@@ -1,0 +1,93 @@
+---
+import LayoutDefault from "../../layouts/LayoutDefault.astro";
+
+const projects = [
+  {
+    title: "Polysome",
+    description: "An interactive generative artwork built from flowing fields of interacting motes.",
+    href: "/art/polysome",
+  },
+  {
+    title: "QQL",
+    description: "A personal selection from the collaborative generative art project I created with Tyler Hobbs.",
+    href: "/art/qql",
+  },
+];
+---
+
+<LayoutDefault
+  title="Art — dandelion.art"
+  description="Generative art projects by Dandelion Mané."
+>
+  <article class="art-index">
+    <h1>Art</h1>
+
+    <div class="projects">
+      {
+        projects.map((project) => (
+          <a class="project" href={project.href}>
+            <h2>{project.title}</h2>
+            <p>{project.description}</p>
+            <span aria-hidden="true">View project →</span>
+          </a>
+        ))
+      }
+    </div>
+  </article>
+</LayoutDefault>
+
+<style>
+  .art-index {
+    width: min(100%, 52rem);
+  }
+
+  .projects {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .project {
+    display: block;
+    padding: 1.5rem;
+    border: 1px solid color-mix(in oklch, currentColor 20%, transparent);
+    border-radius: 0.75rem;
+    transition:
+      border-color 150ms ease,
+      transform 150ms ease;
+  }
+
+  .project:hover,
+  .project:focus-visible {
+    border-color: color-mix(in oklch, currentColor 55%, transparent);
+    transform: translateY(-2px);
+  }
+
+  .project:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+
+  .project h2,
+  .project p {
+    margin: 0;
+  }
+
+  .project h2 {
+    font-size: 1.5rem;
+    font-weight: 500;
+  }
+
+  .project p {
+    max-width: 38rem;
+    margin-top: 0.5rem;
+    line-height: 1.55;
+    opacity: 0.75;
+  }
+
+  .project span {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+  }
+</style>
