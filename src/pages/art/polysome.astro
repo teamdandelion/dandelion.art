@@ -1,0 +1,198 @@
+---
+import logoUrl from "../../assets/logo.svg?url";
+import "../../styles/style.css";
+import "../../styles/tailwind.css";
+
+const title = "Polysome · Dandelion Mané";
+const description =
+  "Polysome is a generative artwork by Dandelion Mané, built from flowing fields of interacting motes.";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#05001a" />
+    <link rel="icon" href={logoUrl} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <main class="polysome" data-polysome>
+      <canvas aria-label="Polysome generative artwork"></canvas>
+
+      <a class="home-link" href="/" aria-label="Back to dandelion.art">
+        <img src={logoUrl} width="28" height="28" alt="" />
+        <span>dandelion.art</span>
+      </a>
+
+      <aside class="placard" aria-label="Artwork information">
+        <strong>Polysome</strong>
+        <span>Dandelion Mané</span>
+      </aside>
+    </main>
+
+    <script>
+      import { Instance, randomSeed } from "@teamdandelion/polysome";
+
+      const root = document.querySelector<HTMLElement>("[data-polysome]");
+      const canvas = root?.querySelector<HTMLCanvasElement>("canvas");
+
+      if (!root || !canvas) {
+        throw new Error("Polysome is missing its canvas");
+      }
+
+      const width = root.clientWidth;
+      const height = root.clientHeight;
+      const xDim = width >= height ? 1000 : (width / height) * 1000;
+      const yDim = width >= height ? (height / width) * 1000 : 1000;
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      const instance = new Instance(randomSeed(), xDim, yDim, {
+        maxFps: 30,
+        maxPixelRatio: 1.5,
+        autoResize: true,
+        pauseWhenHidden: true,
+      });
+
+      instance.setup(canvas);
+      if (reducedMotion.matches) {
+        instance.draw();
+      } else {
+        instance.start();
+      }
+
+      const handleMotionPreference = (event: MediaQueryListEvent) => {
+        if (event.matches) {
+          instance.stop();
+          instance.draw();
+        } else {
+          instance.start();
+        }
+      };
+
+      reducedMotion.addEventListener("change", handleMotionPreference);
+      window.addEventListener(
+        "pagehide",
+        () => {
+          reducedMotion.removeEventListener("change", handleMotionPreference);
+          instance.destroy();
+        },
+        { once: true },
+      );
+    </script>
+  </body>
+</html>
+
+<style>
+  :global(html),
+  :global(body) {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  :global(body) {
+    background: #05001a;
+    color: #f7f3ff;
+  }
+
+  .polysome,
+  canvas {
+    display: block;
+    height: 100%;
+    width: 100%;
+  }
+
+  .polysome {
+    isolation: isolate;
+    min-height: 100svh;
+    position: relative;
+  }
+
+  canvas {
+    inset: 0;
+    position: absolute;
+  }
+
+  .home-link,
+  .placard {
+    backdrop-filter: blur(12px);
+    background: rgb(5 0 26 / 42%);
+    border: 1px solid rgb(255 255 255 / 12%);
+    box-shadow: 0 8px 28px rgb(0 0 0 / 16%);
+    position: absolute;
+    z-index: 1;
+  }
+
+  .home-link {
+    align-items: center;
+    border-radius: 999px;
+    color: inherit;
+    display: flex;
+    font-size: 0.82rem;
+    gap: 0.55rem;
+    left: max(1rem, env(safe-area-inset-left));
+    letter-spacing: 0.04em;
+    padding: 0.45rem 0.75rem 0.45rem 0.5rem;
+    top: max(1rem, env(safe-area-inset-top));
+  }
+
+  .home-link img {
+    filter: invert(1);
+  }
+
+  .home-link:hover,
+  .home-link:focus-visible {
+    background: rgb(28 14 71 / 72%);
+  }
+
+  .home-link:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+  }
+
+  .placard {
+    align-items: end;
+    border-radius: 0.65rem;
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+    padding: 0.65rem 0.8rem;
+    right: max(1rem, env(safe-area-inset-right));
+  }
+
+  .placard strong {
+    color: #ee72ff;
+    font-family: "Cringe Sans", sans-serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    letter-spacing: 0.025em;
+  }
+
+  .placard span {
+    color: rgb(255 255 255 / 72%);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+  }
+
+  @media (max-width: 32rem) {
+    .home-link span {
+      display: none;
+    }
+
+    .home-link {
+      padding-right: 0.5rem;
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .home-link,
+    .placard {
+      backdrop-filter: none;
+      background: #110736;
+    }
+  }
+</style>
