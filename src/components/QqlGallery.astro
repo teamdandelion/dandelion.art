@@ -36,6 +36,7 @@ const artworks = ids.map((id) => {
           type="button"
           class="qql-frame"
           data-qql-lightbox-src={image.src}
+          data-qql-lightbox-zoom-src={`/art/qql-zoom/${id}.webp`}
           data-qql-lightbox-alt={`Generative artwork QQL #${id}`}
           data-qql-lightbox-title={`QQL #${id}`}
           aria-label={`Expand QQL #${id}`}

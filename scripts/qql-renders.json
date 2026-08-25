@@ -9,6 +9,12 @@
     "format": "webp",
     "quality": 95
   },
+  "zoomOutput": {
+    "width": 3200,
+    "format": "webp",
+    "quality": 92,
+    "path": "public/art/qql-zoom"
+  },
   "pairs": [
     [
       {
