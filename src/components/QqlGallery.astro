@@ -1,0 +1,109 @@
+---
+import { Picture } from "astro:assets";
+
+interface Props {
+  ids: number[];
+  columns?: 1 | 2 | 3;
+  prioritize?: boolean;
+}
+
+const { ids, columns = 2, prioritize = false } = Astro.props;
+const imageModules = import.meta.glob<{ default: ImageMetadata }>(
+  "../assets/qql-hires/*.webp",
+  { eager: true },
+);
+const sizes =
+  columns === 1
+    ? "(min-width: 64rem) 40rem, calc(100vw - 2.5rem)"
+    : columns === 2
+      ? "(min-width: 48rem) 30rem, calc(100vw - 2.5rem)"
+      : "(min-width: 64rem) 19rem, (min-width: 40rem) 30rem, calc(100vw - 2.5rem)";
+
+const artworks = ids.map((id) => {
+  const image = imageModules[`../assets/qql-hires/${id}.webp`]?.default;
+  if (!image) {
+    throw new Error(`Missing render for QQL #${id}`);
+  }
+  return { id, image };
+});
+---
+
+<div class:list={["qql-gallery", `qql-gallery--${columns}`]}>
+  {
+    artworks.map(({ id, image }) => (
+      <figure>
+        <div class="qql-frame">
+          <Picture
+            src={image}
+            alt={`Generative artwork QQL #${id}`}
+            formats={["avif"]}
+            fallbackFormat="webp"
+            widths={[480, 960, 1600]}
+            sizes={sizes}
+            loading={prioritize ? "eager" : "lazy"}
+            fetchpriority={prioritize ? "high" : "auto"}
+            decoding="async"
+          />
+        </div>
+        <figcaption>QQL #{id}</figcaption>
+      </figure>
+    ))
+  }
+</div>
+
+<style>
+  .qql-gallery {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1rem, 2.5vw, 1.75rem);
+    margin-block: 1.5rem 5rem;
+  }
+
+  figure {
+    min-width: 0;
+    margin: 0;
+  }
+
+  .qql-frame {
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    background: color-mix(in oklch, var(--color-base-200) 75%, transparent);
+  }
+
+  .qql-frame :global(picture),
+  .qql-frame :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .qql-frame :global(img) {
+    object-fit: cover;
+  }
+
+  figcaption {
+    margin-top: 0.55rem;
+    color: color-mix(in oklch, currentColor 68%, transparent);
+    font-size: 0.82rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+  }
+
+  @media (min-width: 40rem) {
+    .qql-gallery--2,
+    .qql-gallery--3 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .qql-gallery--1 {
+      width: min(100%, 40rem);
+      margin-inline: auto;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .qql-gallery--3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

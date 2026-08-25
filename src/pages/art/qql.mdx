@@ -1,0 +1,42 @@
+---
+layout: ../../layouts/LayoutDefault.astro
+title: QQL — dandelion.art
+description: A personal selection of outputs from QQL, a collaborative generative art project by Tyler Hobbs and Dandelion Mané.
+---
+
+import QqlGallery from "../../components/QqlGallery.astro";
+import QqlPage from "../../components/QqlPage.astro";
+
+<QqlPage>
+
+# QQL
+
+<div className="qql-intro">
+  QQL is a collaborative generative art project I created with Tyler Hobbs. 
+  Tyler and I were exploring the theme of community curation in generative art, so 
+  we made an algorithm with near limitless possibility, and invited generative art
+  collectors to decide which QQL "seeds" would be canonicalized as official QQLs. The 
+  images below are a small selection of the over three hundred QQLs that were officially
+  minted.
+</div>
+
+<nav className="qql-links" aria-label="Explore QQL">
+  <a href="https://qql.art/create">QQL generator</a>
+  <a href="https://www.tylerxhobbs.com/words/qql">Tyler’s essay on QQL</a>
+  <a href="https://www.tylerxhobbs.com/words/the-design-philosophy-of-the-qql-algorithm">Design philosophy</a>
+  <a href="https://qql.art/docs">QQL docs</a>
+</nav>
+
+<QqlGallery ids={[162, 319]} columns={2} prioritize />
+
+<QqlGallery ids={[276, 272]} columns={2} />
+
+<QqlGallery ids={[279, 281]} columns={2} />
+
+<QqlGallery ids={[2, 328]} columns={2} />
+
+<QqlGallery ids={[288, 287]} columns={2} />
+
+<QqlGallery ids={[278, 282]} columns={2} />
+
+</QqlPage>

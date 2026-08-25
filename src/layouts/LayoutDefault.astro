@@ -22,7 +22,11 @@ const {
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
     <link rel="icon" href={logoUrl} />
-    <link rel="preload" as="image" href="/art/qql-276.png" />
+    {
+      Astro.url.pathname === "/" && (
+        <link rel="preload" as="image" href="/art/qql-276.png" />
+      )
+    }
     <title>{title}</title>
     <script is:inline>
       (() => {
@@ -56,10 +60,15 @@ const {
                 Home
               </a>
               <a
-                href="/art/polysome"
-                aria-current={Astro.url.pathname === "/art/polysome" ? "page" : undefined}
+                href="/art"
+                aria-current={
+                  Astro.url.pathname === "/art" ||
+                  Astro.url.pathname.startsWith("/art/")
+                    ? "page"
+                    : undefined
+                }
               >
-                Polysome
+                Art
               </a>
             </nav>
             <ThemeToggle />
