@@ -5,6 +5,9 @@ import { defineConfig } from "astro/config";
 
 export default defineConfig({
   integrations: [mdx(), react()],
+  redirects: {
+    "/polysome": "/art/polysome",
+  },
   vite: {
     plugins: [tailwindcss()],
   },
