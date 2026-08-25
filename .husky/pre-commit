@@ -1,9 +1,9 @@
 #!/bin/sh
 
-# Run TypeScript compiler
-echo "🔍 Checking TypeScript..."
-bun tsc --noEmit || exit 1
+# Run the framework's production build, including its compile-time checks.
+echo "🔍 Checking production build..."
+npm run build || exit 1
 
 # Run lint-staged for formatting
 echo "✨ Running formatters..."
-bunx lint-staged
+npx lint-staged
