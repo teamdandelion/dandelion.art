@@ -1,4 +1,9 @@
 name = "dandelion-art"
-compatibility_date = "2024-09-29"
-pages_build_output_dir = "./dist/cloudflare"
-compatibility_flags = [ "nodejs_compat" ]
+compatibility_date = "2026-08-24"
+workers_dev = true
+preview_urls = true
+
+[assets]
+directory = "./dist"
+html_handling = "auto-trailing-slash"
+not_found_handling = "404-page"

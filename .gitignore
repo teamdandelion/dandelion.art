@@ -131,6 +131,9 @@ dist
 # Cloudflare
 .wrangler/
 
+# Astro
+.astro/
+
 # Vercel
 .vercel/
 

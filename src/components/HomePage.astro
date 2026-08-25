@@ -1,0 +1,35 @@
+<div class="home-page">
+  <slot />
+</div>
+
+<style>
+  .home-page {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 2rem;
+    row-gap: 1rem;
+    align-items: start;
+  }
+
+  .home-page > :global(p) {
+    grid-column: 1;
+  }
+
+  .home-page > :global(.qql-feature) {
+    grid-column: 2;
+    grid-row: 1 / span 20;
+  }
+
+  @media (max-width: 47.999rem) {
+    .home-page {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 1rem;
+    }
+
+    .home-page > :global(p),
+    .home-page > :global(.qql-feature) {
+      grid-column: 1;
+      grid-row: auto;
+    }
+  }
+</style>

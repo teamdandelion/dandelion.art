@@ -1,37 +1,35 @@
 {
   "scripts": {
-    "dev": "vike dev",
-    "build": "vike build",
-    "preview": "run-s build preview:wrangler",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "preview:worker": "npm run build && wrangler dev",
+    "check": "astro check && biome check .",
     "lint": "biome lint --write .",
     "format": "biome format --write .",
-    "preview:wrangler": "wrangler pages dev",
-    "deploy:wrangler": "wrangler pages deploy",
-    "deploy": "run-s build deploy:wrangler",
+    "deploy": "npm run build && wrangler deploy",
+    "deploy:preview": "npm run build && wrangler versions upload",
     "prepare": "husky"
   },
   "dependencies": {
-    "vike": "^0.4.237",
-    "@vitejs/plugin-react": "^5.0.1",
+    "@astrojs/mdx": "^7.0.8",
+    "@astrojs/react": "^6.0.4",
+    "astro": "^7.2.6",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "vike-react": "^0.6.5",
-    "vike-cloudflare": "0.2.7"
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.10",
     "@biomejs/biome": "2.2.2",
-    "@cloudflare/workers-types": "^4.20250823.0",
     "@tailwindcss/vite": "^4.1.12",
     "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.7",
     "daisyui": "^5.0.50",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.6",
-    "npm-run-all2": "^8.0.4",
     "tailwindcss": "^4.1.12",
     "typescript": "^5.9.2",
-    "vite": "^7.1.3",
-    "wrangler": "^4.32.0"
+    "wrangler": "^4.125.0"
   },
   "type": "module"
 }
