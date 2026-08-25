@@ -11,8 +11,7 @@ on:
         type: string
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 concurrency:
   group: update-polysome
@@ -28,11 +27,12 @@ jobs:
     env:
       POLYSOME_VERSION: ${{ github.event.client_payload.version || inputs.version }}
       POLYSOME_TAG: ${{ github.event.client_payload.tag || format('v{0}', inputs.version) }}
-      GH_TOKEN: ${{ github.token }}
+      GH_TOKEN: ${{ secrets.POLYSOME_UPDATE_TOKEN }}
     steps:
       - uses: actions/checkout@v6
         with:
           ref: main
+          token: ${{ secrets.POLYSOME_UPDATE_TOKEN }}
 
       - uses: actions/setup-node@v6
         with:

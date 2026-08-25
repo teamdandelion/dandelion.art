@@ -41,7 +41,16 @@ The workflow can also be run manually with a published version number from the
 Actions page. If the requested version is already installed, it exits without
 opening a duplicate pull request.
 
-Repository administrators must enable **Allow GitHub Actions to create and
-approve pull requests** under **Settings → Actions → General → Workflow
-permissions**. The workflow requires only `contents: write` and
-`pull-requests: write`; it does not auto-merge or bypass branch protection.
+Create one fine-grained GitHub personal access token with access only to the
+`teamdandelion/dandelion.art` repository and these permissions:
+
+- Contents: read and write
+- Pull requests: read and write
+
+Store the same token as `DANDELION_ART_DISPATCH_TOKEN` in the Polysome
+repository and as `POLYSOME_UPDATE_TOKEN` in this repository. The first secret
+allows Polysome to send the cross-repository dispatch; the second allows this
+workflow to push its version branch and create the pull request. Using this
+narrow token also ensures the resulting branch and pull-request events reach
+the normal CI and Cloudflare integrations. The workflow does not auto-merge or
+bypass branch protection.
