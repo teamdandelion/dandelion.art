@@ -1,0 +1,86 @@
+name: Update Polysome
+
+on:
+  repository_dispatch:
+    types: [polysome-released]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Published Polysome version to install
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-polysome
+  cancel-in-progress: false
+
+jobs:
+  update:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.client_payload.package == '@teamdandelion/polysome' &&
+      github.event.client_payload.repository == 'teamdandelion/polysome')
+    runs-on: ubuntu-latest
+    env:
+      POLYSOME_VERSION: ${{ github.event.client_payload.version || inputs.version }}
+      POLYSOME_TAG: ${{ github.event.client_payload.tag || format('v{0}', inputs.version) }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Validate release payload
+        run: |
+          node --input-type=module --eval '
+            const version = process.env.POLYSOME_VERSION ?? "";
+            if (!/^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(version)) {
+              throw new Error(`Invalid Polysome version: ${version}`);
+            }
+          '
+
+      - name: Install exact release
+        id: update
+        run: |
+          npm install --save-exact "@teamdandelion/polysome@$POLYSOME_VERSION"
+          if git diff --quiet -- package.json package-lock.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Verify site
+        if: steps.update.outputs.changed == 'true'
+        run: npm run check && npm run build
+
+      - name: Commit exact dependency update
+        if: steps.update.outputs.changed == 'true'
+        env:
+          UPDATE_BRANCH: automation/polysome-${{ env.POLYSOME_VERSION }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$UPDATE_BRANCH"
+          git add package.json package-lock.json
+          git commit -m "chore: update Polysome to v$POLYSOME_VERSION"
+          git push origin "$UPDATE_BRANCH"
+
+      - name: Open dependency pull request
+        if: steps.update.outputs.changed == 'true'
+        env:
+          UPDATE_BRANCH: automation/polysome-${{ env.POLYSOME_VERSION }}
+        run: |
+          gh pr create \
+            --base main \
+            --head "$UPDATE_BRANCH" \
+            --title "chore: update Polysome to v$POLYSOME_VERSION" \
+            --body "Automated update to @teamdandelion/polysome $POLYSOME_VERSION, triggered by the $POLYSOME_TAG release. The site checks and production build passed before this pull request was opened."
