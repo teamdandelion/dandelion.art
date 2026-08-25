@@ -16,6 +16,10 @@ Cloudflare's GitHub integration. A merge to `main` deploys the production
 version. The custom domain is attached to the Worker in Cloudflare rather than
 declared in `wrangler.toml`, so preview deployments cannot affect it.
 
+Keep **Preview URLs** enabled under the Worker's **Domains** settings. A preview
+build runs `wrangler versions upload`, which uploads a version but cannot enable
+the Worker's preview-routing setting on its own.
+
 For local verification, run `npm run preview:worker`. To deploy manually, run
 `npm run deploy`; to upload a non-production preview version, run
 `npm run deploy:preview`.
