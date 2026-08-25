@@ -37,7 +37,11 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  .qql-feature__image:focus-visible {
+  .qql-feature__image:focus {
+    outline: none;
+  }
+
+  :global(html[data-qql-input-modality="keyboard"]) .qql-feature__image:focus {
     outline: 2px solid currentColor;
     outline-offset: 3px;
   }

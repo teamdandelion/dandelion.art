@@ -33,6 +33,17 @@
   if (lightbox && image && closeButton) {
     let imageRequest = 0;
     let previousFocus: HTMLElement | null = null;
+    const root = document.documentElement;
+
+    const markPointerInput = () => {
+      root.dataset.qqlInputModality = "pointer";
+    };
+
+    document.addEventListener("pointerdown", markPointerInput, { capture: true });
+    document.addEventListener("touchstart", markPointerInput, {
+      capture: true,
+      passive: true,
+    });
 
     const close = () => {
       if (lightbox.hidden) return;
@@ -70,6 +81,7 @@
 
     closeButton.addEventListener("click", close);
     document.addEventListener("keydown", (event) => {
+      root.dataset.qqlInputModality = "keyboard";
       if (event.key === "Escape" && !lightbox.hidden) {
         event.preventDefault();
         close();
@@ -154,12 +166,16 @@
   }
 
   .qql-lightbox__close:hover,
-  .qql-lightbox__close:focus-visible {
+  :global(html[data-qql-input-modality="keyboard"]) .qql-lightbox__close:focus {
     background-color: rgb(255 255 255 / 16%);
     transform: scale(1.04);
   }
 
-  .qql-lightbox__close:focus-visible {
+  .qql-lightbox__close:focus {
+    outline: none;
+  }
+
+  :global(html[data-qql-input-modality="keyboard"]) .qql-lightbox__close:focus {
     outline: 2px solid white;
     outline-offset: 3px;
   }

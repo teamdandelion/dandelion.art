@@ -84,7 +84,11 @@ const artworks = ids.map((id) => {
     -webkit-tap-highlight-color: transparent;
   }
 
-  .qql-frame:focus-visible {
+  .qql-frame:focus {
+    outline: none;
+  }
+
+  :global(html[data-qql-input-modality="keyboard"]) .qql-frame:focus {
     outline: 2px solid currentColor;
     outline-offset: 3px;
   }
