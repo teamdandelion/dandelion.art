@@ -33,10 +33,13 @@
   const title = lightbox
     ? lightbox.querySelector<HTMLElement>("[data-qql-lightbox-title]")
     : null;
+  const pageContent = document.querySelector<HTMLElement>("[data-page-content]");
 
-  if (lightbox && image && closeButton && title) {
+  if (lightbox && image && closeButton && title && pageContent) {
     let imageRequest = 0;
     let previousFocus: HTMLElement | null = null;
+    let previousPageInert = false;
+    let previousPageAriaHidden: string | null = null;
     const root = document.documentElement;
 
     const markPointerInput = () => {
@@ -54,6 +57,12 @@
       imageRequest++;
       lightbox.hidden = true;
       document.documentElement.classList.remove("qql-lightbox-open");
+      if (!previousPageInert) pageContent.removeAttribute("inert");
+      if (previousPageAriaHidden === null) {
+        pageContent.removeAttribute("aria-hidden");
+      } else {
+        pageContent.setAttribute("aria-hidden", previousPageAriaHidden);
+      }
       if (previousFocus) previousFocus.focus();
     };
 
@@ -76,6 +85,10 @@
       lightbox.hidden = false;
       document.documentElement.classList.add("qql-lightbox-open");
       closeButton.focus();
+      previousPageInert = pageContent.hasAttribute("inert");
+      previousPageAriaHidden = pageContent.getAttribute("aria-hidden");
+      pageContent.setAttribute("inert", "");
+      pageContent.setAttribute("aria-hidden", "true");
 
       const highResolutionImage = new Image();
       highResolutionImage.addEventListener("load", () => {
@@ -90,6 +103,9 @@
       if (event.key === "Escape" && !lightbox.hidden) {
         event.preventDefault();
         close();
+      } else if (event.key === "Tab" && !lightbox.hidden) {
+        event.preventDefault();
+        closeButton.focus();
       }
     });
     lightbox.addEventListener("click", (event) => {
