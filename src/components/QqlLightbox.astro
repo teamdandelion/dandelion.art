@@ -163,6 +163,13 @@
         },
         { once: true },
       );
+      zoomImage.addEventListener(
+        "error",
+        () => {
+          if (zoomLoadRequest === request) zoomLoadRequest = 0;
+        },
+        { once: true },
+      );
       zoomImage.src = source;
     };
 
