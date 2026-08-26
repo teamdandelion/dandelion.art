@@ -1,11 +1,20 @@
 <div class="qql-feature w-full">
-  <img
-    src="/art/qql-276.png"
-    alt="QQL #276"
-    class="w-full h-auto rounded-lg shadow-lg"
-    loading="eager"
-    fetchpriority="high"
-  />
+  <button
+    type="button"
+    class="qql-feature__image"
+    data-qql-lightbox-src="/art/qql-276.png"
+    data-qql-lightbox-alt="Generative artwork QQL #276"
+    data-qql-lightbox-title="QQL #276"
+    aria-label="Expand QQL #276"
+  >
+    <img
+      src="/art/qql-276.png"
+      alt="QQL #276"
+      class="w-full h-auto rounded-lg shadow-lg"
+      loading="eager"
+      fetchpriority="high"
+    />
+  </button>
   <p class="text-sm text-center mt-2 text-base-content/70">
     <a
       href="/art/qql"
@@ -15,3 +24,26 @@
     </a>, by Tyler Hobbs and Dandelion Mané (2022)
   </p>
 </div>
+
+<style>
+  .qql-feature__image {
+    display: block;
+    width: 100%;
+    padding: 0;
+    color: inherit;
+    cursor: zoom-in;
+    touch-action: manipulation;
+    border: 0;
+    background: transparent;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .qql-feature__image:focus {
+    outline: none;
+  }
+
+  :global(html[data-qql-input-modality="keyboard"]) .qql-feature__image:focus {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+</style>

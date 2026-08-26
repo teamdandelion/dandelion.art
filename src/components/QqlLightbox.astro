@@ -1,0 +1,233 @@
+<div
+  class="qql-lightbox"
+  data-qql-lightbox
+  role="dialog"
+  aria-modal="true"
+  aria-label="Expanded QQL artwork"
+  hidden
+>
+  <button
+    type="button"
+    class="qql-lightbox__close"
+    data-qql-lightbox-close
+    aria-label="Close expanded artwork"
+  >
+    <svg aria-hidden="true" viewBox="0 0 24 24">
+      <path d="M6 6l12 12M18 6L6 18"></path>
+    </svg>
+  </button>
+  <figure class="qql-lightbox__figure">
+    <img data-qql-lightbox-image alt="" />
+    <figcaption data-qql-lightbox-title></figcaption>
+  </figure>
+</div>
+
+<script>
+  const lightbox = document.querySelector<HTMLElement>("[data-qql-lightbox]");
+  const image = lightbox
+    ? lightbox.querySelector<HTMLImageElement>("[data-qql-lightbox-image]")
+    : null;
+  const closeButton = lightbox
+    ? lightbox.querySelector<HTMLButtonElement>("[data-qql-lightbox-close]")
+    : null;
+  const title = lightbox
+    ? lightbox.querySelector<HTMLElement>("[data-qql-lightbox-title]")
+    : null;
+  const pageContent = document.querySelector<HTMLElement>("[data-page-content]");
+
+  if (lightbox && image && closeButton && title && pageContent) {
+    let imageRequest = 0;
+    let previousFocus: HTMLElement | null = null;
+    let previousPageInert = false;
+    let previousPageAriaHidden: string | null = null;
+    const root = document.documentElement;
+
+    const markPointerInput = () => {
+      root.dataset.qqlInputModality = "pointer";
+    };
+
+    document.addEventListener("pointerdown", markPointerInput, { capture: true });
+    document.addEventListener("touchstart", markPointerInput, {
+      capture: true,
+      passive: true,
+    });
+
+    const close = () => {
+      if (lightbox.hidden) return;
+      imageRequest++;
+      lightbox.hidden = true;
+      document.documentElement.classList.remove("qql-lightbox-open");
+      if (!previousPageInert) pageContent.removeAttribute("inert");
+      if (previousPageAriaHidden === null) {
+        pageContent.removeAttribute("aria-hidden");
+      } else {
+        pageContent.setAttribute("aria-hidden", previousPageAriaHidden);
+      }
+      if (previousFocus) previousFocus.focus();
+    };
+
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const trigger = target.closest<HTMLElement>("[data-qql-lightbox-src]");
+      if (!trigger) return;
+
+      const source = trigger.dataset.qqlLightboxSrc;
+      const preview = trigger.querySelector<HTMLImageElement>("img");
+      if (!source || !preview) return;
+
+      const request = ++imageRequest;
+      image.src = preview.currentSrc || preview.src;
+      image.alt = trigger.dataset.qqlLightboxAlt || preview.alt;
+      title.textContent = trigger.dataset.qqlLightboxTitle || preview.alt;
+      previousFocus = trigger;
+      lightbox.hidden = false;
+      document.documentElement.classList.add("qql-lightbox-open");
+      closeButton.focus();
+      previousPageInert = pageContent.hasAttribute("inert");
+      previousPageAriaHidden = pageContent.getAttribute("aria-hidden");
+      pageContent.setAttribute("inert", "");
+      pageContent.setAttribute("aria-hidden", "true");
+
+      const highResolutionImage = new Image();
+      highResolutionImage.addEventListener("load", () => {
+        if (request === imageRequest && !lightbox.hidden) image.src = source;
+      });
+      highResolutionImage.src = source;
+    });
+
+    closeButton.addEventListener("click", close);
+    document.addEventListener("keydown", (event) => {
+      root.dataset.qqlInputModality = "keyboard";
+      if (event.key === "Escape" && !lightbox.hidden) {
+        event.preventDefault();
+        close();
+      } else if (event.key === "Tab" && !lightbox.hidden) {
+        event.preventDefault();
+        closeButton.focus();
+      }
+    });
+    lightbox.addEventListener("click", (event) => {
+      if (event.target === lightbox) close();
+    });
+  }
+</script>
+
+<style>
+  :global(html.qql-lightbox-open) {
+    overflow: hidden;
+  }
+
+  .qql-lightbox {
+    position: fixed;
+    z-index: 100;
+    inset: 0;
+    margin: 0;
+    padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right))
+      max(0.75rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
+    overflow: hidden;
+    background: rgb(3 1 18);
+  }
+
+  .qql-lightbox:not([hidden]) {
+    display: grid;
+    place-items: center;
+  }
+
+  .qql-lightbox__figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: fit-content;
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
+  }
+
+  .qql-lightbox__figure img {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: calc(
+      100dvh - max(1.5rem, env(safe-area-inset-top) + env(safe-area-inset-bottom)) - 2.4rem
+    );
+    object-fit: contain;
+    box-shadow: 0 24px 80px rgb(0 0 0 / 38%);
+  }
+
+  .qql-lightbox__close {
+    position: absolute;
+    z-index: 1;
+    top: max(0.75rem, env(safe-area-inset-top));
+    right: max(0.75rem, env(safe-area-inset-right));
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    place-items: center;
+    color: white;
+    cursor: pointer;
+    border: 1px solid rgb(255 255 255 / 35%);
+    border-radius: 999px;
+    background:
+      linear-gradient(145deg, rgb(255 255 255 / 24%), rgb(255 255 255 / 7%)),
+      rgb(7 5 22 / 34%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 28%),
+      0 6px 24px rgb(0 0 0 / 32%);
+    backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    transition:
+      background-color 150ms ease,
+      transform 150ms ease;
+  }
+
+  .qql-lightbox__close:hover,
+  :global(html[data-qql-input-modality="keyboard"]) .qql-lightbox__close:focus {
+    background-color: rgb(255 255 255 / 16%);
+    transform: scale(1.04);
+  }
+
+  .qql-lightbox__close:focus {
+    outline: none;
+  }
+
+  :global(html[data-qql-input-modality="keyboard"]) .qql-lightbox__close:focus {
+    outline: 2px solid white;
+    outline-offset: 3px;
+  }
+
+  .qql-lightbox__close svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    overflow: visible;
+    filter: drop-shadow(0 1px 2px rgb(0 0 0 / 45%));
+  }
+
+  .qql-lightbox__close path {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-width: 1.8;
+  }
+
+  .qql-lightbox__figure figcaption {
+    margin-top: 0.7rem;
+    color: rgb(255 255 255 / 72%);
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+    text-align: center;
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .qql-lightbox__close {
+      background: rgb(7 5 22 / 88%);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+  }
+</style>

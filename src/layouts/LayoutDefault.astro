@@ -1,5 +1,6 @@
 ---
 import logoUrl from "../assets/logo.svg?url";
+import QqlLightbox from "../components/QqlLightbox.astro";
 import ThemeToggle from "../components/ThemeToggle.astro";
 import "../styles/style.css";
 import "../styles/tailwind.css";
@@ -13,13 +14,15 @@ const {
   title = "dandelion.art",
   description = "Dandelion Mané's personal site.",
 } = Astro.props;
+const pathname = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const hasQqlLightbox = pathname === "/" || pathname === "/art/qql";
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content={description} />
     <link rel="icon" href={logoUrl} />
     {
@@ -40,7 +43,7 @@ const {
     </script>
   </head>
   <body>
-    <div class="min-h-screen bg-base-100">
+    <div class="min-h-screen bg-base-100" data-page-content>
       <header class="border-b border-base-300 bg-base-200">
         <div
           class="max-w-5xl mx-auto px-5 py-2 flex items-center justify-between"
@@ -79,5 +82,6 @@ const {
         <slot />
       </main>
     </div>
+    {hasQqlLightbox && <QqlLightbox />}
   </body>
 </html>
