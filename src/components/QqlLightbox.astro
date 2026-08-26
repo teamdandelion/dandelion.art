@@ -64,6 +64,9 @@
     const magnification = 4;
     const touchOffset = 100;
     let imageRequest = 0;
+    let zoomLoadRequest = 0;
+    let zoomSource = "";
+    let loupeImageTier = 0;
     let previousFocus: HTMLElement | null = null;
     let previousPageInert = false;
     let previousPageAriaHidden: string | null = null;
@@ -137,7 +140,34 @@
       if (!frameRequest) frameRequest = requestAnimationFrame(updateLoupe);
     };
 
+    const ensureZoomSource = () => {
+      const request = imageRequest;
+      const source = zoomSource;
+      if (!source || zoomLoadRequest === request) return;
+
+      zoomLoadRequest = request;
+      const zoomImage = new Image();
+      zoomImage.decoding = "async";
+      zoomImage.addEventListener(
+        "load",
+        async () => {
+          try {
+            await zoomImage.decode();
+          } catch {
+            // A loaded image is still safe to display if explicit decoding fails.
+          }
+          if (request === imageRequest && !lightbox.hidden) {
+            loupeImage.src = source;
+            loupeImageTier = 2;
+          }
+        },
+        { once: true },
+      );
+      zoomImage.src = source;
+    };
+
     const showLoupe = (event: PointerEvent) => {
+      ensureZoomSource();
       activePointerType = event.pointerType || "mouse";
       measureLoupe();
       latestPointer = { clientX: event.clientX, clientY: event.clientY };
@@ -172,7 +202,9 @@
       const source = trigger.dataset.qqlLightboxSrc;
       const preview = trigger.querySelector<HTMLImageElement>("img");
       if (!source || !preview) return;
-      const zoomSource = trigger.dataset.qqlLightboxZoomSrc || source;
+      zoomSource = trigger.dataset.qqlLightboxZoomSrc || source;
+      zoomLoadRequest = 0;
+      loupeImageTier = 0;
 
       const request = ++imageRequest;
       image.src = preview.currentSrc || preview.src;
@@ -190,15 +222,14 @@
 
       const highResolutionImage = new Image();
       highResolutionImage.addEventListener("load", () => {
-        if (request === imageRequest && !lightbox.hidden) image.src = source;
+        if (request !== imageRequest || lightbox.hidden) return;
+        image.src = source;
+        if (loupeImageTier < 1) {
+          loupeImage.src = source;
+          loupeImageTier = 1;
+        }
       });
       highResolutionImage.src = source;
-
-      const zoomImage = new Image();
-      zoomImage.addEventListener("load", () => {
-        if (request === imageRequest && !lightbox.hidden) loupeImage.src = zoomSource;
-      });
-      zoomImage.src = zoomSource;
     });
 
     stage.addEventListener("pointerenter", (event) => {
