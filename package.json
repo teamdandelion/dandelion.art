@@ -5,6 +5,7 @@
     "preview": "astro preview",
     "preview:worker": "npm run build && wrangler dev",
     "check": "astro check && biome check .",
+    "test:music": "node --experimental-strip-types --test tests/music.test.mjs",
     "lint": "biome lint --write .",
     "format": "biome format --write .",
     "deploy": "npm run build && wrangler deploy",

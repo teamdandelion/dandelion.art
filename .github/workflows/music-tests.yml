@@ -1,0 +1,29 @@
+name: Music model tests
+
+on:
+  pull_request:
+    paths:
+      - "src/lib/music/**"
+      - "tests/music.test.mjs"
+      - ".github/workflows/music-tests.yml"
+      - "package.json"
+  push:
+    branches: [main]
+    paths:
+      - "src/lib/music/**"
+      - "tests/music.test.mjs"
+      - ".github/workflows/music-tests.yml"
+      - "package.json"
+
+permissions:
+  contents: read
+
+jobs:
+  theory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - run: npm run test:music
