@@ -35,10 +35,14 @@ export type Chord = {
 };
 export type Voice = { id: string; pitch: Pitch; toneDegree: number };
 export type Voicing = { id: string; chordId: string; voices: Voice[] };
+export type FrettedCourse = {
+  number: number;
+  strings: { number: number; open: Pitch }[];
+};
 export type FrettedInstrument = {
   id: string;
   name: string;
-  strings: { number: number; open: Pitch }[];
+  courses: FrettedCourse[];
 };
 export type Fingering = {
   id: string;
@@ -46,6 +50,7 @@ export type Fingering = {
   instrumentId: string;
   frets: (number | null)[];
   strings: {
+    courseNumber: number;
     stringNumber: number;
     fret: number | null;
     voiceId: string | null;
@@ -355,13 +360,57 @@ export function parseChord(query: string): Chord | null {
 export const BARITONE: FrettedInstrument = {
   id: "baritone-dgbe",
   name: "Baritone ukulele",
-  strings: [
-    { number: 4, open: { note: parseNote("D"), octave: 3 } },
-    { number: 3, open: { note: parseNote("G"), octave: 3 } },
-    { number: 2, open: { note: parseNote("B"), octave: 3 } },
-    { number: 1, open: { note: parseNote("E"), octave: 4 } },
+  courses: [
+    {
+      number: 4,
+      strings: [{ number: 4, open: { note: parseNote("D"), octave: 3 } }],
+    },
+    {
+      number: 3,
+      strings: [{ number: 3, open: { note: parseNote("G"), octave: 3 } }],
+    },
+    {
+      number: 2,
+      strings: [{ number: 2, open: { note: parseNote("B"), octave: 3 } }],
+    },
+    {
+      number: 1,
+      strings: [{ number: 1, open: { note: parseNote("E"), octave: 4 } }],
+    },
   ],
 };
+
+/** Four fretted courses, six physical strings. The G course doubles at the octave. */
+export const SIX_STRING_BARITONE: FrettedInstrument = {
+  id: "baritone-six-string-dg-gbe-e",
+  name: "6-string baritone ukulele",
+  courses: [
+    {
+      number: 4,
+      strings: [{ number: 6, open: { note: parseNote("D"), octave: 3 } }],
+    },
+    {
+      number: 3,
+      strings: [
+        { number: 5, open: { note: parseNote("G"), octave: 3 } },
+        { number: 4, open: { note: parseNote("G"), octave: 4 } },
+      ],
+    },
+    {
+      number: 2,
+      strings: [{ number: 3, open: { note: parseNote("B"), octave: 3 } }],
+    },
+    {
+      number: 1,
+      strings: [
+        { number: 2, open: { note: parseNote("E"), octave: 4 } },
+        { number: 1, open: { note: parseNote("E"), octave: 4 } },
+      ],
+    },
+  ],
+};
+
+export const INSTRUMENTS = [BARITONE, SIX_STRING_BARITONE];
 
 function pitchAtMidi(note: PitchClass, value: number): Pitch {
   return {
@@ -370,37 +419,43 @@ function pitchAtMidi(note: PitchClass, value: number): Pitch {
   };
 }
 
-/** Resolve physical string positions to spelled, registered voices. Muted strings have no voice. */
+/** One fret applies to a whole course; every sounding physical string has its own voice. */
 export function realizeFingering(
   chord: Chord,
   frets: (number | null)[],
   instrument: FrettedInstrument = BARITONE,
 ): Fingering {
-  if (frets.length !== instrument.strings.length)
-    throw new Error("One fret or mute is required per string.");
+  if (frets.length !== instrument.courses.length)
+    throw new Error("One fret or mute is required per course.");
   const id = `${instrument.id}/${chord.id}/${frets.map((fret) => fret ?? "x").join("-")}`;
   const voices: Voice[] = [];
-  const strings = instrument.strings.map((string, index) => {
+  const strings = instrument.courses.flatMap((course, index) => {
     const fret = frets[index];
-    if (fret === null)
-      return { stringNumber: string.number, fret, voiceId: null };
-    if (!Number.isInteger(fret) || fret < 0)
+    if (fret !== null && (!Number.isInteger(fret) || fret < 0))
       throw new Error("Frets must be non-negative integers or null.");
-    const value = midi(string.open) + fret;
-    const tone = chord.tones.find(
-      (candidate) => pitchClassNumber(candidate.note) === mod(value, 12),
-    );
-    if (!tone)
-      throw new Error(
-        `String ${string.number} is not a tone of ${chord.symbol}.`,
+    return course.strings.map((string) => {
+      const position = {
+        courseNumber: course.number,
+        stringNumber: string.number,
+        fret,
+      };
+      if (fret === null) return { ...position, voiceId: null };
+      const value = midi(string.open) + fret;
+      const tone = chord.tones.find(
+        (candidate) => pitchClassNumber(candidate.note) === mod(value, 12),
       );
-    const voiceId = `string-${string.number}`;
-    voices.push({
-      id: voiceId,
-      pitch: pitchAtMidi(tone.note, value),
-      toneDegree: tone.degree,
+      if (!tone)
+        throw new Error(
+          `String ${string.number} is not a tone of ${chord.symbol}.`,
+        );
+      const voiceId = `string-${string.number}`;
+      voices.push({
+        id: voiceId,
+        pitch: pitchAtMidi(tone.note, value),
+        toneDegree: tone.degree,
+      });
+      return { ...position, voiceId };
     });
-    return { stringNumber: string.number, fret, voiceId };
   });
   if (!voices.length)
     throw new Error("A voicing must sound at least one note.");
@@ -521,23 +576,32 @@ const FAMILIAR: Record<string, (number | null)[]> = {
 const fingeringCache = new Map<string, Fingering[]>();
 
 /** Pitch-correct candidates, not promises of ergonomic fingerings. All chord tones must sound. */
-export function findFingerings(chord: Chord): Fingering[] {
-  const cached = fingeringCache.get(chord.id);
+export function findFingerings(
+  chord: Chord,
+  instrument: FrettedInstrument = BARITONE,
+): Fingering[] {
+  const cacheKey = `${instrument.id}/${chord.id}`;
+  const cached = fingeringCache.get(cacheKey);
   if (cached) return cached;
   const allowed = new Set(
     chord.tones.map((tone) => pitchClassNumber(tone.note)),
   );
-  const choices = BARITONE.strings.map((string, index) => {
+  const choices = instrument.courses.map((course, index) => {
     const frets: (number | null)[] = [];
     for (let fret = 0; fret <= 12; fret++)
-      if (allowed.has(mod(midi(string.open) + fret, 12))) frets.push(fret);
+      if (
+        course.strings.every((string) =>
+          allowed.has(mod(midi(string.open) + fret, 12)),
+        )
+      )
+        frets.push(fret);
     // Only mute the lowest string; inner mutes make strumming harder to interpret.
     if (index === 0) frets.push(null);
     return frets;
   });
   const candidates: Fingering[] = [];
   const visit = (frets: (number | null)[]) => {
-    if (frets.length < 4) {
+    if (frets.length < instrument.courses.length) {
       for (const fret of choices[frets.length]) visit([...frets, fret]);
       return;
     }
@@ -547,9 +611,11 @@ export function findFingerings(chord: Chord): Fingering[] {
     const min = stopped.length ? Math.min(...stopped) : 0;
     const max = stopped.length ? Math.max(...stopped) : 0;
     if (max - min > 3) return;
-    const shape = realizeFingering(chord, frets);
+    const shape = realizeFingering(chord, frets, instrument);
     if (voicingCoverage(shape.voicing, chord).omitted.length) return;
-    const familiar = FAMILIAR[chord.id];
+    const familiar = INSTRUMENTS.some((known) => known.id === instrument.id)
+      ? FAMILIAR[chord.id]
+      : undefined;
     shape.source = familiar?.every((fret, index) => fret === frets[index])
       ? "familiar"
       : "generated";
@@ -564,7 +630,7 @@ export function findFingerings(chord: Chord): Fingering[] {
   visit([]);
   candidates.sort((a, b) => a.score - b.score || a.id.localeCompare(b.id));
   const result = candidates.slice(0, 12);
-  fingeringCache.set(chord.id, result);
+  fingeringCache.set(cacheKey, result);
   return result;
 }
 

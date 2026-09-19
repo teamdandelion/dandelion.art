@@ -26,6 +26,15 @@ can be added without making their object models the application's storage format
    making the keyboard an exact view of the uke's sound. A separately selected
    piano inversion is a different voicing of the same chord.
 
+Fretted instruments contain **courses**, each containing one or more physical
+strings. A shape has one fret/mute per course, and the realization maps every
+physical string to its own voice. The six-string baritone preset has four courses:
+D3 / G3+G4 / B3 / E4+E4. Its `2010` C shape sounds E3, G3, G4, C4, E4, E4.
+The octave G remains a separate piano key; unison E strings share one key but
+remain two voices in the model. Neither doubling changes the inversion. Course
+numbers 4→1 describe shape positions; physical string IDs distinguish all six
+voices without assuming a particular within-course mounting order.
+
 The MVP keeps related values together as serializable objects. Consumers should
 treat returned values as read-only, including cached fingering candidates.
 A database, normalized
@@ -115,7 +124,8 @@ or claim that D6 is diatonic to C major.
 
 ## Boundaries and verification
 
-The initial instrument is standard linear baritone uke. Alternate tunings,
+The initial instruments are standard linear baritone uke and a six-string variant
+with an octave G course and unison E course. Other tunings,
 microtones, rhythm, chord-symbol inference, and progression recommendations are
 outside this scope. The domain leaves instrument mapping independent of harmony
 so these can be considered without rewriting chord identity.
