@@ -5,9 +5,11 @@ import {
   type Chord,
   type ChordQuality,
   type Fingering,
+  type FrettedInstrument,
   findFingerings,
   formatNote,
   formatPitch,
+  INSTRUMENTS,
   inversionName,
   KEY_OPTIONS,
   type Key,
@@ -22,6 +24,7 @@ import {
   pianoVoicing,
   pitchClassNumber,
   ROOT_OPTIONS,
+  SIX_STRING_BARITONE,
   type Voicing,
 } from "../../lib/music";
 import "./chord-atlas.css";
@@ -36,13 +39,23 @@ function noteList(notes: PitchClass[]) {
   return notes.map(formatNote).join(" · ");
 }
 
+function uniqueVoices(voicing: Voicing) {
+  return [
+    ...new Map(
+      voicing.voices.map((voice) => [midi(voice.pitch), voice]),
+    ).values(),
+  ].sort((a, b) => midi(a.pitch) - midi(b.pitch));
+}
+
 function UkeDiagram({
   fingering,
   chord,
+  instrument,
   compact = false,
 }: {
   fingering: Fingering;
   chord: Chord;
+  instrument: FrettedInstrument;
   compact?: boolean;
 }) {
   const titleId = useId();
@@ -56,22 +69,21 @@ function UkeDiagram({
     ...fingering.frets.map((fret) => (fret ? fret - start + 1 : 0)),
   );
   const bottom = top + rows * fretHeight;
-  const sounding = fingering.voicing.voices;
-  let voiceIndex = 0;
+  const sounding = new Map(
+    fingering.voicing.voices.map((voice) => [voice.id, voice]),
+  );
   return (
     <svg
-      viewBox={`0 0 188 ${bottom + 55}`}
+      viewBox={`0 0 188 ${bottom + (compact ? 55 : 70)}`}
       className={`ca-uke-diagram${compact ? " ca-uke-diagram--compact" : ""}`}
       role="img"
       aria-labelledby={titleId}
       aria-hidden={compact || undefined}
     >
       <title id={titleId}>
-        {chord.symbol} baritone ukulele: D, G, B, E strings, frets{" "}
-        {fingering.frets
+        {`${chord.symbol}, ${instrument.name}: D, G, B, E courses, frets ${fingering.frets
           .map((fret) => (fret === null ? "muted" : fret === 0 ? "open" : fret))
-          .join(", ")}
-        .
+          .join(", ")}.`}
       </title>
       {Array.from({ length: rows + 1 }, (_, i) => i).map((fret) => (
         <line
@@ -95,7 +107,24 @@ function UkeDiagram({
       )}
       {fingering.frets.map((fret, index) => {
         const x = left + index * spacing;
-        const voice = fret === null ? null : sounding[voiceIndex++];
+        const course = instrument.courses[index];
+        const voices = fingering.strings
+          .filter(
+            (position) =>
+              position.courseNumber === course.number && position.voiceId,
+          )
+          .flatMap((position) => {
+            const voice = position.voiceId
+              ? sounding.get(position.voiceId)
+              : undefined;
+            return voice ? [voice] : [];
+          });
+        const voice = voices[0];
+        const uniquePitches = [
+          ...new Map(
+            voices.map((item) => [midi(item.pitch), item.pitch]),
+          ).values(),
+        ];
         const isRoot =
           voice &&
           pitchClassNumber(voice.pitch.note) === pitchClassNumber(chord.root);
@@ -137,7 +166,17 @@ function UkeDiagram({
                 textAnchor="middle"
                 className="ca-string-pitch"
               >
-                {voice ? formatPitch(voice.pitch) : "—"}
+                {uniquePitches.length
+                  ? uniquePitches.map((pitch, pitchIndex) => (
+                      <tspan
+                        key={midi(pitch)}
+                        x={x}
+                        dy={pitchIndex === 0 ? 0 : 15}
+                      >
+                        {formatPitch(pitch)}
+                      </tspan>
+                    ))
+                  : "—"}
               </text>
             )}
           </g>
@@ -176,8 +215,9 @@ function PianoDiagram({ voicing, chord }: { voicing: Voicing; chord: Chord }) {
       aria-labelledby={titleId}
     >
       <title id={titleId}>
-        {chord.symbol} on piano:{" "}
-        {voicing.voices.map((voice) => formatPitch(voice.pitch)).join(", ")}.
+        {`${chord.symbol} on piano: ${uniqueVoices(voicing)
+          .map((voice) => formatPitch(voice.pitch))
+          .join(", ")}.`}
       </title>
       {whites.map((n, index) => {
         const { voice, root } = keyInfo(n);
@@ -276,6 +316,10 @@ function PlayButton({ voicing }: { voicing: Voicing }) {
         gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
         oscillator.connect(gain);
         gain.connect(ctx.destination);
+        oscillator.onended = () => {
+          oscillator.disconnect();
+          gain.disconnect();
+        };
         oscillator.start(now);
         oscillator.stop(now + 1.7);
       }
@@ -307,6 +351,14 @@ function PlayButton({ voicing }: { voicing: Voicing }) {
 export default function ChordAtlas() {
   const id = useId();
   const [root, setRoot] = useState("C");
+  const [instrumentId, setInstrumentId] = useState(SIX_STRING_BARITONE.id);
+  const instrument =
+    INSTRUMENTS.find((item) => item.id === instrumentId) ?? SIX_STRING_BARITONE;
+  const hasPairedCourses = instrument.courses.some(
+    (course) => course.strings.length > 1,
+  );
+  const graphNodeRefs = useRef(new Map<string, SVGGElement>());
+  const [announcement, setAnnouncement] = useState("");
   const [quality, setQuality] = useState<ChordQuality>("major");
   const [shapeIndex, setShapeIndex] = useState(0);
   const [query, setQuery] = useState("");
@@ -317,7 +369,10 @@ export default function ChordAtlas() {
   const [pianoMode, setPianoMode] = useState<"same" | "closed">("same");
   const [inversion, setInversion] = useState(0);
   const chord = useMemo(() => makeChord(root, quality), [root, quality]);
-  const fingerings = useMemo(() => findFingerings(chord), [chord]);
+  const fingerings = useMemo(
+    () => findFingerings(chord, instrument),
+    [chord, instrument],
+  );
   const fingering = fingerings[shapeIndex % Math.max(fingerings.length, 1)];
   const key = useMemo<Key>(
     () => ({ tonic: parseNote(tonic), mode }),
@@ -331,10 +386,10 @@ export default function ChordAtlas() {
       new Map(
         graph.nodes.map((node) => [
           node.chord.id,
-          findFingerings(node.chord)[0],
+          findFingerings(node.chord, instrument)[0],
         ]),
       ),
-    [graph],
+    [graph, instrument],
   );
   const selectedNode = graph.nodes.find((node) => node.chord.id === chord.id);
   const adjacent = graph.edges
@@ -353,6 +408,7 @@ export default function ChordAtlas() {
   );
   const shownVoicing =
     pianoMode === "same" && fingering ? fingering.voicing : closedVoicing;
+  const shownPitches = uniqueVoices(shownVoicing);
   const rootOptions = ROOT_OPTIONS.includes(root)
     ? ROOT_OPTIONS
     : [...ROOT_OPTIONS, root];
@@ -384,16 +440,43 @@ export default function ChordAtlas() {
             </span>
           </h1>
           <p>
-            A reference for four strings, a keyboard, and the connections
-            between chords.
+            A reference for baritone ukulele, piano, and the connections between
+            chords.
           </p>
         </div>
         <div className="ca-tuning">
-          <span className="ca-eyebrow">Baritone ukulele</span>
-          <strong>
-            D<span>3</span> G<span>3</span> B<span>3</span> E<span>4</span>
+          <div className="ca-field ca-instrument-field">
+            <label htmlFor={`${id}-instrument`}>Instrument</label>
+            <select
+              id={`${id}-instrument`}
+              value={instrumentId}
+              onChange={(event) => {
+                setInstrumentId(event.target.value);
+                setShapeIndex(0);
+              }}
+            >
+              {INSTRUMENTS.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.courses.flatMap((course) => course.strings).length}
+                  -string baritone
+                </option>
+              ))}
+            </select>
+          </div>
+          <strong className="ca-course-tuning">
+            {instrument.courses
+              .map((course) =>
+                course.strings
+                  .map((string) => formatPitch(string.open))
+                  .join(" + "),
+              )
+              .join(" / ")}
           </strong>
-          <span>Standard tuning · low to high</span>
+          <span>
+            {hasPairedCourses
+              ? "4 courses · G octave pair · E unison pair"
+              : "4 courses · standard tuning"}
+          </span>
         </div>
       </header>
 
@@ -440,6 +523,9 @@ export default function ChordAtlas() {
               if (found) {
                 chooseChord(found);
                 setQuery("");
+                setAnnouncement(
+                  `Selected ${found.name}. Chord tones: ${noteList(found.tones.map((tone) => tone.note))}.`,
+                );
               } else setSearchError("Try a chord like C, D6, F#m7, or Bbmaj7.");
             }}
           >
@@ -471,6 +557,7 @@ export default function ChordAtlas() {
               </output>
             )}
           </form>
+          <output className="ca-sr-only">{announcement}</output>
         </div>
 
         <div className="ca-chord-heading">
@@ -512,7 +599,11 @@ export default function ChordAtlas() {
             </div>
             {fingering ? (
               <>
-                <UkeDiagram fingering={fingering} chord={chord} />
+                <UkeDiagram
+                  fingering={fingering}
+                  chord={chord}
+                  instrument={instrument}
+                />
                 <div className="ca-shape-controls">
                   <button
                     type="button"
@@ -546,8 +637,14 @@ export default function ChordAtlas() {
                   </button>
                 </div>
                 <p className="ca-help ca-center">
-                  ○ open string · × muted · dots are fret positions
+                  ○ open course · × muted · dots are fret positions
                 </p>
+                {hasPairedCourses && (
+                  <p className="ca-help ca-center">
+                    One dot frets a whole course. Two pitches on G; doubled E
+                    sounds one pitch.
+                  </p>
+                )}
                 <p className="ca-help ca-center">
                   {fingering.source === "familiar"
                     ? "Familiar shape."
@@ -619,12 +716,10 @@ export default function ChordAtlas() {
             <div className="ca-voicing">
               <div>
                 <span className="ca-eyebrow">
-                  {pianoMode === "same" && fingering
-                    ? "Exact pitches · string order"
-                    : "Exact pitches · low to high"}
+                  Exact sounding pitches · low to high
                 </span>
                 <p className="ca-pitch-list">
-                  {shownVoicing.voices.map((voice, index) => (
+                  {shownPitches.map((voice, index) => (
                     <span key={voice.id}>
                       {index > 0 && <i aria-hidden="true"> · </i>}
                       {formatPitch(voice.pitch)}
@@ -640,7 +735,7 @@ export default function ChordAtlas() {
             </div>
             <p className="ca-piano-note">
               {pianoMode === "same" && fingering
-                ? "These keys sound exactly the pitches of the selected ukulele shape. Changing the shape can change the bass, register, and doubled notes."
+                ? "These keys sound the pitches of the selected ukulele shape. Each distinct pitch appears once; octave partners use different keys. Changing the shape can change the bass and register."
                 : "Choose a chord tone for the bass to explore closed-position voicings. These piano voicings are independent of the ukulele shape."}
             </p>
             <div className="ca-color-legend">
@@ -735,7 +830,12 @@ export default function ChordAtlas() {
                 <span className="ca-roman">{node.roman}</span>
                 <strong>{node.chord.symbol}</strong>
                 {shape && (
-                  <UkeDiagram fingering={shape} chord={node.chord} compact />
+                  <UkeDiagram
+                    fingering={shape}
+                    chord={node.chord}
+                    instrument={instrument}
+                    compact
+                  />
                 )}
                 <span className="ca-card-tones">
                   {noteList(node.chord.tones.map((tone) => tone.note))}
@@ -753,8 +853,7 @@ export default function ChordAtlas() {
               aria-labelledby={`${id}-graph-title`}
             >
               <title id={`${id}-graph-title`}>
-                Chords in {formatNote(key.tonic)} {mode}. Lines connect chords
-                sharing one or more notes. Activate a chord to explore it.
+                {`Chords in ${formatNote(key.tonic)} ${mode}. Lines connect chords sharing one or more notes. Activate a chord to explore it.`}
               </title>
               {graph.edges.map((edge) => {
                 const a =
@@ -780,7 +879,7 @@ export default function ChordAtlas() {
                     y2={b.y}
                     className={`ca-graph-edge${active ? " ca-graph-edge--active" : ""}`}
                   >
-                    <title>Shared tones: {noteList(edge.sharedTones)}</title>
+                    <title>{`Shared tones: ${noteList(edge.sharedTones)}`}</title>
                   </line>
                 );
               })}
@@ -805,6 +904,11 @@ export default function ChordAtlas() {
                 // biome-ignore lint/a11y/useSemanticElements: Native HTML buttons cannot be children of an SVG; these SVG controls implement button keyboard behavior.
                 <g
                   key={node.chord.id}
+                  ref={(element) => {
+                    if (element)
+                      graphNodeRefs.current.set(node.chord.id, element);
+                    else graphNodeRefs.current.delete(node.chord.id);
+                  }}
                   role="button"
                   tabIndex={0}
                   aria-label={`${node.roman}, ${node.chord.name}`}
@@ -867,7 +971,12 @@ export default function ChordAtlas() {
                         <button
                           type="button"
                           key={node.chord.id}
-                          onClick={() => chooseChord(node.chord)}
+                          onClick={() => {
+                            chooseChord(node.chord);
+                            graphNodeRefs.current
+                              .get(node.chord.id)
+                              ?.focus({ preventScroll: true });
+                          }}
                         >
                           <span>
                             <strong>{node.chord.symbol}</strong>
