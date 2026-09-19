@@ -1,0 +1,15 @@
+---
+import ChordAtlas from "../../components/music/ChordAtlas";
+import LayoutDefault from "../../layouts/LayoutDefault.astro";
+---
+
+<LayoutDefault
+  title="Chord atlas — dandelion.art"
+  description="Baritone ukulele chord diagrams, exact piano voicings, inversions, and an interactive map of shared notes."
+  noindex
+>
+  <ChordAtlas client:load />
+  <noscript>
+    <p>JavaScript is needed to select other chords, explore the graph, and play audio. The C-major reference above is available without it.</p>
+  </noscript>
+</LayoutDefault>
