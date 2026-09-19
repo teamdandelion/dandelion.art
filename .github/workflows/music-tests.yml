@@ -1,17 +1,19 @@
-name: Music model tests
+name: Music tests
 
 on:
   pull_request:
     paths:
       - "src/lib/music/**"
-      - "tests/music.test.mjs"
+      - "src/components/music/**"
+      - "tests/music*.test.mjs"
       - ".github/workflows/music-tests.yml"
       - "package.json"
   push:
     branches: [main]
     paths:
       - "src/lib/music/**"
-      - "tests/music.test.mjs"
+      - "src/components/music/**"
+      - "tests/music*.test.mjs"
       - ".github/workflows/music-tests.yml"
       - "package.json"
 

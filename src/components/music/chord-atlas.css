@@ -1,12 +1,12 @@
 .chord-atlas {
   --ca-ink: #263a36;
-  --ca-muted: #6d7771;
+  --ca-muted: #5d6962;
   --ca-paper: #faf8f0;
   --ca-panel: #f1efe5;
   --ca-line: #dcded2;
   --ca-accent: #296d61;
   --ca-accent-soft: #dfece2;
-  --ca-coral: #b96146;
+  --ca-coral: #a64e36;
   --ca-focus: #237f79;
   --ca-white: #fffdf6;
   color: var(--ca-ink);
@@ -212,7 +212,7 @@ html[data-theme="dark"] .chord-atlas {
 }
 .ca-search-input input::placeholder {
   color: var(--ca-muted);
-  opacity: 0.8;
+  opacity: 1;
 }
 .ca-search-input button {
   flex-shrink: 0;
@@ -491,7 +491,7 @@ html[data-theme="dark"] .chord-atlas {
   stroke: #619d87;
 }
 .ca-black-key.ca-key-active {
-  fill: #438d77;
+  fill: #347660;
   stroke: #265944;
 }
 .ca-white-key.ca-key-root {
@@ -499,12 +499,12 @@ html[data-theme="dark"] .chord-atlas {
   stroke: #bd876a;
 }
 .ca-black-key.ca-key-root {
-  fill: #b96d4f;
+  fill: #9f573b;
   stroke: #8f4e36;
 }
 .ca-key-label {
   font-size: 12px;
-  fill: #88938d;
+  fill: #5e7065;
 }
 .ca-key-label--active {
   fill: #193c31;
@@ -730,7 +730,8 @@ html[data-theme="dark"] .chord-atlas {
 .ca-chord-heading h2 {
   scroll-margin-block-start: 24px;
 }
-.ca-chord-heading h2:focus {
+.ca-chord-heading h2:focus,
+.ca-neighbors h3:focus {
   outline: none;
 }
 .ca-graph-notation {

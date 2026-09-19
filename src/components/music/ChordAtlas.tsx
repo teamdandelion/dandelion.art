@@ -28,6 +28,7 @@ import {
   type Voicing,
 } from "../../lib/music";
 import "./chord-atlas.css";
+import { createVoicingPlayer, type PlaybackState } from "./voicing-audio";
 
 const STRING_NAMES = ["D", "G", "B", "E"];
 
@@ -286,65 +287,35 @@ function PianoDiagram({ voicing, chord }: { voicing: Voicing; chord: Chord }) {
 }
 
 function PlayButton({ voicing }: { voicing: Voicing }) {
-  const context = useRef<AudioContext | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [playing, setPlaying] = useState(false);
-  const [message, setMessage] = useState("");
-  useEffect(
-    () => () => {
-      if (timer.current) clearTimeout(timer.current);
-      if (context.current) void context.current.close();
-    },
-    [],
-  );
-  async function play() {
-    try {
+  const player = useRef<ReturnType<typeof createVoicingPlayer> | null>(null);
+  const [{ playing, message }, setPlayback] = useState<PlaybackState>({
+    playing: false,
+    message: "",
+  });
+  useEffect(() => {
+    const controller = createVoicingPlayer(() => {
       const Audio =
         window.AudioContext ||
         (window as typeof window & { webkitAudioContext?: typeof AudioContext })
           .webkitAudioContext;
-      if (!Audio) {
-        setMessage("Audio isn’t available in this browser.");
-        return;
-      }
-      const ctx = context.current ?? new Audio();
-      context.current = ctx;
-      await ctx.resume();
-      const now = ctx.currentTime;
-      for (const voice of voicing.voices) {
-        const oscillator = ctx.createOscillator();
-        const gain = ctx.createGain();
-        oscillator.type = "triangle";
-        oscillator.frequency.value = 440 * 2 ** ((midi(voice.pitch) - 69) / 12);
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(
-          0.2 / voicing.voices.length,
-          now + 0.025,
-        );
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
-        oscillator.connect(gain);
-        gain.connect(ctx.destination);
-        oscillator.onended = () => {
-          oscillator.disconnect();
-          gain.disconnect();
-        };
-        oscillator.start(now);
-        oscillator.stop(now + 1.7);
-      }
-      setMessage("");
-      setPlaying(true);
-      if (timer.current) clearTimeout(timer.current);
-      timer.current = setTimeout(() => setPlaying(false), 1700);
-    } catch {
-      setMessage("Couldn’t start audio. Tap again to retry.");
-    }
-  }
+      return Audio ? new Audio() : null;
+    }, setPlayback);
+    player.current = controller;
+    return () => {
+      controller.dispose();
+      player.current = null;
+    };
+  }, []);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: The displayed voicing identity triggers playback cancellation.
+  useEffect(() => {
+    player.current?.cancel();
+  }, [voicing.id]);
   return (
     <div className="ca-audio">
       <button
         type="button"
         className="ca-button ca-play"
-        onClick={play}
+        onClick={() => void player.current?.play(voicing)}
         disabled={playing}
         aria-label="Hear this voicing as a synthesized chord"
       >
@@ -365,7 +336,7 @@ export default function ChordAtlas() {
   const hasPairedCourses = instrument.courses.some(
     (course) => course.strings.length > 1,
   );
-  const graphNodeRefs = useRef(new Map<string, SVGGElement>());
+  const neighborsHeadingRef = useRef<HTMLHeadingElement>(null);
   const explorerHeadingRef = useRef<HTMLHeadingElement>(null);
   const [announcement, setAnnouncement] = useState("");
   const [quality, setQuality] = useState<ChordQuality>("major");
@@ -939,11 +910,6 @@ export default function ChordAtlas() {
                 // biome-ignore lint/a11y/useSemanticElements: Native HTML buttons cannot be children of an SVG; these SVG controls implement button keyboard behavior.
                 <g
                   key={node.chord.id}
-                  ref={(element) => {
-                    if (element)
-                      graphNodeRefs.current.set(node.chord.id, element);
-                    else graphNodeRefs.current.delete(node.chord.id);
-                  }}
                   role="button"
                   tabIndex={0}
                   aria-label={`${node.roman}, ${node.chord.name}`}
@@ -993,7 +959,7 @@ export default function ChordAtlas() {
           </div>
           <div className="ca-neighbors">
             <span className="ca-eyebrow">Around the selected chord</span>
-            <h3>
+            <h3 ref={neighborsHeadingRef} tabIndex={-1}>
               {selectedNode
                 ? `Connected to ${chord.symbol}`
                 : `${chord.symbol} in this key`}
@@ -1016,9 +982,11 @@ export default function ChordAtlas() {
                           key={node.chord.id}
                           onClick={() => {
                             chooseChord(node.chord);
-                            graphNodeRefs.current
-                              .get(node.chord.id)
-                              ?.focus({ preventScroll: true });
+                            // The activated row disappears from the new list. Keep
+                            // keyboard focus nearby, not on the graph above it.
+                            requestAnimationFrame(() =>
+                              neighborsHeadingRef.current?.focus(),
+                            );
                           }}
                         >
                           <span>
