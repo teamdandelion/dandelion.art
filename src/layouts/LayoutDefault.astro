@@ -8,11 +8,13 @@ import "../styles/tailwind.css";
 interface Props {
   title?: string;
   description?: string;
+  noindex?: boolean;
 }
 
 const {
   title = "dandelion.art",
   description = "Dandelion Mané's personal site.",
+  noindex = false,
 } = Astro.props;
 const pathname = Astro.url.pathname.replace(/\/+$/, "") || "/";
 const hasQqlLightbox = pathname === "/" || pathname === "/art/qql";
@@ -24,6 +26,7 @@ const hasQqlLightbox = pathname === "/" || pathname === "/art/qql";
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" href={logoUrl} />
     {
       Astro.url.pathname === "/" && (
