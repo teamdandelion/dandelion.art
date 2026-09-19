@@ -70,7 +70,7 @@ function UkeDiagram({
   const start = fingering.startFret;
   const top = 44;
   const left = 43;
-  const spacing = 34;
+  const spacing = compact ? 34 : 44;
   const fretHeight = 34;
   const rows = Math.max(
     4,
@@ -82,7 +82,7 @@ function UkeDiagram({
   );
   return (
     <svg
-      viewBox={`0 0 188 ${bottom + (compact ? 55 : 70)}`}
+      viewBox={`0 0 ${compact ? 188 : 220} ${bottom + (compact ? 55 : 70)}`}
       className={`ca-uke-diagram${compact ? " ca-uke-diagram--compact" : ""}`}
       role="img"
       aria-labelledby={titleId}
@@ -204,7 +204,20 @@ function PianoDiagram({ voicing, chord }: { voicing: Voicing; chord: Chord }) {
     { length: high - low + 1 },
     (_, i) => low + i,
   ).filter((n) => whiteClasses.includes(n % 12));
-  const keyWidth = 34;
+  // Preserve the written spelling without squeezing long accidental labels.
+  const blackKeyWidth = Math.max(
+    20,
+    ...voicing.voices
+      .filter((voice) => !whiteClasses.includes(midi(voice.pitch) % 12))
+      .map((voice) => formatNote(voice.pitch.note).length * 7 + 6),
+  );
+  const keyWidth = Math.max(
+    34,
+    blackKeyWidth + 14,
+    ...voicing.voices
+      .filter((voice) => whiteClasses.includes(midi(voice.pitch) % 12))
+      .map((voice) => formatPitch(voice.pitch).length * 8 + 6),
+  );
   const width = whites.length * keyWidth;
   const keyInfo = (n: number) => {
     const voice = voicing.voices.find((item) => midi(item.pitch) === n);
@@ -219,7 +232,7 @@ function PianoDiagram({ voicing, chord }: { voicing: Voicing; chord: Chord }) {
     <svg
       viewBox={`0 0 ${width} 150`}
       className="ca-piano"
-      style={{ minWidth: whites.length * 32 }}
+      style={{ minWidth: whites.length * (keyWidth - 2) }}
       role="img"
       aria-labelledby={titleId}
     >
@@ -262,9 +275,9 @@ function PianoDiagram({ voicing, chord }: { voicing: Voicing; chord: Chord }) {
         return (
           <g key={n + 1}>
             <rect
-              x={x - 10}
+              x={x - blackKeyWidth / 2}
               y="0"
-              width="20"
+              width={blackKeyWidth}
               height="88"
               rx="3"
               className={`ca-black-key${voice ? " ca-key-active" : ""}${root ? " ca-key-root" : ""}`}

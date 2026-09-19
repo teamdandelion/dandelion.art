@@ -70,7 +70,7 @@ html[data-theme="dark"] .chord-atlas {
 }
 .ca-eyebrow {
   display: block;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.5;
   font-weight: 650;
   letter-spacing: 0.12em;
@@ -154,7 +154,7 @@ html[data-theme="dark"] .chord-atlas {
 }
 .ca-tuning > span:last-child {
   color: var(--ca-muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 .ca-explorer {
   background: var(--ca-paper);
@@ -178,7 +178,7 @@ html[data-theme="dark"] .chord-atlas {
 .ca-search > label {
   display: block;
   color: var(--ca-muted);
-  font-size: 11px;
+  font-size: 12px;
   margin-bottom: 6px;
   font-weight: 600;
 }
@@ -225,7 +225,7 @@ html[data-theme="dark"] .chord-atlas {
 }
 .ca-error {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--ca-coral);
   padding-top: 6px;
 }
@@ -281,7 +281,7 @@ html[data-theme="dark"] .chord-atlas {
 .ca-tone > span {
   display: block;
   color: var(--ca-muted);
-  font-size: 11px;
+  font-size: 12px;
   margin-top: 2px;
 }
 .ca-tone-root strong {
@@ -306,24 +306,25 @@ html[data-theme="dark"] .chord-atlas {
   font-weight: 600;
 }
 .ca-panel-heading > .ca-eyebrow {
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.06em;
 }
 .ca-fret-code {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--ca-muted);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 .ca-uke-diagram {
   display: block;
-  width: 202px;
+  width: 260px;
   max-width: 100%;
   margin: 14px auto 5px;
   overflow: visible;
 }
 .ca-fret {
-  stroke: var(--ca-line);
+  stroke: var(--ca-muted);
+  stroke-opacity: 0.8;
   stroke-width: 1.5;
 }
 .ca-nut {
@@ -391,7 +392,7 @@ html[data-theme="dark"] .chord-atlas {
   background: var(--ca-accent-soft);
 }
 .ca-help {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--ca-muted);
   line-height: 1.6;
 }
@@ -400,7 +401,6 @@ html[data-theme="dark"] .chord-atlas {
 }
 .ca-uke-panel > .ca-help {
   margin-top: 11px;
-  font-size: 10px;
 }
 .ca-empty {
   padding: 50px 10px;
@@ -434,7 +434,7 @@ html[data-theme="dark"] .chord-atlas {
   border: 0;
   border-radius: 4px;
   padding: 6px 11px;
-  font-size: 11px;
+  font-size: 12px;
   background: transparent;
   color: var(--ca-muted);
   line-height: 1.4;
@@ -524,7 +524,7 @@ html[data-theme="dark"] .chord-atlas {
   padding-bottom: 17px;
 }
 .ca-voicing .ca-eyebrow {
-  font-size: 8px;
+  font-size: 11px;
   letter-spacing: 0.09em;
 }
 .ca-pitch-list {
@@ -542,7 +542,7 @@ html[data-theme="dark"] .chord-atlas {
   padding: 9px 12px;
   background: var(--ca-white);
   font-weight: 550;
-  font-size: 11px;
+  font-size: 12px;
 }
 .ca-play span {
   display: inline-block;
@@ -562,7 +562,7 @@ html[data-theme="dark"] .chord-atlas {
 }
 .ca-piano-note {
   color: var(--ca-muted);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.65;
   max-width: 440px;
 }
@@ -574,7 +574,7 @@ html[data-theme="dark"] .chord-atlas {
   margin-top: auto;
   padding-top: 15px;
   color: var(--ca-muted);
-  font-size: 9px;
+  font-size: 11px;
 }
 .ca-color-legend span {
   display: flex;
@@ -618,10 +618,10 @@ html[data-theme="dark"] .chord-atlas {
   gap: 10px;
 }
 .ca-key-controls .ca-field:first-child {
-  width: 65px;
+  width: 78px;
 }
 .ca-key-controls .ca-field:last-child {
-  width: 135px;
+  width: 170px;
 }
 .ca-key-controls select {
   height: 36px;
@@ -647,11 +647,11 @@ html[data-theme="dark"] .chord-atlas {
 }
 .ca-key-summary p > span {
   color: var(--ca-muted);
-  font-size: 11px;
+  font-size: 12px;
 }
 .ca-chord-grid {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 128px), 1fr));
   gap: 8px;
 }
 .ca-chord-card {
@@ -695,10 +695,14 @@ html[data-theme="dark"] .chord-atlas {
 .ca-uke-diagram--compact .ca-string {
   stroke-width: 1.7;
 }
+.ca-uke-diagram--compact .ca-string-name,
+.ca-uke-diagram--compact .ca-fret-number {
+  font-size: 20px;
+}
 .ca-card-tones {
   display: block;
   color: var(--ca-muted);
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.5;
   padding: 0 2px;
 }
@@ -782,7 +786,7 @@ html[data-theme="dark"] .chord-atlas {
   fill: var(--ca-muted);
 }
 .ca-graph-mode {
-  font-size: 10px;
+  font-size: 13px;
   fill: var(--ca-muted);
 }
 .ca-graph-node {
@@ -790,6 +794,7 @@ html[data-theme="dark"] .chord-atlas {
   outline: none;
 }
 .ca-graph-node > circle {
+  r: 40;
   fill: var(--ca-paper);
   stroke: var(--ca-line);
   stroke-width: 1.3;
@@ -811,18 +816,17 @@ html[data-theme="dark"] .chord-atlas {
   stroke-width: 4;
 }
 .ca-graph-symbol {
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 550;
   fill: var(--ca-ink);
   pointer-events: none;
 }
 .ca-graph-roman {
-  font-size: 10px;
+  font-size: 16px;
   fill: var(--ca-muted);
   pointer-events: none;
 }
 .ca-graph-panel > .ca-help {
-  font-size: 10px;
   text-align: center;
 }
 .ca-line-key {
@@ -870,8 +874,9 @@ html[data-theme="dark"] .chord-atlas {
 }
 .ca-neighbor-list button > span:first-child {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 9px;
+  gap: 2px 9px;
 }
 .ca-neighbor-list strong {
   font-weight: 550;
@@ -893,7 +898,7 @@ html[data-theme="dark"] .chord-atlas {
 }
 .ca-shared-notes small {
   color: var(--ca-muted);
-  font-size: 9px;
+  font-size: 11px;
   margin-left: 7px;
 }
 .ca-outside-key {
@@ -906,7 +911,7 @@ html[data-theme="dark"] .chord-atlas {
   margin-top: 12px;
 }
 .ca-theory-note {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--ca-muted);
   line-height: 1.8;
   margin-top: 15px;
@@ -941,7 +946,7 @@ html[data-theme="dark"] .chord-atlas {
   font-weight: 600;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .ca-connections {
     grid-template-columns: 1fr;
   }
@@ -949,39 +954,43 @@ html[data-theme="dark"] .chord-atlas {
     border-right: 0;
     border-bottom: 1px solid var(--ca-line);
   }
+  .ca-shared-notes small {
+    display: block;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 760px) {
   .ca-intro {
-    align-items: flex-start;
+    display: block;
   }
   .ca-tuning {
-    padding-left: 17px;
-    margin-top: 28px;
-  }
-  .ca-tuning strong {
-    font-size: 20px;
-    white-space: nowrap;
-  }
-  .ca-tuning .ca-eyebrow {
-    font-size: 8px;
-  }
-  .ca-tuning > span:last-child {
-    font-size: 9px;
+    border: 0;
+    border-top: 1px solid var(--ca-line);
+    padding: 16px 0 0;
+    margin-top: 19px;
+    max-width: none;
   }
   .ca-controls {
     padding: 17px 19px;
     gap: 12px;
-    grid-template-columns: 70px minmax(130px, 1fr) minmax(145px, 1fr);
+    grid-template-columns: 88px minmax(0, 1fr);
+  }
+  .ca-search {
+    grid-column: 1 / -1;
   }
   .ca-chord-heading {
     padding: 22px;
   }
   .ca-instruments {
-    grid-template-columns: minmax(200px, 0.85fr) minmax(0, 1.15fr);
+    grid-template-columns: 1fr;
   }
   .ca-uke-panel {
-    padding: 20px 14px;
+    border-right: 0;
+    border-bottom: 1px solid var(--ca-line);
   }
   .ca-piano-panel {
-    padding: 20px 18px;
+    padding: 20px 22px;
   }
   .ca-panel-heading > .ca-eyebrow {
     display: none;
@@ -989,15 +998,12 @@ html[data-theme="dark"] .chord-atlas {
   .ca-keyboard-wrap {
     min-height: 150px;
   }
-  .ca-chord-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
+  .ca-section-heading {
+    display: block;
+    margin-bottom: 16px;
   }
-  .ca-chord-card > strong {
-    font-size: 21px;
-  }
-  .ca-card-tones {
-    font-size: 11px;
+  .ca-key-controls {
+    margin-top: 17px;
   }
   .ca-neighbors {
     padding: 22px 18px;
@@ -1005,36 +1011,10 @@ html[data-theme="dark"] .chord-atlas {
   .ca-graph-panel {
     padding: 22px 14px 16px;
   }
-  .ca-neighbor-list button {
-    grid-template-columns: 1fr 1fr 10px;
-    gap: 5px;
-  }
-  .ca-shared-notes small {
-    display: block;
-  }
 }
 
 @media (max-width: 560px) {
-  .ca-field select,
-  .ca-search-input input,
-  .ca-inversion-field select,
-  .ca-key-controls select {
-    font-size: 16px;
-  }
-  .ca-field select,
-  .ca-search-input,
-  .ca-arrow,
-  .ca-button,
-  .ca-segmented button {
-    min-height: 44px;
-  }
-  .ca-arrow,
-  .ca-search-input button {
-    min-width: 44px;
-    min-height: 44px;
-  }
   .ca-intro {
-    display: block;
     padding-top: 0;
     padding-bottom: 22px;
   }
@@ -1047,40 +1027,14 @@ html[data-theme="dark"] .chord-atlas {
     margin-top: 10px;
   }
   .ca-tuning {
-    display: block;
-    border: 0;
-    border-top: 1px solid var(--ca-line);
-    padding: 13px 0 0;
-    margin-top: 19px;
-    max-width: none;
+    padding-top: 13px;
   }
   .ca-tuning strong.ca-course-tuning {
     font-size: 13px;
   }
-  .ca-tuning .ca-eyebrow {
-    font-size: 9px;
-  }
-  .ca-tuning strong {
-    font-size: 18px;
-    margin: 0;
-  }
-  .ca-tuning > span:last-child {
-    font-size: 9px;
-  }
   .ca-controls {
     grid-template-columns: 72px minmax(0, 1fr);
     padding: 16px;
-    gap: 12px;
-  }
-  .ca-search {
-    grid-column: 1 / -1;
-  }
-  .ca-search > label {
-    font-size: 10px;
-  }
-  .ca-field select,
-  .ca-search-input input {
-    font-size: 16px;
   }
   .ca-explorer {
     border-radius: 12px;
@@ -1096,7 +1050,7 @@ html[data-theme="dark"] .chord-atlas {
   .ca-chord-heading h2 > span {
     display: block;
     margin: 4px 0 0;
-    font-size: 11px;
+    font-size: 12px;
   }
   .ca-tones {
     gap: 14px;
@@ -1105,22 +1059,13 @@ html[data-theme="dark"] .chord-atlas {
   .ca-tone strong {
     font-size: 20px;
   }
-  .ca-tone > span {
-    font-size: 10px;
-  }
   .ca-tone {
     min-width: 18px;
   }
-  .ca-instruments {
-    grid-template-columns: 1fr;
-  }
   .ca-uke-panel {
     padding: 18px 22px 19px;
-    border-right: 0;
-    border-bottom: 1px solid var(--ca-line);
   }
   .ca-uke-diagram:not(.ca-uke-diagram--compact) {
-    width: 207px;
     margin: 8px auto 3px;
   }
   .ca-piano-panel {
@@ -1148,25 +1093,14 @@ html[data-theme="dark"] .chord-atlas {
   .ca-key-section {
     padding-top: 31px;
   }
-  .ca-section-heading {
-    display: block;
-    margin-bottom: 16px;
-  }
   .ca-section-heading h2 {
     font-size: 31px;
-  }
-  .ca-key-controls {
-    margin-top: 17px;
-  }
-  .ca-key-controls .ca-field:first-child {
-    width: 78px;
   }
   .ca-key-controls .ca-field:last-child {
     width: auto;
     flex: 1;
   }
   .ca-key-controls select {
-    font-size: 16px;
     height: 40px;
   }
   .ca-key-summary {
@@ -1178,41 +1112,23 @@ html[data-theme="dark"] .chord-atlas {
   }
   .ca-key-summary p > span {
     display: block;
-    font-size: 10px;
     margin-top: 4px;
   }
   .ca-key-summary .ca-segmented button {
     padding: 6px 8px;
-    font-size: 10px;
-  }
-  .ca-chord-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 7px;
   }
   .ca-chord-card {
     padding: 11px 2px 10px;
-  }
-  .ca-chord-card > strong {
-    font-size: 20px;
-  }
-  .ca-card-tones {
-    font-size: 11px;
   }
   .ca-uke-diagram--compact {
     width: 100%;
     margin-top: 2px;
   }
   .ca-connections {
-    grid-template-columns: 1fr;
     margin-top: 19px;
   }
   .ca-graph-panel {
     padding: 20px 10px 17px;
-    border-right: 0;
-    border-bottom: 1px solid var(--ca-line);
-  }
-  .ca-graph {
-    max-width: 335px;
   }
   .ca-neighbors {
     padding: 22px;
@@ -1221,12 +1137,6 @@ html[data-theme="dark"] .chord-atlas {
     padding: 13px 3px;
     grid-template-columns: 1fr 1fr 14px;
     gap: 10px;
-  }
-  .ca-shared-notes small {
-    display: inline;
-  }
-  .ca-neighbor-intro {
-    font-size: 12px;
   }
   .ca-model-note > div {
     grid-template-columns: 1fr;
@@ -1252,43 +1162,7 @@ html[data-theme="dark"] .chord-atlas {
   min-height: 44px;
 }
 
-@media (max-width: 760px), (pointer: coarse) {
-  .ca-graph-node > circle {
-    r: 40;
-  }
-  .ca-graph-symbol {
-    font-size: 20px;
-  }
-  .ca-graph-roman {
-    font-size: 13px;
-  }
-  .ca-uke-diagram--compact .ca-string-name,
-  .ca-uke-diagram--compact .ca-fret-number {
-    font-size: 17px;
-  }
-  .ca-help,
-  .ca-uke-panel > .ca-help,
-  .ca-piano-note,
-  .ca-theory-note,
-  .ca-card-tones,
-  .ca-graph-panel > .ca-help {
-    font-size: 12px;
-  }
-  .ca-segmented button,
-  .ca-key-summary .ca-segmented button,
-  .ca-button {
-    font-size: 12px;
-  }
-  .ca-shared-notes small {
-    display: block;
-    margin-left: 0;
-  }
-}
-
 @media (max-width: 359px) {
-  .ca-chord-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
   .ca-controls {
     grid-template-columns: 1fr;
   }
