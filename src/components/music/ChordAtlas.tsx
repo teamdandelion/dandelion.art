@@ -39,6 +39,13 @@ function noteList(notes: PitchClass[]) {
   return notes.map(formatNote).join(" · ");
 }
 
+function graphSymbol(chord: Chord) {
+  return chord.symbol
+    .replace("maj7", "Δ7")
+    .replace("m7♭5", "ø7")
+    .replace("dim", "°");
+}
+
 function uniqueVoices(voicing: Voicing) {
   return [
     ...new Map(
@@ -211,6 +218,7 @@ function PianoDiagram({ voicing, chord }: { voicing: Voicing; chord: Chord }) {
     <svg
       viewBox={`0 0 ${width} 150`}
       className="ca-piano"
+      style={{ minWidth: whites.length * 32 }}
       role="img"
       aria-labelledby={titleId}
     >
@@ -358,6 +366,7 @@ export default function ChordAtlas() {
     (course) => course.strings.length > 1,
   );
   const graphNodeRefs = useRef(new Map<string, SVGGElement>());
+  const explorerHeadingRef = useRef<HTMLHeadingElement>(null);
   const [announcement, setAnnouncement] = useState("");
   const [quality, setQuality] = useState<ChordQuality>("major");
   const [shapeIndex, setShapeIndex] = useState(0);
@@ -523,6 +532,10 @@ export default function ChordAtlas() {
               if (found) {
                 chooseChord(found);
                 setQuery("");
+                // Reveal the result and dismiss the phone keyboard without losing focus.
+                requestAnimationFrame(() =>
+                  explorerHeadingRef.current?.focus(),
+                );
                 setAnnouncement(
                   `Selected ${found.name}. Chord tones: ${noteList(found.tones.map((tone) => tone.note))}.`,
                 );
@@ -540,6 +553,7 @@ export default function ChordAtlas() {
                 }}
                 placeholder="Cmaj, D6, F♯m7…"
                 autoComplete="off"
+                enterKeyHint="go"
                 autoCapitalize="off"
                 spellCheck={false}
                 aria-invalid={Boolean(searchError)}
@@ -563,7 +577,7 @@ export default function ChordAtlas() {
         <div className="ca-chord-heading">
           <div>
             <span className="ca-eyebrow">Explore a chord</span>
-            <h2 id={`${id}-explorer`}>
+            <h2 id={`${id}-explorer`} ref={explorerHeadingRef} tabIndex={-1}>
               {chord.symbol} <span>{qualityInfo?.name}</span>
             </h2>
             <p className="ca-help">{qualityInfo?.description}</p>
@@ -710,9 +724,18 @@ export default function ChordAtlas() {
                 </div>
               )}
             </div>
-            <div className="ca-keyboard-wrap">
+            <section
+              className="ca-keyboard-wrap"
+              aria-label="Piano keyboard"
+              aria-describedby={`${id}-keyboard-hint`}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: Keyboard users need focus to scroll this overflowing region.
+              tabIndex={0}
+            >
               <PianoDiagram voicing={shownVoicing} chord={chord} />
-            </div>
+            </section>
+            <p id={`${id}-keyboard-hint`} className="ca-keyboard-hint">
+              Scroll the keyboard sideways if needed.
+            </p>
             <div className="ca-voicing">
               <div>
                 <span className="ca-eyebrow">
@@ -844,12 +867,24 @@ export default function ChordAtlas() {
             );
           })}
         </div>
+        <div className="ca-selection-summary">
+          <p>
+            <span className="ca-eyebrow">Selected chord</span>
+            <strong>{chord.symbol}</strong>{" "}
+            <span>{noteList(chord.tones.map((tone) => tone.note))}</span>
+          </p>
+          <a className="ca-view-chord" href={`#${id}-explorer`}>
+            View {chord.symbol} diagrams ↑
+          </a>
+        </div>
         <div className="ca-connections">
           <div className="ca-graph-panel">
             <h3>Shared-tone map</h3>
+            {/* biome-ignore lint/a11y/useSemanticElements: An interactive SVG is a group rather than a flattened image; a fieldset cannot replace its SVG viewport. */}
             <svg
               viewBox="0 0 400 335"
               className="ca-graph"
+              role="group"
               aria-labelledby={`${id}-graph-title`}
             >
               <title id={`${id}-graph-title`}>
@@ -933,7 +968,7 @@ export default function ChordAtlas() {
                     textAnchor="middle"
                     className="ca-graph-symbol"
                   >
-                    {node.chord.symbol}
+                    {graphSymbol(node.chord)}
                   </text>
                   <text
                     x={nodePoints[index].x}
@@ -946,6 +981,11 @@ export default function ChordAtlas() {
                 </g>
               ))}
             </svg>
+            {sevenths && (
+              <p className="ca-graph-notation">
+                Δ7 = major seventh · ø7 = half-diminished seventh
+              </p>
+            )}
             <p className="ca-help">
               <span className="ca-line-key" aria-hidden="true" /> A line means
               shared notes, not a prescribed progression.
@@ -958,6 +998,9 @@ export default function ChordAtlas() {
                 ? `Connected to ${chord.symbol}`
                 : `${chord.symbol} in this key`}
             </h3>
+            <a className="ca-view-chord" href={`#${id}-explorer`}>
+              View {chord.symbol} diagrams ↑
+            </a>
             {selectedNode ? (
               <>
                 <p className="ca-neighbor-intro">

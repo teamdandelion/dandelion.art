@@ -453,10 +453,23 @@ html[data-theme="dark"] .chord-atlas {
   font-size: 12px;
 }
 .ca-keyboard-wrap {
-  display: flex;
-  align-items: center;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ca-accent) var(--ca-panel);
   min-height: 160px;
   margin: 3px 0 15px;
+  padding-bottom: 8px;
+  border-radius: 4px;
+}
+.ca-keyboard-wrap:focus-visible {
+  outline: 2px solid var(--ca-focus);
+  outline-offset: 3px;
+}
+.ca-keyboard-hint {
+  font-size: 12px;
+  color: var(--ca-muted);
+  margin: -5px 0 18px;
 }
 .ca-piano {
   width: 100%;
@@ -490,7 +503,7 @@ html[data-theme="dark"] .chord-atlas {
   stroke: #8f4e36;
 }
 .ca-key-label {
-  font-size: 9px;
+  font-size: 12px;
   fill: #88938d;
 }
 .ca-key-label--active {
@@ -498,7 +511,7 @@ html[data-theme="dark"] .chord-atlas {
   font-weight: 650;
 }
 .ca-black-key-label {
-  font-size: 8px;
+  font-size: 11px;
   fill: #fffdf7;
   font-weight: 600;
 }
@@ -673,6 +686,7 @@ html[data-theme="dark"] .chord-atlas {
   font-weight: 500;
   margin: 3px 0 0;
   letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
 }
 .ca-uke-diagram--compact {
   width: 95%;
@@ -687,6 +701,43 @@ html[data-theme="dark"] .chord-atlas {
   font-size: 9px;
   line-height: 1.5;
   padding: 0 2px;
+}
+.ca-selection-summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 18px;
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--ca-muted);
+}
+.ca-selection-summary strong {
+  color: var(--ca-ink);
+  font-size: 18px;
+  margin-right: 8px;
+}
+.ca-view-chord {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ca-accent);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.ca-chord-heading h2 {
+  scroll-margin-block-start: 24px;
+}
+.ca-chord-heading h2:focus {
+  outline: none;
+}
+.ca-graph-notation {
+  color: var(--ca-muted);
+  font-size: 12px;
+  text-align: center;
+  margin-top: 8px;
 }
 .ca-connections {
   margin-top: 23px;
@@ -735,6 +786,7 @@ html[data-theme="dark"] .chord-atlas {
 }
 .ca-graph-node {
   cursor: pointer;
+  outline: none;
 }
 .ca-graph-node > circle {
   fill: var(--ca-paper);
@@ -869,6 +921,8 @@ html[data-theme="dark"] .chord-atlas {
   color: var(--ca-accent);
   font-size: 12px;
   font-weight: 500;
+  min-height: 44px;
+  padding-block: 12px;
 }
 .ca-model-note > div {
   display: grid;
@@ -887,6 +941,13 @@ html[data-theme="dark"] .chord-atlas {
 }
 
 @media (max-width: 760px) {
+  .ca-connections {
+    grid-template-columns: 1fr;
+  }
+  .ca-graph-panel {
+    border-right: 0;
+    border-bottom: 1px solid var(--ca-line);
+  }
   .ca-intro {
     align-items: flex-start;
   }
@@ -928,13 +989,14 @@ html[data-theme="dark"] .chord-atlas {
     min-height: 150px;
   }
   .ca-chord-grid {
-    gap: 5px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
   }
   .ca-chord-card > strong {
-    font-size: 17px;
+    font-size: 21px;
   }
   .ca-card-tones {
-    font-size: 8px;
+    font-size: 11px;
   }
   .ca-neighbors {
     padding: 22px 18px;
@@ -1123,7 +1185,7 @@ html[data-theme="dark"] .chord-atlas {
     font-size: 10px;
   }
   .ca-chord-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 7px;
   }
   .ca-chord-card {
@@ -1133,7 +1195,7 @@ html[data-theme="dark"] .chord-atlas {
     font-size: 20px;
   }
   .ca-card-tones {
-    font-size: 8px;
+    font-size: 11px;
   }
   .ca-uke-diagram--compact {
     width: 100%;
@@ -1144,7 +1206,7 @@ html[data-theme="dark"] .chord-atlas {
     margin-top: 19px;
   }
   .ca-graph-panel {
-    padding: 20px 20px 17px;
+    padding: 20px 10px 17px;
     border-right: 0;
     border-bottom: 1px solid var(--ca-line);
   }
@@ -1168,6 +1230,72 @@ html[data-theme="dark"] .chord-atlas {
   .ca-model-note > div {
     grid-template-columns: 1fr;
     gap: 13px;
+  }
+}
+
+/* Keep controls touch-sized in landscape and on tablets as well as narrow phones. */
+.chord-atlas .ca-field select,
+.chord-atlas .ca-search-input input {
+  font-size: 16px;
+}
+.ca-field select,
+.ca-search-input,
+.ca-button,
+.ca-segmented button,
+.ca-arrow {
+  min-height: 44px;
+}
+.ca-arrow,
+.ca-search-input button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+@media (max-width: 760px), (pointer: coarse) {
+  .ca-graph-node > circle {
+    r: 40;
+  }
+  .ca-graph-symbol {
+    font-size: 20px;
+  }
+  .ca-graph-roman {
+    font-size: 13px;
+  }
+  .ca-uke-diagram--compact .ca-string-name,
+  .ca-uke-diagram--compact .ca-fret-number {
+    font-size: 17px;
+  }
+  .ca-help,
+  .ca-uke-panel > .ca-help,
+  .ca-piano-note,
+  .ca-theory-note,
+  .ca-card-tones,
+  .ca-graph-panel > .ca-help {
+    font-size: 12px;
+  }
+  .ca-segmented button,
+  .ca-key-summary .ca-segmented button,
+  .ca-button {
+    font-size: 12px;
+  }
+  .ca-shared-notes small {
+    display: block;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 359px) {
+  .ca-chord-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ca-controls {
+    grid-template-columns: 1fr;
+  }
+  .ca-segmented {
+    width: 100%;
+  }
+  .ca-segmented button {
+    flex: 1;
   }
 }
 
