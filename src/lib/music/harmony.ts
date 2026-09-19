@@ -91,7 +91,7 @@ export function chordRelations(from: Chord, to: Chord): HarmonicRelation[] {
       kind: "shared-tones",
       directed: false,
       label: `${sharedTones.length} shared ${sharedTones.length === 1 ? "note" : "notes"}`,
-      explanation: `Both chords contain ${sharedTones.map(formatNote).join(" · ")}. A shared note can stay while the harmony changes; this is not a prescribed resolution.`,
+      explanation: sharedTones.map(formatNote).join(" · "),
       sharedTones,
     });
   return relations;

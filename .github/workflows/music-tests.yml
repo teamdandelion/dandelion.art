@@ -6,6 +6,7 @@ on:
       - "src/lib/music/**"
       - "src/components/music/**"
       - "tests/music*.test.mjs"
+      - "scripts/import-ukulele-library.mjs"
       - ".github/workflows/music-tests.yml"
       - "package.json"
   push:
@@ -14,6 +15,7 @@ on:
       - "src/lib/music/**"
       - "src/components/music/**"
       - "tests/music*.test.mjs"
+      - "scripts/import-ukulele-library.mjs"
       - ".github/workflows/music-tests.yml"
       - "package.json"
 

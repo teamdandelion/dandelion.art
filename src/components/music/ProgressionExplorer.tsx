@@ -104,8 +104,7 @@ export default function ProgressionExplorer({
     >
       <div className="hp-heading">
         <div>
-          <span className="ca-eyebrow">Progression playground · prototype</span>
-          <h2 id={`${id}-title`}>Where could this go?</h2>
+          <h2 id={`${id}-title`}>Progressions</h2>
         </div>
         <button
           type="button"
@@ -116,14 +115,12 @@ export default function ProgressionExplorer({
         </button>
       </div>
       <p className="hp-intro">
-        Build a trail one chord at a time. Some moves share notes; others create
-        a pull toward a destination. These are possibilities to hear, not rules
-        to follow.
+        Tap a neighboring chord to append it. Tap a step to inspect it.
       </p>
 
       <div className="hp-reference-actions">
         <span>
-          From the reference above: <strong>{selectedChord.symbol}</strong>
+          Selected: <strong>{selectedChord.symbol}</strong>
         </span>
         <button
           type="button"
@@ -221,7 +218,7 @@ export default function ProgressionExplorer({
             ? `Playing step ${(playback.step ?? 0) + 1}: ${trail[playback.step ?? 0]?.symbol}`
             : trail.length === MAX_STEPS
               ? "Trail full. Undo a step or start a new trail."
-              : "Piano playback uses root-position voicings, not optimized voice leading.")}
+              : "Synth · root-position voicings")}
       </output>
 
       <div className="hp-explanation" aria-live="polite">
@@ -231,10 +228,7 @@ export default function ProgressionExplorer({
             : `${trail[inspected - 1].symbol} → ${trail[inspected].symbol}`}
         </h3>
         {inspected === 0 ? (
-          <p>
-            Choose a neighbor below to extend your trail. Tap any trail step to
-            inspect it in the reference.
-          </p>
+          <p>Select a chord from the map below.</p>
         ) : relation.length ? (
           relation.map((edge) => (
             <p key={edge.kind}>
@@ -242,10 +236,7 @@ export default function ProgressionExplorer({
             </p>
           ))
         ) : (
-          <p>
-            No shared-tone or resolution relationship is labeled for this move.
-            That does not make it wrong—listen to it in context.
-          </p>
+          <p>No shared notes or modeled resolution.</p>
         )}
         <a className="ca-view-chord" href={referenceHref}>
           View {selectedChord.symbol} diagrams ↑
@@ -264,8 +255,7 @@ export default function ProgressionExplorer({
         </label>
       </div>
       <p className="ca-help">
-        Key filter: {keyName} · uses the key controls below. This filters
-        suggestions, not your existing trail.
+        Key: {keyName} · <a href="#key-chords">Change key ↓</a>
       </p>
       <div className="hp-legend">
         {(
@@ -365,9 +355,7 @@ export default function ProgressionExplorer({
         </p>
       )}
       <p className="ca-help">
-        Arrows mark directional resolutions; plain lines mark shared notes or
-        relative chords. Showing up to six suggestions—not every possible next
-        chord.
+        Arrows: resolutions · lines: shared notes or relative chords
       </p>
     </section>
   );

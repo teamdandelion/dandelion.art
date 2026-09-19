@@ -338,6 +338,25 @@ html[data-theme="dark"] .chord-atlas {
 .ca-finger {
   fill: var(--ca-accent);
 }
+.ca-finger-label {
+  fill: var(--ca-paper);
+  font-size: 14px;
+  font-weight: 600;
+}
+.ca-barre {
+  stroke: var(--ca-accent);
+  stroke-width: 16;
+  stroke-linecap: round;
+}
+.ca-attribution {
+  padding-top: 24px;
+  color: var(--ca-muted);
+  font-size: 12px;
+}
+.ca-attribution a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .ca-finger.ca-root {
   fill: var(--ca-coral);
 }
@@ -847,13 +866,6 @@ html[data-theme="dark"] .chord-atlas {
   letter-spacing: -0.03em;
   margin-top: 5px;
 }
-.ca-neighbor-intro {
-  color: var(--ca-muted);
-  font-size: 12px;
-  line-height: 1.65;
-  padding: 8px 0 18px;
-  max-width: 340px;
-}
 .ca-neighbor-list {
   display: flex;
   flex-direction: column;
@@ -906,9 +918,6 @@ html[data-theme="dark"] .chord-atlas {
   font-size: 13px;
   line-height: 1.8;
   margin-top: 18px;
-}
-.ca-outside-key p + p {
-  margin-top: 12px;
 }
 .ca-theory-note {
   font-size: 12px;
