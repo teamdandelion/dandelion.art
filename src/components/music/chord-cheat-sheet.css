@@ -15,6 +15,188 @@
   text-decoration: underline;
   text-underline-offset: 4px;
 }
+.cs-controls {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+.cs-view {
+  display: flex;
+  border: 1px solid var(--ca-line);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 3px;
+}
+.cs-view button {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--ca-muted);
+}
+.cs-view button[aria-pressed="true"] {
+  background: var(--ca-accent-soft);
+  color: var(--ca-ink);
+}
+.cs-selector {
+  flex: 1 1 190px;
+  max-width: 300px;
+  min-width: 0;
+}
+.cs-selector label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 12px;
+  color: var(--ca-muted);
+}
+.cs-selector select {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  font-size: 16px;
+  border: 1px solid var(--ca-line);
+  border-radius: 6px;
+  background: var(--ca-paper);
+}
+.cs-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.cs-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+.cs-section-heading h2 {
+  font-size: 19px;
+  font-weight: 500;
+}
+.cs-help-button,
+.cs-close {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--ca-line);
+  border-radius: 50%;
+  background: var(--ca-paper);
+  color: var(--ca-accent);
+  font-size: 18px;
+}
+.cs-paired {
+  --cs-column-count: 2;
+}
+.cs-nearby-heading {
+  margin-top: 28px;
+}
+.cs-nearby-grid,
+.cs-single-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px 8px;
+}
+.cs-roman,
+.cs-single h2 {
+  color: var(--ca-muted);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 8px;
+  scroll-margin-top: 60px;
+}
+.cs-destination {
+  text-align: center;
+  color: var(--ca-accent);
+  margin-top: 8px;
+  font-size: 13px;
+}
+.cs-modal {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(600px, calc(100vw - 24px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 1px solid var(--ca-line);
+  border-radius: 14px;
+  background: var(--ca-paper);
+  color: var(--ca-ink);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.cs-modal::backdrop {
+  background: rgb(0 0 0 / 65%);
+}
+.cs-modal-content {
+  padding: 20px;
+}
+.cs-modal header {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background: var(--ca-paper);
+  padding: 12px 20px;
+  margin: -20px -20px 16px;
+  border-bottom: 1px solid var(--ca-line);
+}
+.cs-modal h2 {
+  font:
+    400 26px / 1.2 Georgia,
+    serif;
+}
+.cs-modal h3 {
+  margin: 22px 0 8px;
+  font-size: 17px;
+  font-weight: 600;
+}
+.cs-modal p,
+.cs-modal li {
+  font-size: 15px;
+  line-height: 1.65;
+}
+.cs-modal p + p {
+  margin-top: 12px;
+}
+.cs-modal ul,
+.cs-modal ol {
+  padding-left: 22px;
+  margin: 12px 0;
+}
+.cs-modal ul {
+  list-style: disc;
+}
+.cs-modal ol {
+  list-style: decimal;
+}
+.cs-modal li + li {
+  margin-top: 10px;
+}
+.cs-modal a {
+  color: var(--ca-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cs-reading {
+  margin-top: 24px;
+  color: var(--ca-muted);
+}
 .cs-jump {
   display: flex;
   flex-wrap: wrap;
@@ -34,7 +216,7 @@
 .cs-columns,
 .cs-chords {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--cs-column-count, 3), minmax(0, 1fr));
   gap: 8px;
 }
 .cs-columns {
@@ -109,14 +291,26 @@
   font-variant-numeric: tabular-nums;
   color: var(--ca-muted);
 }
+@media (max-width: 560px) {
+  .cs-single-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 @media (max-width: 400px) {
   .cs-columns,
   .cs-chords {
     gap: 2px;
   }
+  .cs-nearby-grid,
+  .cs-single-grid {
+    gap: 16px 3px;
+  }
 }
 @media print {
   .cs-jump,
+  .cs-controls,
+  .cs-help-button,
+  .cs-modal,
   .cs-atlas-link {
     display: none;
   }
