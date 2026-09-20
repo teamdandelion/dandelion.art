@@ -8,28 +8,20 @@ import { CHEAT_SHEET_COLUMNS, CHEAT_SHEET_ROWS } from "../../lib/music/cheat-she
 ---
 
 <LayoutDefault
-  title="Baritone chord cheat sheet — dandelion.art"
+  title="Baritone ukulele cheat sheet — dandelion.art"
   description="21 baritone ukulele chords: major, minor, and dominant seventh, with finger numbers and barres."
   noindex
 >
   <article class="chord-atlas chord-sheet">
     <header class="cs-intro">
       <a class="ca-eyebrow ca-back" href="/music">Music /</a>
-      <h1>Chord cheat sheet</h1>
-      <p>Baritone ukulele · D G B E · 4- or 6-string</p>
+      <h1>Baritone ukulele cheat sheet</h1>
       <a class="cs-atlas-link" href="/music/chords">Open chord atlas ↗</a>
     </header>
-
-    <div class="cs-key">
-      <p><strong>Fingers:</strong> 1 index · 2 middle · 3 ring · 4 pinky</p>
-      <p><strong>Diagrams:</strong> ○ open · × muted · joined dots = barre</p>
-      <p>Dots show fingers, not frets. The number beside each grid is its first fret. Seventh = dominant seventh.</p>
-    </div>
 
     <nav class="cs-jump" aria-label="Jump to chord root">
       {CHEAT_SHEET_ROWS.map(({ root }) => <a href={`#root-${root}`}>{root}</a>)}
     </nav>
-    <p class="cs-hint">Tap a chord for piano notes and more shapes.</p>
 
     <div class="cs-columns" aria-hidden="true">
       {CHEAT_SHEET_COLUMNS.map(({ label }) => <span>{label}</span>)}
