@@ -22,7 +22,7 @@ export type SheetEntry = ReturnType<typeof sheetEntry>;
 export const CHEAT_SHEET_COLUMNS = [
   { quality: "major", label: "Major" },
   { quality: "minor", label: "Minor" },
-  { quality: "7", label: "Seventh" },
+  { quality: "7", label: "Dominant 7" },
 ] as const;
 
 export const CHROMATIC_ROOTS = [

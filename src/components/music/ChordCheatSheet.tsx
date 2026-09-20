@@ -59,6 +59,7 @@ export default function ChordCheatSheet() {
     const opener = helpOpenerRef.current;
     const previousOverflow = document.documentElement.style.overflow;
     dialog.showModal();
+    dialog.scrollTop = 0;
     document.documentElement.style.overflow = "hidden";
     return () => {
       dialog.close();
@@ -84,22 +85,24 @@ export default function ChordCheatSheet() {
   return (
     <article className="chord-atlas chord-sheet">
       <header className="cs-intro">
-        <a className="ca-eyebrow ca-back" href="/music">
-          Music /
-        </a>
+        <nav className="cs-nav" aria-label="Music tools">
+          <a href="/music">Music</a>
+          <a className="cs-atlas-link" href="/music/chords">
+            Chord atlas ↗
+          </a>
+        </nav>
         <h1>Baritone ukulele cheat sheet</h1>
-        <a className="cs-atlas-link" href="/music/chords">
-          Open chord atlas ↗
-        </a>
       </header>
-      <div className="cs-controls">
+      <div
+        className={`cs-controls${view === "all" ? " cs-controls--all" : ""}`}
+      >
         <fieldset className="cs-view" aria-label="Sheet view">
           <button
             type="button"
             aria-pressed={view === "key"}
             onClick={() => setView("key")}
           >
-            By key
+            Key
           </button>
           <button
             type="button"
@@ -112,7 +115,9 @@ export default function ChordCheatSheet() {
         <div className="cs-selector">
           {view === "key" ? (
             <>
-              <label htmlFor={`${id}-key`}>Key</label>
+              <label className="cs-status" htmlFor={`${id}-key`}>
+                Key
+              </label>
               <select
                 id={`${id}-key`}
                 value={tonic}
@@ -127,7 +132,9 @@ export default function ChordCheatSheet() {
             </>
           ) : (
             <>
-              <label htmlFor={`${id}-quality`}>Chords</label>
+              <label className="cs-status" htmlFor={`${id}-quality`}>
+                Chords
+              </label>
               <select
                 id={`${id}-quality`}
                 value={quality}
@@ -153,33 +160,37 @@ export default function ChordCheatSheet() {
       </output>
       {view === "key" ? (
         <>
-          <div className="cs-section-heading">
-            <h2>In {keyName}</h2>
-            {helpButton("practice", "How to practice chords in a key")}
-          </div>
+          <h2 className="cs-status">In {keyName}</h2>
           <div className="cs-paired">
-            <div className="cs-columns" aria-hidden="true">
-              <span>Triad</span>
-              <span>Seventh</span>
+            <div className="cs-key-header">
+              <div className="cs-columns" aria-hidden="true">
+                <span>Triad</span>
+                <span>Seventh</span>
+                <span className="cs-repeated-column">Triad</span>
+                <span className="cs-repeated-column">Seventh</span>
+              </div>
+              {helpButton("practice", "How to practice chords in a key")}
             </div>
-            {practice.rows.map((row) => (
-              <section
-                key={row.degree}
-                className="cs-row"
-                aria-labelledby={`${id}-degree-${row.degree}`}
-              >
-                <h2 id={`${id}-degree-${row.degree}`}>{row.roman}</h2>
-                <div className="cs-chords">
-                  {row.entries.map((entry) => (
-                    <ChordCard key={entry.chord.id} entry={entry} />
-                  ))}
-                </div>
-              </section>
-            ))}
+            <div className="cs-degree-grid">
+              {practice.rows.map((row) => (
+                <section
+                  key={row.degree}
+                  className="cs-row"
+                  aria-labelledby={`${id}-degree-${row.degree}`}
+                >
+                  <h2 id={`${id}-degree-${row.degree}`}>{row.roman}</h2>
+                  <div className="cs-chords">
+                    {row.entries.map((entry) => (
+                      <ChordCard key={entry.chord.id} entry={entry} />
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
           </div>
           <section aria-labelledby={`${id}-nearby`}>
             <div className="cs-section-heading cs-nearby-heading">
-              <h2 id={`${id}-nearby`}>Common outside-key chords</h2>
+              <h2 id={`${id}-nearby`}>Outside key</h2>
               {helpButton("nearby", "About outside-key chords")}
             </div>
             <div className="cs-nearby-grid">
