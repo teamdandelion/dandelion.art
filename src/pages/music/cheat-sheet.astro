@@ -1,47 +1,13 @@
 ---
-import UkeDiagram from "../../components/music/UkeDiagram";
-import "../../components/music/chord-atlas.css";
-import "../../components/music/chord-cheat-sheet.css";
+import ChordCheatSheet from "../../components/music/ChordCheatSheet";
 import LayoutDefault from "../../layouts/LayoutDefault.astro";
-import { SIX_STRING_BARITONE } from "../../lib/music";
-import { CHEAT_SHEET_COLUMNS, CHEAT_SHEET_ROWS } from "../../lib/music/cheat-sheet";
 ---
 
 <LayoutDefault
   title="Baritone ukulele cheat sheet — dandelion.art"
-  description="21 baritone ukulele chords: major, minor, and dominant seventh, with finger numbers and barres."
+  description="Baritone ukulele chords by key, with related chords, practice ideas, and a full chromatic reference."
   noindex
 >
-  <article class="chord-atlas chord-sheet">
-    <header class="cs-intro">
-      <a class="ca-eyebrow ca-back" href="/music">Music /</a>
-      <h1>Baritone ukulele cheat sheet</h1>
-      <a class="cs-atlas-link" href="/music/chords">Open chord atlas ↗</a>
-    </header>
-
-    <nav class="cs-jump" aria-label="Jump to chord root">
-      {CHEAT_SHEET_ROWS.map(({ root }) => <a href={`#root-${root}`}>{root}</a>)}
-    </nav>
-
-    <div class="cs-columns" aria-hidden="true">
-      {CHEAT_SHEET_COLUMNS.map(({ label }) => <span>{label}</span>)}
-    </div>
-    {CHEAT_SHEET_ROWS.map(({ root, entries }) => (
-      <section class="cs-row" aria-labelledby={`root-${root}`}>
-        <h2 id={`root-${root}`}>{root}</h2>
-        <div class="cs-chords">
-          {entries.map(({ chord, fingering, href }) => (
-            <a class="cs-chord" href={href} aria-label={`${chord.name}: D, G, B, E courses, frets ${fingering.frets.map(fret => fret === null ? "muted" : fret === 0 ? "open" : fret).join(", ")}. Fingers ${fingering.fingers.map(finger => finger ?? "none").join(", ")}.${fingering.barres.map(barre => ` Barre finger ${barre.finger} at fret ${barre.fret}, courses ${barre.fromCourse} to ${barre.toCourse}.`).join("")} Open in chord atlas.`}>
-              <h3>{chord.symbol}</h3>
-              <UkeDiagram chord={chord} fingering={fingering} instrument={SIX_STRING_BARITONE} reference />
-              <span class="cs-frets" aria-hidden="true">{fingering.frets.map(fret => fret ?? "×").join(" · ")}</span>
-            </a>
-          ))}
-        </div>
-      </section>
-    ))}
-    <footer class="ca-attribution">
-      Fingerings: <a href="https://github.com/tombatossals/chords-db">chords-db</a> · <a href="/licenses/chords-db.txt">MIT license</a>
-    </footer>
-  </article>
+  <ChordCheatSheet client:load />
+  <noscript><p>The G-major sheet is shown above. Enable JavaScript to change key or open the study notes.</p></noscript>
 </LayoutDefault>

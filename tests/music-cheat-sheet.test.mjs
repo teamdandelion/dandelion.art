@@ -1,29 +1,37 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  allChordRows,
   CHEAT_SHEET_COLUMNS,
-  CHEAT_SHEET_ROWS,
+  practiceSheet,
 } from "../src/lib/music/cheat-sheet.ts";
 import {
   BARITONE,
+  CHORD_QUALITIES,
   findFingerings,
+  KEY_OPTIONS,
+  keyContext,
+  keyScale,
   parseChord,
+  pitchClassNumber,
 } from "../src/lib/music/index.ts";
 
-test("cheat sheet has C–B rows and major, minor, dominant seventh columns", () => {
+test("all-chords sheet covers 12 roots and major, minor, dominant seventh columns", () => {
   assert.deepEqual(
-    CHEAT_SHEET_ROWS.map((row) => row.root),
-    ["C", "D", "E", "F", "G", "A", "B"],
+    allChordRows().map((row) => row.root),
+    ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"],
   );
   assert.deepEqual(
     CHEAT_SHEET_COLUMNS.map((column) => column.quality),
     ["major", "minor", "7"],
   );
-  assert.equal(CHEAT_SHEET_ROWS.flatMap((row) => row.entries).length, 21);
+  assert.equal(allChordRows().flatMap((row) => row.entries).length, 36);
 });
 
 test("all sheet diagrams use the first canonical shape and work on both baritones", () => {
-  for (const { entries } of CHEAT_SHEET_ROWS) {
+  for (const { entries } of CHORD_QUALITIES.flatMap((item) =>
+    allChordRows(item.id),
+  )) {
     for (const { chord, fingering, href } of entries) {
       assert.equal(fingering.source, "library");
       assert.equal(fingering.library.position, 1);
@@ -34,6 +42,61 @@ test("all sheet diagrams use the first canonical shape and work on both baritone
         "chord",
       );
       assert.equal(parseChord(requested).id, chord.id);
+    }
+  }
+});
+
+test("G-major practice sheet has correct pairs, outside chords, and practice loops", () => {
+  const sheet = practiceSheet("G");
+  assert.deepEqual(
+    sheet.rows.map((row) => row.entries.map((entry) => entry.chord.symbol)),
+    [
+      ["G", "Gmaj7"],
+      ["Am", "Am7"],
+      ["Bm", "Bm7"],
+      ["C", "Cmaj7"],
+      ["D", "D7"],
+      ["Em", "Em7"],
+      ["F♯dim", "F♯m7♭5"],
+    ],
+  );
+  assert.deepEqual(
+    sheet.nearby.map((entry) => entry.chord.symbol),
+    ["A7", "B7", "E7", "G7", "Cm", "F"],
+  );
+  assert.deepEqual(
+    sheet.nearby.map((entry) => entry.move),
+    ["→ D", "→ Em", "→ Am", "→ C", "→ G", "→ C → G"],
+  );
+  assert.deepEqual(sheet.loops[2], ["G", "B7", "Em", "C", "D7", "G"]);
+});
+
+test("every major-key sheet preserves diatonic spelling and meaningful outside relationships", () => {
+  for (const tonic of KEY_OPTIONS) {
+    const sheet = practiceSheet(tonic);
+    const scale = keyScale(sheet.key);
+    assert.equal(sheet.rows.length, 7);
+    assert.equal(sheet.nearby.length, 6);
+    for (const row of sheet.rows)
+      for (const entry of row.entries) {
+        assert.ok(keyContext(entry.chord, sheet.key).fitsPitchClasses);
+        assert.deepEqual(entry.chord.root, scale[row.degree - 1]);
+        assert.equal(entry.fingering.library.position, 1);
+        assert.equal(parseChord(entry.chord.symbol).id, entry.chord.id);
+      }
+    for (const [i, entry] of sheet.nearby.entries()) {
+      assert.equal(keyContext(entry.chord, sheet.key).fitsPitchClasses, false);
+      assert.equal(entry.fingering.source, "library");
+      if (i < 4) {
+        const target = sheet.rows[[4, 5, 1, 3][i]].entries[0].chord;
+        assert.equal(
+          (pitchClassNumber(entry.chord.root) -
+            pitchClassNumber(target.root) +
+            12) %
+            12,
+          7,
+        );
+      }
     }
   }
 });

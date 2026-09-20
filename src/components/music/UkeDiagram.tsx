@@ -25,7 +25,8 @@ export default function UkeDiagram({
 }) {
   const titleId = useId();
   const start = fingering.startFret;
-  const top = 44;
+  const top = reference ? 28 : 44;
+  const openY = reference ? 12 : 25;
   const left = reference ? 19 : 43;
   const spacing = compact || reference ? 34 : 44;
   const fretHeight = 34;
@@ -133,13 +134,13 @@ export default function UkeDiagram({
             {fret === 0 ? (
               <circle
                 cx={x}
-                cy="25"
+                cy={openY}
                 r="6"
                 className={`ca-open${isRoot ? " ca-root" : ""}`}
               />
             ) : fret === null ? (
               <path
-                d={`M${x - 5} 20l10 10m-10 0l10-10`}
+                d={`M${x - 5} ${openY - 5}l10 10m-10 0l10-10`}
                 className="ca-muted-string"
               />
             ) : (
