@@ -1,0 +1,129 @@
+.chord-sheet {
+  max-width: 760px;
+}
+.cs-intro h1 {
+  font:
+    400 clamp(2rem, 6vw, 3.5rem) / 1.1 Georgia,
+    serif;
+  margin: 8px 0 12px;
+}
+.cs-atlas-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--ca-accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.cs-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 16px 0 8px;
+}
+.cs-jump a {
+  display: grid;
+  place-items: center;
+  flex: 1 0 32px;
+  min-height: 44px;
+  border: 1px solid var(--ca-line);
+  border-radius: 6px;
+  color: var(--ca-accent);
+  font-weight: 600;
+}
+.cs-columns,
+.cs-chords {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.cs-columns {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 12px 0;
+  background: var(--ca-paper);
+  border-bottom: 1px solid var(--ca-line);
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+.cs-row {
+  padding: 14px 0 20px;
+  border-bottom: 1px solid var(--ca-line);
+}
+.cs-row h2 {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: var(--ca-muted);
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  scroll-margin-top: 60px;
+}
+.cs-row h2::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--ca-line);
+}
+.cs-chord {
+  display: block;
+  min-width: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px 0;
+  background: var(--ca-paper);
+  text-align: center;
+  text-decoration: none;
+}
+@media (hover: hover) {
+  .cs-chord:hover,
+  .cs-jump a:hover {
+    border-color: var(--ca-accent);
+    background: var(--ca-accent-soft);
+  }
+}
+.cs-chord h3 {
+  font:
+    400 clamp(1.5rem, 4vw, 2rem) / 1.2 Georgia,
+    serif;
+  color: var(--ca-ink);
+}
+.cs-chord .ca-uke-diagram {
+  width: 154px;
+  max-width: 100%;
+  margin: 0 auto;
+}
+.cs-chord .ca-finger-label {
+  font-size: 16px;
+}
+.cs-chord .ca-string-name {
+  font-size: 15px;
+}
+.cs-frets {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ca-muted);
+}
+@media (max-width: 400px) {
+  .cs-columns,
+  .cs-chords {
+    gap: 2px;
+  }
+}
+@media print {
+  .cs-jump,
+  .cs-atlas-link {
+    display: none;
+  }
+  .cs-columns {
+    position: static;
+  }
+  .cs-row {
+    break-inside: avoid;
+  }
+}
