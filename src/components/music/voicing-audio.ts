@@ -1,6 +1,10 @@
 import { midi, type Voicing } from "../../lib/music/index.ts";
 
-export type PlaybackState = { playing: boolean; message: string };
+export type PlaybackState = {
+  playing: boolean;
+  message: string;
+  step?: number;
+};
 type PlaybackContext = Pick<
   AudioContext,
   | "currentTime"
@@ -11,9 +15,11 @@ type PlaybackContext = Pick<
   | "createOscillator"
   | "createGain"
 >;
-type Sound = { oscillator: OscillatorNode; gain: GainNode };
+type Sound = { oscillator: OscillatorNode; gain: GainNode; step: number };
+// The reference and progression players must not sound over one another.
+let releaseAudioFocus: (() => void) | null = null;
 
-/** One pending or sounding voicing at a time, with cancellation across async resume. */
+/** One pending or sounding performance, with cancellation across async resume. */
 export function createVoicingPlayer(
   createContext: () => PlaybackContext | null,
   onChange: (state: PlaybackState) => void,
@@ -40,21 +46,31 @@ export function createVoicingPlayer(
 
   function cancel() {
     generation++;
+    if (releaseAudioFocus === cancel) releaseAudioFocus = null;
     for (const sound of sounds) release(sound, true);
     active = false;
     if (!disposed) onChange({ playing: false, message: "" });
   }
 
-  async function play(voicing: Voicing) {
+  async function start(
+    voicings: Voicing[],
+    duration: number,
+    sequence: boolean,
+  ) {
     if (active || disposed) return;
+    if (!voicings.length || !Number.isFinite(duration) || duration < 0.2)
+      return;
+    releaseAudioFocus?.();
+    releaseAudioFocus = cancel;
     // Lock synchronously: React may not have disabled the button before another tap.
     active = true;
     const request = ++generation;
-    onChange({ playing: true, message: "" });
+    onChange({ playing: true, message: "", ...(sequence ? { step: 0 } : {}) });
     try {
       if (!context || context.state === "closed") context = createContext();
       if (!context) {
         active = false;
+        if (releaseAudioFocus === cancel) releaseAudioFocus = null;
         onChange({
           playing: false,
           message: "Audio isn’t available in this browser.",
@@ -65,33 +81,52 @@ export function createVoicingPlayer(
       await ctx.resume();
       if (request !== generation || disposed) return;
       const now = ctx.currentTime;
-      for (const voice of voicing.voices) {
-        const oscillator = ctx.createOscillator();
-        const gain = ctx.createGain();
-        const sound = { oscillator, gain };
-        sounds.add(sound);
-        oscillator.type = "triangle";
-        oscillator.frequency.value = 440 * 2 ** ((midi(voice.pitch) - 69) / 12);
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(
-          0.2 / voicing.voices.length,
-          now + 0.025,
-        );
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
-        oscillator.connect(gain);
-        gain.connect(ctx.destination);
-        oscillator.onended = () => {
-          release(sound);
-          if (!sounds.size && request === generation && !disposed) {
-            active = false;
-            onChange({ playing: false, message: "" });
-          }
-        };
-        oscillator.start(now);
-        oscillator.stop(now + 1.7);
-      }
+      for (const [step, voicing] of voicings.entries())
+        for (const voice of voicing.voices) {
+          const begins = now + step * duration;
+          const oscillator = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const sound = { oscillator, gain, step };
+          sounds.add(sound);
+          oscillator.type = "triangle";
+          oscillator.frequency.value =
+            440 * 2 ** ((midi(voice.pitch) - 69) / 12);
+          gain.gain.setValueAtTime(0, begins);
+          gain.gain.linearRampToValueAtTime(
+            0.2 / voicing.voices.length,
+            begins + 0.025,
+          );
+          gain.gain.exponentialRampToValueAtTime(
+            0.0001,
+            begins + duration - 0.1,
+          );
+          oscillator.connect(gain);
+          gain.connect(ctx.destination);
+          oscillator.onended = () => {
+            release(sound);
+            if (!sounds.size && request === generation && !disposed) {
+              active = false;
+              if (releaseAudioFocus === cancel) releaseAudioFocus = null;
+              onChange({ playing: false, message: "" });
+            } else if (
+              sequence &&
+              request === generation &&
+              !disposed &&
+              ![...sounds].some((item) => item.step === step)
+            ) {
+              onChange({
+                playing: true,
+                message: "",
+                step: Math.min(...[...sounds].map((item) => item.step)),
+              });
+            }
+          };
+          oscillator.start(begins);
+          oscillator.stop(begins + duration);
+        }
       if (!sounds.size) {
         active = false;
+        if (releaseAudioFocus === cancel) releaseAudioFocus = null;
         onChange({ playing: false, message: "" });
       }
     } catch {
@@ -113,5 +148,11 @@ export function createVoicingPlayer(
     context = null;
   }
 
-  return { play, cancel, dispose };
+  return {
+    play: (voicing: Voicing) => start([voicing], 1.7, false),
+    playSequence: (voicings: Voicing[], secondsPerChord = 1.5) =>
+      start(voicings, secondsPerChord, true),
+    cancel,
+    dispose,
+  };
 }

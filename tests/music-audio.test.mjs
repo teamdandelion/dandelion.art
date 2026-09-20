@@ -239,3 +239,48 @@ test("unmount closes the context and suppresses pending work and further state u
   assert.equal(context.oscillators.length, 0);
   assert.equal(states.length, before);
 });
+
+test("a progression schedules its chord boundaries on the audio clock and advances the active step", async () => {
+  const { context, player, states } = setup();
+  await player.playSequence([c, d], 1.5);
+  assert.deepEqual(
+    context.oscillators.map((node) => node.starts[0]),
+    [10, 10, 10, 11.5, 11.5, 11.5],
+  );
+  assert.deepEqual(
+    context.oscillators.map((node) => node.stops[0]),
+    [11.5, 11.5, 11.5, 13, 13, 13],
+  );
+  assert.equal(states.at(-1).step, 0);
+  for (const node of context.oscillators.slice(0, 3)) node.finish();
+  assert.equal(states.at(-1).step, 1);
+  for (const node of context.oscillators.slice(3)) node.finish();
+  assert.equal(states.at(-1).playing, false);
+  player.dispose();
+});
+
+test("stopping a progression cancels future notes as well as the current chord", async () => {
+  const { context, player, states } = setup();
+  await player.playSequence([c, d]);
+  player.cancel();
+  assert.equal(states.at(-1).playing, false);
+  assert.ok(
+    context.oscillators.every(
+      (node) => node.disconnected && node.stops.at(-1) === undefined,
+    ),
+  );
+  assert.ok(context.oscillators.every((node) => node.onended === null));
+  player.dispose();
+});
+
+test("reference and progression players cancel one another rather than overlap", async () => {
+  const first = setup();
+  const second = setup();
+  await first.player.playSequence([c, d]);
+  await second.player.play(c);
+  assert.equal(first.states.at(-1).playing, false);
+  assert.ok(first.context.oscillators.every((node) => node.disconnected));
+  assert.equal(second.states.at(-1).playing, true);
+  first.player.dispose();
+  second.player.dispose();
+});

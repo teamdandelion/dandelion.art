@@ -28,6 +28,7 @@ import {
   type Voicing,
 } from "../../lib/music";
 import "./chord-atlas.css";
+import ProgressionExplorer from "./ProgressionExplorer";
 import { createVoicingPlayer, type PlaybackState } from "./voicing-audio";
 
 const STRING_NAMES = ["D", "G", "B", "E"];
@@ -436,6 +437,9 @@ export default function ChordAtlas() {
             A reference for baritone ukulele, piano, and the connections between
             chords.
           </p>
+          <a className="ca-view-chord" href="#progression-playground">
+            Explore chord progressions ↓
+          </a>
         </div>
         <div className="ca-tuning">
           <div className="ca-field ca-instrument-field">
@@ -759,6 +763,13 @@ export default function ChordAtlas() {
           </div>
         </div>
       </section>
+
+      <ProgressionExplorer
+        selectedChord={chord}
+        tonalKey={key}
+        onSelect={chooseChord}
+        referenceHref={`#${id}-explorer`}
+      />
 
       <section className="ca-key-section" aria-labelledby={`${id}-key-heading`}>
         <div className="ca-section-heading">

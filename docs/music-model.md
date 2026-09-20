@@ -102,10 +102,27 @@ selected key. An edge records the common tones that justify it. It describes
 similarity; it does not assert that one chord ought to follow another or rank a
 progression as musically better. Adjacent-chord links expose this same relation.
 
-A future directed harmonic graph can add relations such as dominant resolution,
-secondary dominants, borrowed harmony, or changes of key. Preserve each edge's
-type, applicable context, and explanation. These relations should coexist with
-shared-tone edges rather than inheriting their meaning.
+The progression playground adds a separate `harmony.ts` layer. `chordRelations`
+returns explained, typed edges: shared tones and relative major/minor triads are
+undirected; dominant-seventh and leading-tone resolutions are directional. A pair
+can have both kinds of relationship. These are possible moves, not claims about
+how an actual piece must be analyzed. Key membership is reported separately.
+
+`harmonicMoves` selects up to six neighbors from the key's triads and sevenths,
+plus applied dominants and leading-tone diminished chords when chromatic choices
+are enabled. Explicit resolution destinations include major, minor, and major-sixth
+chords. The selection heuristic prioritizes resolutions and relative triads, then
+shared tones with a diversity pass; it is not a musical quality score. Turning off
+chromatic suggestions requires every destination's pitch classes to fit the scale,
+without changing an existing trail. Borrowed-chord and modulation analysis remain
+future work.
+
+The interactive trail stores chord identities, not fingerings. Up to sixteen steps
+play as root-position piano voicings, two beats per chord, scheduled on the Web
+Audio clock. The reference and progression players share audio focus; stop, edits,
+and unmount cancel pending as well as active notes. The prototype does not save
+trails across reloads or optimize voice leading. Inspecting a step selects it in
+the existing instrument reference; it does not move the trail's endpoint.
 
 Path search will need distinct objectives:
 
@@ -126,7 +143,7 @@ or claim that D6 is diatonic to C major.
 
 The initial instruments are standard linear baritone uke and a six-string variant
 with an octave G course and unison E course. Other tunings,
-microtones, rhythm, chord-symbol inference, and progression recommendations are
+microtones, custom rhythms, chord-symbol inference, and automatic path search are
 outside this scope. The domain leaves instrument mapping independent of harmony
 so these can be considered without rewriting chord identity.
 

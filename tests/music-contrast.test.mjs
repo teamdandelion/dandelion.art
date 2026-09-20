@@ -6,11 +6,15 @@ const css = readFileSync(
   new URL("../src/components/music/chord-atlas.css", import.meta.url),
   "utf8",
 );
+const progressionCss = readFileSync(
+  new URL("../src/components/music/progression-explorer.css", import.meta.url),
+  "utf8",
+);
 
-function declaration(selector, property) {
-  const start = css.indexOf(`${selector} {`);
+function declaration(selector, property, source = css) {
+  const start = source.indexOf(`${selector} {`);
   assert.notEqual(start, -1, `Missing selector ${selector}`);
-  const block = css.slice(start, css.indexOf("}", start));
+  const block = source.slice(start, source.indexOf("}", start));
   const match = new RegExp(`${property}: (#[0-9a-f]{6});`).exec(block);
   assert.ok(match, `Missing color ${property} in ${selector}`);
   return match[1];
@@ -49,6 +53,21 @@ test("atlas text colors remain readable on their light and dark surfaces", () =>
     css,
     /\.ca-search-input input::placeholder\s*\{[^}]*opacity: 1;/,
   );
+});
+
+test("progression chord families remain readable in both themes", () => {
+  for (const prefix of ["", 'html[data-theme="dark"] '])
+    for (const family of ["major", "minor", "dominant", "diminished"])
+      for (const background of ["paper", "panel", "white", "accent-soft"])
+        checkContrast(
+          declaration(
+            `${prefix}.hp-family-${family}`,
+            "--hp-color",
+            progressionCss,
+          ),
+          declaration(`${prefix}.chord-atlas`, `--ca-${background}`),
+          `${prefix}${family} on ${background}`,
+        );
 });
 
 test("piano labels remain readable on natural, highlighted, and root keys", () => {
