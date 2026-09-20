@@ -1,3 +1,5 @@
+import { LIBRARY_REVISION, UKULELE_SHAPES } from "./data/ukulele-shapes.ts";
+
 /** Small, instrument-independent music model. All pitches use 12-tone equal temperament. */
 export type Letter = "C" | "D" | "E" | "F" | "G" | "A" | "B";
 export type PitchClass = { step: Letter; alter: number };
@@ -49,6 +51,13 @@ export type Fingering = {
   chordId: string;
   instrumentId: string;
   frets: (number | null)[];
+  fingers: (1 | 2 | 3 | 4 | null)[];
+  barres: {
+    fret: number;
+    finger: 1 | 2 | 3 | 4;
+    fromCourse: number;
+    toCourse: number;
+  }[];
   strings: {
     courseNumber: number;
     stringNumber: number;
@@ -57,7 +66,8 @@ export type Fingering = {
   }[];
   voicing: Voicing;
   startFret: number;
-  source: "familiar" | "generated";
+  source: "library" | "generated";
+  library?: { chord: string; position: number; revision: string };
   score: number;
 };
 export type Key = { tonic: PitchClass; mode: "major" | "natural-minor" };
@@ -147,7 +157,7 @@ export const CHORD_QUALITIES: ChordFormula[] = [
     id: "minor",
     name: "Minor",
     suffix: "m",
-    description: "The minor third gives this triad its minor quality.",
+    description: "Root, minor third, perfect fifth.",
     intervals: [R, m3, P5],
   },
   {
@@ -467,6 +477,8 @@ export function realizeFingering(
     chordId: chord.id,
     instrumentId: instrument.id,
     frets: [...frets],
+    fingers: frets.map(() => null),
+    barres: [],
     strings,
     voicing: { id: `${id}/voicing`, chordId: chord.id, voices },
     startFret:
@@ -553,29 +565,9 @@ export function pianoVoicing(
   };
 }
 
-// Familiar complete shapes in physical string order D–G–B–E. No guessed finger numbers.
-const FAMILIAR: Record<string, (number | null)[]> = {
-  "C0:major": [2, 0, 1, 0],
-  "C0:minor": [1, 0, 1, 3],
-  "D0:major": [0, 2, 3, 2],
-  "D0:minor": [0, 2, 3, 1],
-  "E0:major": [2, 1, 0, 0],
-  "E0:minor": [2, 0, 0, 0],
-  "F0:major": [3, 2, 1, 1],
-  "G0:major": [0, 0, 0, 3],
-  "A0:major": [2, 2, 2, 0],
-  "A0:minor": [2, 2, 1, 0],
-  "B0:major": [4, 4, 4, 2],
-  "B0:minor": [4, 4, 3, 2],
-  "D0:7": [0, 2, 1, 2],
-  "E0:7": [0, 1, 0, 0],
-  "G0:7": [0, 0, 0, 1],
-  "A0:m7": [2, 2, 1, 3],
-  "D0:6": [0, 2, 0, 2],
-};
 const fingeringCache = new Map<string, Fingering[]>();
 
-/** Pitch-correct candidates, not promises of ergonomic fingerings. All chord tones must sound. */
+/** Canonical library positions for DGBE courses; generated fallback for other tunings. */
 export function findFingerings(
   chord: Chord,
   instrument: FrettedInstrument = BARITONE,
@@ -583,6 +575,77 @@ export function findFingerings(
   const cacheKey = `${instrument.id}/${chord.id}`;
   const cached = fingeringCache.get(cacheKey);
   if (cached) return cached;
+  const isBaritone =
+    instrument.courses.length === 4 &&
+    instrument.courses.every(
+      (course, index) =>
+        course.strings.length > 0 &&
+        course.strings.every(
+          (string) =>
+            pitchClassNumber(string.open.note) === [2, 7, 11, 4][index],
+        ),
+    );
+  if (isBaritone) {
+    // GCEA chord names are a fourth above the same physical shape on DGBE.
+    // Recompute every voice from the real instrument, not upstream MIDI/bass data.
+    const root = [
+      "C",
+      "Db",
+      "D",
+      "Eb",
+      "E",
+      "F",
+      "Gb",
+      "G",
+      "Ab",
+      "A",
+      "Bb",
+      "B",
+    ][mod(pitchClassNumber(chord.root) + 5, 12)];
+    const libraryChord = `${root}:${chord.quality}`;
+    const result = (UKULELE_SHAPES[libraryChord] ?? []).map(
+      (position, index) => {
+        const shape = realizeFingering(chord, position.frets, instrument);
+        shape.source = "library";
+        shape.library = {
+          chord: libraryChord,
+          position: index + 1,
+          revision: LIBRARY_REVISION,
+        };
+        shape.fingers = position.fingers.map((finger) =>
+          finger === 0 ? null : (finger as 1 | 2 | 3 | 4),
+        );
+        shape.barres = position.barres.map((fret) => {
+          const finger = position.fingers.find(
+            (finger, i) =>
+              finger > 0 &&
+              position.frets[i] === fret &&
+              position.fingers.filter(
+                (other, j) => other === finger && position.frets[j] === fret,
+              ).length > 1,
+          );
+          if (!finger)
+            throw new Error(
+              `Missing barre finger: ${libraryChord}/${index + 1}`,
+            );
+          const courses = position.frets.flatMap((value, i) =>
+            value === fret && position.fingers[i] === finger
+              ? [instrument.courses[i].number]
+              : [],
+          );
+          return {
+            fret,
+            finger: finger as 1 | 2 | 3 | 4,
+            fromCourse: courses[0],
+            toCourse: courses[courses.length - 1],
+          };
+        });
+        return shape;
+      },
+    );
+    fingeringCache.set(cacheKey, result);
+    return result;
+  }
   const allowed = new Set(
     chord.tones.map((tone) => pitchClassNumber(tone.note)),
   );
@@ -613,14 +676,7 @@ export function findFingerings(
     if (max - min > 3) return;
     const shape = realizeFingering(chord, frets, instrument);
     if (voicingCoverage(shape.voicing, chord).omitted.length) return;
-    const familiar = INSTRUMENTS.some((known) => known.id === instrument.id)
-      ? FAMILIAR[chord.id]
-      : undefined;
-    shape.source = familiar?.every((fret, index) => fret === frets[index])
-      ? "familiar"
-      : "generated";
     shape.score =
-      (shape.source === "familiar" ? -100 : 0) +
       max * 2 +
       (max - min) * 3 +
       stopped.length +

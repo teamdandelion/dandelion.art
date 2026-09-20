@@ -92,7 +92,9 @@ function UkeDiagram({
       <title id={titleId}>
         {`${chord.symbol}, ${instrument.name}: D, G, B, E courses, frets ${fingering.frets
           .map((fret) => (fret === null ? "muted" : fret === 0 ? "open" : fret))
-          .join(", ")}.`}
+          .join(
+            ", ",
+          )}. Fingers ${fingering.fingers.map((finger) => finger ?? "none").join(", ")}.${fingering.barres.map((barre) => ` Barre finger ${barre.finger} at fret ${barre.fret}, courses ${barre.fromCourse} to ${barre.toCourse}.`).join("")}`}
       </title>
       {Array.from({ length: rows + 1 }, (_, i) => i).map((fret) => (
         <line
@@ -114,6 +116,38 @@ function UkeDiagram({
           {start}
         </text>
       )}
+      {instrument.courses.map((course, index) => (
+        <line
+          key={course.number}
+          x1={left + index * spacing}
+          x2={left + index * spacing}
+          y1={top}
+          y2={bottom}
+          className="ca-string"
+        />
+      ))}
+      {fingering.barres.map((barre) => (
+        <line
+          key={`${barre.fret}-${barre.finger}`}
+          x1={
+            left +
+            instrument.courses.findIndex(
+              (course) => course.number === barre.fromCourse,
+            ) *
+              spacing
+          }
+          x2={
+            left +
+            instrument.courses.findIndex(
+              (course) => course.number === barre.toCourse,
+            ) *
+              spacing
+          }
+          y1={top + (barre.fret - start + 0.5) * fretHeight}
+          y2={top + (barre.fret - start + 0.5) * fretHeight}
+          className="ca-barre"
+        />
+      ))}
       {fingering.frets.map((fret, index) => {
         const x = left + index * spacing;
         const course = instrument.courses[index];
@@ -139,7 +173,6 @@ function UkeDiagram({
           pitchClassNumber(voice.pitch.note) === pitchClassNumber(chord.root);
         return (
           <g key={STRING_NAMES[index]}>
-            <line x1={x} x2={x} y1={top} y2={bottom} className="ca-string" />
             {fret === 0 ? (
               <circle
                 cx={x}
@@ -153,12 +186,24 @@ function UkeDiagram({
                 className="ca-muted-string"
               />
             ) : (
-              <circle
-                cx={x}
-                cy={top + (fret - start + 0.5) * fretHeight}
-                r="11"
-                className={`ca-finger${isRoot ? " ca-root" : ""}`}
-              />
+              <>
+                <circle
+                  cx={x}
+                  cy={top + (fret - start + 0.5) * fretHeight}
+                  r="11"
+                  className={`ca-finger${isRoot ? " ca-root" : ""}`}
+                />
+                {fingering.fingers[index] && (
+                  <text
+                    x={x}
+                    y={top + (fret - start + 0.5) * fretHeight + 4.5}
+                    textAnchor="middle"
+                    className="ca-finger-label"
+                  >
+                    {fingering.fingers[index]}
+                  </text>
+                )}
+              </>
             )}
             <text
               x={x}
@@ -433,10 +478,7 @@ export default function ChordAtlas() {
               .
             </span>
           </h1>
-          <p>
-            A reference for baritone ukulele, piano, and the connections between
-            chords.
-          </p>
+          <p>Baritone ukulele · piano · progressions</p>
           <a className="ca-view-chord" href="#progression-playground">
             Explore chord progressions ↓
           </a>
@@ -564,7 +606,6 @@ export default function ChordAtlas() {
 
         <div className="ca-chord-heading">
           <div>
-            <span className="ca-eyebrow">Explore a chord</span>
             <h2 id={`${id}-explorer`} ref={explorerHeadingRef} tabIndex={-1}>
               {chord.symbol} <span>{qualityInfo?.name}</span>
             </h2>
@@ -639,33 +680,20 @@ export default function ChordAtlas() {
                   </button>
                 </div>
                 <p className="ca-help ca-center">
-                  ○ open course · × muted · dots are fret positions
+                  1 index · 2 middle · 3 ring · 4 pinky
                 </p>
-                {hasPairedCourses && (
-                  <p className="ca-help ca-center">
-                    One dot frets a whole course. Two pitches on G; doubled E
-                    sounds one pitch.
-                  </p>
-                )}
                 <p className="ca-help ca-center">
-                  {fingering.source === "familiar"
-                    ? "Familiar shape."
-                    : "Generated shape: pitch-correct, not hand-checked for comfort."}{" "}
-                  Finger numbers and barres aren’t specified.
+                  ○ open · × muted · joined dots = barre
                 </p>
               </>
             ) : (
-              <p className="ca-empty">
-                No complete four-string shape found within the first twelve
-                frets. Explore this chord on the piano.
-              </p>
+              <p className="ca-empty">No fingering available.</p>
             )}
           </div>
 
           <div className="ca-piano-panel">
             <div className="ca-panel-heading">
               <h3>On piano</h3>
-              <span className="ca-eyebrow">Same harmony, another view</span>
             </div>
             <div className="ca-piano-controls">
               <fieldset
@@ -726,9 +754,7 @@ export default function ChordAtlas() {
             </p>
             <div className="ca-voicing">
               <div>
-                <span className="ca-eyebrow">
-                  Exact sounding pitches · low to high
-                </span>
+                <span className="ca-eyebrow">Pitches · low to high</span>
                 <p className="ca-pitch-list">
                   {shownPitches.map((voice, index) => (
                     <span key={voice.id}>
@@ -746,8 +772,8 @@ export default function ChordAtlas() {
             </div>
             <p className="ca-piano-note">
               {pianoMode === "same" && fingering
-                ? "These keys sound the pitches of the selected ukulele shape. Each distinct pitch appears once; octave partners use different keys. Changing the shape can change the bass and register."
-                : "Choose a chord tone for the bass to explore closed-position voicings. These piano voicings are independent of the ukulele shape."}
+                ? "Matches the selected uke shape; unison strings share a key."
+                : "Piano voicing, independent of the uke shape."}
             </p>
             <div className="ca-color-legend">
               <span>
@@ -756,9 +782,7 @@ export default function ChordAtlas() {
               <span>
                 <i /> other chord tones
               </span>
-              <span className="ca-audio-note">
-                Playback uses a simple synth.
-              </span>
+              <span className="ca-audio-note">Synth playback</span>
             </div>
           </div>
         </div>
@@ -771,11 +795,14 @@ export default function ChordAtlas() {
         referenceHref={`#${id}-explorer`}
       />
 
-      <section className="ca-key-section" aria-labelledby={`${id}-key-heading`}>
+      <section
+        id="key-chords"
+        className="ca-key-section"
+        aria-labelledby={`${id}-key-heading`}
+      >
         <div className="ca-section-heading">
           <div>
-            <span className="ca-eyebrow">Find the connections</span>
-            <h2 id={`${id}-key-heading`}>A chord has company.</h2>
+            <h2 id={`${id}-key-heading`}>Chords in a key</h2>
           </div>
           <div className="ca-key-controls">
             <div className="ca-field">
@@ -977,12 +1004,10 @@ export default function ChordAtlas() {
               </p>
             )}
             <p className="ca-help">
-              <span className="ca-line-key" aria-hidden="true" /> A line means
-              shared notes, not a prescribed progression.
+              <span className="ca-line-key" aria-hidden="true" /> Shared notes
             </p>
           </div>
           <div className="ca-neighbors">
-            <span className="ca-eyebrow">Around the selected chord</span>
             <h3 ref={neighborsHeadingRef} tabIndex={-1}>
               {selectedNode
                 ? `Connected to ${chord.symbol}`
@@ -993,10 +1018,6 @@ export default function ChordAtlas() {
             </a>
             {selectedNode ? (
               <>
-                <p className="ca-neighbor-intro">
-                  Keep a note, change the harmony. Select a neighbor to see what
-                  stays and what moves.
-                </p>
                 <div className="ca-neighbor-list">
                   {adjacent.map(
                     ({ edge, node }) =>
@@ -1039,20 +1060,14 @@ export default function ChordAtlas() {
                     ? `All pitches of ${chord.symbol} fit this scale, but its spelling or chord quality differs from the seven ${sevenths ? "seventh chords" : "triads"} currently shown.`
                     : `${chord.symbol} includes ${noteList(context.outside)}, outside this scale.`}
                 </p>
-                <p>
-                  That can still make beautiful music. Choose one of the seven
-                  chords to explore its connections within this key.
-                </p>
               </div>
             )}
           </div>
         </div>
         <p className="ca-theory-note">
           {mode === "natural-minor"
-            ? "Natural minor keeps the seventh scale degree unraised. Many minor-key songs also use harmonic or melodic minor; their altered chords aren’t included in this map."
-            : "These seven chords are built by stacking alternate notes of the major scale. Roman numerals show their scale degree; lowercase numerals indicate minor chords."}{" "}
-          Shared tones describe one relationship between chords; rhythm, melody,
-          and voice leading give a progression its character.
+            ? "Natural minor only; harmonic and melodic minor alterations aren’t shown."
+            : "Roman numerals show scale degrees; lowercase indicates minor."}
         </p>
       </section>
 
@@ -1060,25 +1075,25 @@ export default function ChordAtlas() {
         <summary>Chord, voicing, shape — what’s the difference?</summary>
         <div>
           <p>
-            <strong>A chord</strong> names a root and a collection of intervals:{" "}
-            {chord.symbol} contains{" "}
+            <strong>Chord:</strong> {chord.symbol} contains{" "}
             {noteList(chord.tones.map((tone) => tone.note))}, regardless of
             octave or instrument.
           </p>
           <p>
-            <strong>A voicing</strong> chooses the actual pitches, including
-            octave, bass, and any doubled notes. An inversion tells you which
-            chord tone is lowest; it doesn’t describe every detail of the
-            voicing.
+            <strong>Voicing:</strong> pitches with specific octaves and
+            doublings. The lowest note determines the inversion.
           </p>
           <p>
-            <strong>A shape</strong> puts that voicing on an instrument. The
-            ukulele fret positions above produce the pitches shown beneath the
-            strings. The piano can play those same pitches, or arrange the chord
-            differently.
+            <strong>Shape:</strong> fret positions and fingering on an
+            instrument.
           </p>
         </div>
       </details>
+      <p className="ca-attribution">
+        Fingerings:{" "}
+        <a href="https://github.com/tombatossals/chords-db">chords-db</a> ·{" "}
+        <a href="/licenses/chords-db.txt">MIT license</a>
+      </p>
     </div>
   );
 }

@@ -26,6 +26,10 @@
   line-height: 1.7;
   margin-top: 12px;
 }
+.hp-explorer .ca-help a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .hp-reference-actions {
   display: flex;
   flex-wrap: wrap;

@@ -78,11 +78,12 @@ test("lookup accepts supported aliases and refuses unsupported or ambiguous synt
     assert.equal(parseChord(query), null);
 });
 
-test("familiar baritone C maps its individual strings to a doubled, inverted voicing", () => {
+test("canonical baritone C maps its individual strings to a doubled, inverted voicing", () => {
   const chord = makeChord("C", "major");
   const shape = findFingerings(chord)[0];
   assert.deepEqual(shape.frets, [2, 0, 1, 0]);
-  assert.equal(shape.source, "familiar");
+  assert.equal(shape.source, "library");
+  assert.deepEqual(shape.fingers, [2, null, 1, null]);
   assert.deepEqual(
     shape.voicing.voices.map((voice) => formatPitch(voice.pitch)),
     ["E3", "G3", "C4", "E4"],
@@ -137,7 +138,7 @@ test("every offered shape across all roots and qualities has exact, complete cho
         const chord = makeChord(root, quality.id);
         const shapes = findFingerings(chord, instrument);
         assert.ok(shapes.length > 0, `Missing ${chord.symbol}`);
-        assert.ok(shapes.length <= 12);
+        assert.equal(shapes.length, 4);
         assert.equal(
           new Set(shapes.map((shape) => shape.id)).size,
           shapes.length,
@@ -159,7 +160,7 @@ test("every offered shape across all roots and qualities has exact, complete cho
           );
           for (const string of shape.strings) {
             if (string.fret === null) continue;
-            assert.ok(string.fret >= 0 && string.fret <= 12);
+            assert.ok(string.fret >= 0 && string.fret <= 14);
             const voice = shape.voicing.voices.find(
               (item) => item.id === string.voiceId,
             );

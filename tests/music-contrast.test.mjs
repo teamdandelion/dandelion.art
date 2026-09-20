@@ -84,3 +84,14 @@ test("piano labels remain readable on natural, highlighted, and root keys", () =
       `${label} on ${key}`,
     );
 });
+
+test("finger numbers remain readable on root and other finger dots", () => {
+  for (const theme of [".chord-atlas", 'html[data-theme="dark"] .chord-atlas'])
+    for (const dot of ["accent", "coral"])
+      checkContrast(
+        declaration(theme, "--ca-paper"),
+        declaration(theme, `--ca-${dot}`),
+        `${theme}: finger on ${dot}`,
+      );
+  assert.match(css, /\.ca-finger-label\s*\{[^}]*fill: var\(--ca-paper\)/);
+});

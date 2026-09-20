@@ -68,17 +68,35 @@ sus4, dominant seventh, major seventh, minor seventh, diminished seventh,
 half-diminished seventh, major sixth, minor sixth, and add9. Chord spelling follows
 the formula's degrees, including double accidentals where musically required.
 
-The shape generator searches frets 0–12, with at most three frets between the
-lowest and highest nonzero frets (a four-fret window). Open strings do not increase
-that span. Every sounding note must belong to the requested chord and every
-chord tone must be present. Doubling is allowed; omitted tones are not part of the
-MVP. A muted string is distinct from an open string.
+The canonical baritone fingerings are a vendored subset of
+[tombatossals/chords-db](https://github.com/tombatossals/chords-db), pinned to
+`df06fa7b425cf5fd29485ff6591236b3557e3fac`: 672 positions covering 12 roots × 14
+qualities × 4 positions, preserving upstream order. The MIT notice ships at
+`public/licenses/chords-db.txt`. `scripts/import-ukulele-library.mjs` fetches that
+revision and prints the normalized TypeScript subset; format its output with Biome.
+The app makes no runtime requests to the library.
 
-Common curated shapes rank first, with their pitch contents validated by the
-same theory functions. Other candidates are labeled generated. These constraints
-are a useful search filter, not a guarantee of ergonomic playability. Finger
-numbers and barres are not guessed. Future curated technique data can enrich an
-instrument realization without changing the voicing it produces.
+The source is GCEA. For a DGBE chord, look up the source root a perfect fourth
+higher, reuse its physical shape and finger numbers, and realize it on the actual
+instrument. Do not reuse upstream MIDI pitches or inversion labels. This also
+preserves the six-string instrument's octave and unison partners. Enharmonic roots
+share a shape, but retain their requested spelling in the derived voicing.
+
+`Fingering` carries per-course finger numbers (1–4; null for open/muted or unknown)
+and explicit barres with fret, finger, and start/end course numbers. Upstream
+relative frets and barre frets are converted to absolute frets at import. Barre
+spans use the outermost courses stopped by the same finger at that fret; intervening
+courses may be stopped higher by another finger. A library source reference keeps
+the original chord, position number, and revision for corrections.
+
+Library positions are the default, not mixed with generated alternatives. They
+reach fret 14. Automated tests check every imported position's pitches, finger
+assignments, and barre spans on both instruments. User-reported fingering issues
+can be corrected individually without changing chord identity.
+
+Other tunings retain a generated fallback over frets 0–12, with no assigned finger
+numbers or barres. Every sounding note must belong to the requested chord, and all
+chord tones must be present. A muted string is distinct from an open string.
 
 Extended chords with omitted roots or fifths will eventually require explicit
 coverage policies. They should retain their intended chord and report omissions,
