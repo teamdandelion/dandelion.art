@@ -5,6 +5,7 @@ on:
     paths:
       - "src/lib/music/**"
       - "src/components/music/**"
+      - "src/pages/music/**"
       - "tests/music*.test.mjs"
       - "scripts/import-ukulele-library.mjs"
       - ".github/workflows/music-tests.yml"
@@ -14,6 +15,7 @@ on:
     paths:
       - "src/lib/music/**"
       - "src/components/music/**"
+      - "src/pages/music/**"
       - "tests/music*.test.mjs"
       - "scripts/import-ukulele-library.mjs"
       - ".github/workflows/music-tests.yml"
