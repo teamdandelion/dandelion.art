@@ -7,6 +7,7 @@ import {
   findFingerings,
   formatNote,
   formatPitch,
+  GUITAR,
   INSTRUMENTS,
   inversionName,
   KEY_OPTIONS,
@@ -22,7 +23,7 @@ import {
   pitchClassNumber,
   ROOT_OPTIONS,
   realizeFingering,
-  SIX_STRING_BARITONE,
+  UKULELE,
   voicingCoverage,
 } from "../src/lib/music/index.ts";
 
@@ -130,7 +131,7 @@ test("muted strings remain distinct from open strings and invalid physical notes
   assert.throws(() => realizeFingering(chord, [null, null, null, null]));
 });
 
-test("every offered shape across all roots and qualities has exact, complete chord coverage", () => {
+test("offered shapes contain only chord tones, allowing omitted fifths in guitar voicings", () => {
   let count = 0;
   for (const instrument of INSTRUMENTS)
     for (const root of ROOT_OPTIONS)
@@ -138,7 +139,7 @@ test("every offered shape across all roots and qualities has exact, complete cho
         const chord = makeChord(root, quality.id);
         const shapes = findFingerings(chord, instrument);
         assert.ok(shapes.length > 0, `Missing ${chord.symbol}`);
-        assert.equal(shapes.length, 4);
+        assert.ok(shapes.length > 0);
         assert.equal(
           new Set(shapes.map((shape) => shape.id)).size,
           shapes.length,
@@ -147,7 +148,10 @@ test("every offered shape across all roots and qualities has exact, complete cho
           count++;
           assert.deepEqual(
             voicingCoverage(shape.voicing, chord).omitted,
-            [],
+            instrument.id === GUITAR.id &&
+              voicingCoverage(shape.voicing, chord).omitted.length
+              ? [5]
+              : [],
             shape.id,
           );
           assert.equal(shape.voicing.chordId, chord.id);
@@ -156,7 +160,7 @@ test("every offered shape across all roots and qualities has exact, complete cho
             (fret) => fret !== null && fret > 0,
           );
           assert.ok(
-            !stopped.length || Math.max(...stopped) - Math.min(...stopped) <= 3,
+            !stopped.length || Math.max(...stopped) - Math.min(...stopped) <= 4,
           );
           for (const string of shape.strings) {
             if (string.fret === null) continue;
@@ -189,51 +193,32 @@ test("every offered shape across all roots and qualities has exact, complete cho
   assert.ok(count > ROOT_OPTIONS.length * CHORD_QUALITIES.length);
 });
 
-test("six-string baritone courses retain octave and unison doublings as separate voices", () => {
+test("standard presets retain instrument-specific pitches including reentrant ukulele", () => {
+  assert.deepEqual(
+    INSTRUMENTS.map((i) => i.id),
+    [GUITAR.id, UKULELE.id, BARITONE.id],
+  );
   const chord = makeChord("C", "major");
-  const standard = findFingerings(chord, BARITONE)[0];
-  const six = findFingerings(chord, SIX_STRING_BARITONE)[0];
-  assert.deepEqual(six.frets, standard.frets);
-  assert.notEqual(six.id, standard.id);
-  assert.equal(six.strings.length, 6);
-  assert.equal(six.voicing.voices.length, 6);
-  assert.equal(new Set(six.voicing.voices.map((voice) => voice.id)).size, 6);
   assert.deepEqual(
-    six.voicing.voices.map((voice) => formatPitch(voice.pitch)),
-    ["E3", "G3", "G4", "C4", "E4", "E4"],
-  );
-  assert.deepEqual(
-    [...new Set(six.voicing.voices.map((voice) => midi(voice.pitch)))].sort(
-      (a, b) => a - b,
+    findFingerings(chord, BARITONE)[0].voicing.voices.map((v) =>
+      formatPitch(v.pitch),
     ),
-    [52, 55, 60, 64, 67],
-  );
-  assert.equal(inversionName(six.voicing, chord), "First inversion");
-  assert.deepEqual(
-    six.strings.map((string) => string.courseNumber),
-    [4, 3, 3, 2, 1, 1],
-  );
-
-  const d6 = realizeFingering(
-    makeChord("D", "6"),
-    [0, 2, 0, 2],
-    SIX_STRING_BARITONE,
+    ["E3", "G3", "C4", "E4"],
   );
   assert.deepEqual(
-    d6.voicing.voices.map((voice) => formatPitch(voice.pitch)),
-    ["D3", "A3", "A4", "B3", "F♯4", "F♯4"],
+    realizeFingering(chord, [0, 0, 0, 3], UKULELE).voicing.voices.map((v) =>
+      formatPitch(v.pitch),
+    ),
+    ["G4", "C4", "E4", "C5"],
   );
-  const muted = realizeFingering(
-    chord,
-    [2, null, 1, null],
-    SIX_STRING_BARITONE,
-  );
-  assert.equal(muted.voicing.voices.length, 2);
-  assert.equal(
-    muted.strings.filter((string) => string.voiceId === null).length,
-    4,
-  );
-  assert.deepEqual(voicingCoverage(muted.voicing, chord).omitted, [5]);
+  assert.deepEqual(findFingerings(chord, GUITAR)[0].frets, [
+    null,
+    3,
+    2,
+    0,
+    1,
+    0,
+  ]);
 });
 
 test("piano inversions retain spelling, all tones, ascending register and requested bass", () => {

@@ -3,9 +3,7 @@ import {
   CHORD_QUALITIES,
   type ChordQuality,
   formatNote,
-  KEY_OPTIONS,
   parseNote,
-  SIX_STRING_BARITONE,
 } from "../../lib/music";
 import {
   allChordRows,
@@ -14,6 +12,7 @@ import {
   ROOT_ALIASES,
   type SheetEntry,
 } from "../../lib/music/cheat-sheet";
+import { useMusicPreferences } from "./MusicSettings";
 import UkeDiagram from "./UkeDiagram";
 import "./chord-atlas.css";
 import "./chord-cheat-sheet.css";
@@ -21,18 +20,18 @@ import "./chord-cheat-sheet.css";
 type Help = "practice" | "nearby";
 
 function ChordCard({ entry }: { entry: SheetEntry }) {
-  const { chord, fingering, href } = entry;
+  const { chord, fingering, href, instrument } = entry;
   return (
     <a
       className="cs-chord"
       href={href}
-      aria-label={`${chord.name}: D, G, B, E courses, frets ${fingering.frets.map((fret) => (fret === null ? "muted" : fret === 0 ? "open" : fret)).join(", ")}. Fingers ${fingering.fingers.map((finger) => finger ?? "none").join(", ")}.${fingering.barres.map((barre) => ` Barre finger ${barre.finger} at fret ${barre.fret}, courses ${barre.fromCourse} to ${barre.toCourse}.`).join("")} Open in chord atlas.`}
+      aria-label={`${chord.name} on ${instrument.name}: frets ${fingering.frets.map((fret) => (fret === null ? "muted" : fret === 0 ? "open" : fret)).join(", ")}. Fingers ${fingering.fingers.map((finger) => finger ?? "none").join(", ")}.${fingering.barres.map((barre) => ` Barre finger ${barre.finger} at fret ${barre.fret}, strings ${barre.fromCourse} to ${barre.toCourse}.`).join("")} Open in chord atlas.`}
     >
       <h3>{chord.symbol}</h3>
       <UkeDiagram
         chord={chord}
         fingering={fingering}
-        instrument={SIX_STRING_BARITONE}
+        instrument={instrument}
         reference
       />
       <span className="cs-frets" aria-hidden="true">
@@ -44,15 +43,21 @@ function ChordCard({ entry }: { entry: SheetEntry }) {
 
 export default function ChordCheatSheet() {
   const id = useId();
-  const [tonic, setTonic] = useState("G");
+  const { tonic, mode, instrument } = useMusicPreferences();
   const [view, setView] = useState<"key" | "all">("key");
   const [quality, setQuality] = useState<ChordQuality | "common">("common");
   const [help, setHelp] = useState<Help | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const helpOpenerRef = useRef<HTMLButtonElement>(null);
-  const practice = useMemo(() => practiceSheet(tonic), [tonic]);
-  const dictionary = useMemo(() => allChordRows(quality), [quality]);
-  const keyName = `${formatNote(parseNote(tonic))} major`;
+  const practice = useMemo(
+    () => practiceSheet(tonic, instrument, mode),
+    [tonic, instrument, mode],
+  );
+  const dictionary = useMemo(
+    () => allChordRows(quality, instrument),
+    [quality, instrument],
+  );
+  const keyName = `${formatNote(parseNote(tonic))} ${mode === "major" ? "major" : "minor"}`;
   useEffect(() => {
     if (!help || !dialogRef.current) return;
     const dialog = dialogRef.current;
@@ -83,15 +88,19 @@ export default function ChordCheatSheet() {
   );
 
   return (
-    <article className="chord-atlas chord-sheet">
+    <article
+      className="chord-atlas chord-sheet"
+      data-instrument={instrument.id}
+    >
       <header className="cs-intro">
         <nav className="cs-nav" aria-label="Music tools">
           <a href="/music">Music</a>
+          <a href="/music/fretboard">Fretboard ↗</a>
           <a className="cs-atlas-link" href="/music/chords">
             Chord atlas ↗
           </a>
         </nav>
-        <h1>Baritone ukulele cheat sheet</h1>
+        <h1>{instrument.name} cheat sheet</h1>
       </header>
       <div
         className={`cs-controls${view === "all" ? " cs-controls--all" : ""}`}
@@ -113,24 +122,7 @@ export default function ChordCheatSheet() {
           </button>
         </fieldset>
         <div className="cs-selector">
-          {view === "key" ? (
-            <>
-              <label className="cs-status" htmlFor={`${id}-key`}>
-                Key
-              </label>
-              <select
-                id={`${id}-key`}
-                value={tonic}
-                onChange={(e) => setTonic(e.target.value)}
-              >
-                {KEY_OPTIONS.map((root) => (
-                  <option key={root} value={root}>
-                    {formatNote(parseNote(root))} major
-                  </option>
-                ))}
-              </select>
-            </>
-          ) : (
+          {view === "all" && (
             <>
               <label className="cs-status" htmlFor={`${id}-quality`}>
                 Chords
@@ -155,7 +147,7 @@ export default function ChordCheatSheet() {
       </div>
       <output className="cs-status" aria-live="polite">
         {view === "key"
-          ? `${keyName}: 7 chord pairs and 6 outside-key chords.`
+          ? `${keyName}: 7 chord pairs and ${practice.nearby.length} outside-key chords.`
           : `${dictionary.length * dictionary[0].entries.length} chords across all 12 roots.`}
       </output>
       {view === "key" ? (
@@ -193,15 +185,33 @@ export default function ChordCheatSheet() {
               <h2 id={`${id}-nearby`}>Outside key</h2>
               {helpButton("nearby", "About outside-key chords")}
             </div>
-            <div className="cs-nearby-grid">
-              {practice.nearby.map((entry) => (
-                <div key={entry.chord.id} className="cs-related">
-                  <p className="cs-roman">{entry.roman}</p>
-                  <ChordCard entry={entry} />
-                  <p className="cs-destination">{entry.move}</p>
+            {(
+              [
+                ["applied", "Dominants"],
+                ["ii-v", "ii–V approaches"],
+                ["borrowed", "Borrowed chords"],
+                ["diminished", "Diminished approaches"],
+              ] as const
+            ).map(([kind, title]) => (
+              <section
+                key={kind}
+                className="cs-nearby-family"
+                aria-label={title}
+              >
+                <h3>{title}</h3>
+                <div className="cs-nearby-grid">
+                  {practice.nearby
+                    .filter((entry) => entry.kind === kind)
+                    .map((entry) => (
+                      <div key={entry.chord.id} className="cs-related">
+                        <p className="cs-roman">{entry.roman}</p>
+                        <ChordCard entry={entry} />
+                        <p className="cs-destination">{entry.move}</p>
+                      </div>
+                    ))}
                 </div>
-              ))}
-            </div>
+              </section>
+            ))}
           </section>
         </>
       ) : (
@@ -314,16 +324,15 @@ export default function ChordCheatSheet() {
           {help === "nearby" ? (
             <>
               <p>
-                A key is a home base, not a list of permitted chords. These six
-                choices are a starting vocabulary, not an exhaustive list or a
+                A key is a home base, not a list of permitted chords. These
+                families are a practice vocabulary, not an exhaustive list or a
                 promise that every transition will suit every song.
               </p>
               <h3>Chords that point somewhere</h3>
               <p>
-                The first four are secondary dominants. Each creates a pull
-                toward a chord other than home. V7/vi means “the dominant
-                seventh of chord vi.” The arrow below each diagram shows a
-                useful destination, not a rule.
+                Dominants create a pull toward a target chord. V7/vi means “the
+                dominant seventh of chord vi.” The arrow below each diagram
+                shows a useful destination, not a rule.
               </p>
               <ul>
                 {practice.nearby
@@ -337,17 +346,31 @@ export default function ChordCheatSheet() {
                     </li>
                   ))}
               </ul>
+              <h3>ii–V approaches</h3>
+              <p>
+                A minor-seventh chord can precede a target’s dominant. For a
+                minor target, try a half-diminished ii chord. Follow the arrows
+                as a short progression.
+              </p>
               <h3>Borrowed colors</h3>
               <p>
-                The minor iv and major ♭VII use notes from the parallel minor
-                scale. Try {practice.rows[3].entries[0].chord.symbol} →{" "}
-                {practice.nearby[4].chord.symbol} →{" "}
-                {practice.rows[0].entries[0].chord.symbol}, then{" "}
-                {practice.rows[0].entries[0].chord.symbol} →{" "}
-                {practice.nearby[5].chord.symbol} →{" "}
-                {practice.rows[3].entries[0].chord.symbol} →{" "}
-                {practice.rows[0].entries[0].chord.symbol}. Listen for the
-                change in color.
+                These triads and sevenths come from the parallel{" "}
+                {mode === "major" ? "natural minor" : "major"} scale: the same
+                tonic with a different mode. They offer a change of color, not a
+                fixed resolution. Altered Roman numerals compare roots with the
+                selected scale.
+              </p>
+              <h3>Diminished approaches</h3>
+              <p>
+                A fully diminished seventh rooted a semitone below a target can
+                lead into it. The spelling here names that destination; the same
+                sounding chord can have other names and resolutions.
+              </p>
+              <p>
+                Chords already inside the selected scale are omitted, and
+                repeated chord names appear once. In minor, the dominant of home
+                is included because its raised leading tone is outside natural
+                minor.
               </p>
               <p className="cs-reading">
                 Further reading:{" "}
@@ -363,9 +386,10 @@ export default function ChordCheatSheet() {
           ) : (
             <>
               <p>
-                The seven rows follow the major scale. Roman numerals show each
-                chord’s position: uppercase is major, lowercase is minor, and °
-                means diminished.
+                The seven rows follow the{" "}
+                {mode === "major" ? "major" : "natural minor"} scale. Roman
+                numerals show each chord’s position: uppercase is major,
+                lowercase is minor, and ° means diminished.
               </p>
               <h3>Triads and sevenths</h3>
               <p>
@@ -384,7 +408,7 @@ export default function ChordCheatSheet() {
                       {
                         [
                           "Find home: listen to the departure and return.",
-                          "Add minor chords while keeping a steady pulse.",
+                          "Add diatonic chords while keeping a steady pulse.",
                           "Introduce one outside-key chord and hear where it leads.",
                         ][index]
                       }
@@ -402,8 +426,11 @@ export default function ChordCheatSheet() {
               <p>
                 1 index · 2 middle · 3 ring · 4 pinky. ○ is open; × is muted.
                 Joined dots share a barre. The small number beside the grid is
-                its first fret; the numbers below are frets in D–G–B–E order.
-                The same shapes work on 4- and 6-string baritones.
+                its first fret; the numbers below are frets in{" "}
+                {instrument.courses
+                  .map((c) => formatNote(c.strings[0].open.note))
+                  .join("–")}{" "}
+                order. Labels below each string show the sounding notes.
               </p>
               <p className="cs-reading">
                 More on{" "}

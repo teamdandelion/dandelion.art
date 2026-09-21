@@ -9,8 +9,6 @@ import {
   pitchClassNumber,
 } from "../../lib/music";
 
-const STRING_NAMES = ["D", "G", "B", "E"];
-
 export default function UkeDiagram({
   fingering,
   chord,
@@ -25,6 +23,9 @@ export default function UkeDiagram({
   reference?: boolean;
 }) {
   const titleId = useId();
+  const stringNames = instrument.courses.map((c) =>
+    formatNote(c.strings[0].open.note),
+  );
   const start = fingering.startFret;
   const top = reference ? 28 : 44;
   const openY = reference ? 12 : 25;
@@ -41,14 +42,14 @@ export default function UkeDiagram({
   );
   return (
     <svg
-      viewBox={`0 0 ${reference ? 140 : compact ? 188 : 220} ${bottom + (reference ? 30 : compact ? 55 : 70)}`}
+      viewBox={`0 0 ${left * 2 + spacing * (instrument.courses.length - 1)} ${bottom + (reference ? 30 : compact ? 55 : 70)}`}
       className={`ca-uke-diagram${compact ? " ca-uke-diagram--compact" : ""}`}
       role="img"
       aria-labelledby={titleId}
       aria-hidden={compact || undefined}
     >
       <title id={titleId}>
-        {`${chord.symbol}, ${instrument.name}: D, G, B, E courses, frets ${fingering.frets
+        {`${chord.symbol}, ${instrument.name}: ${stringNames.join(", ")} strings, frets ${fingering.frets
           .map((fret) => (fret === null ? "muted" : fret === 0 ? "open" : fret))
           .join(
             ", ",
@@ -58,7 +59,7 @@ export default function UkeDiagram({
         <line
           key={`fret-${start + fret}`}
           x1={left}
-          x2={left + spacing * 3}
+          x2={left + spacing * (instrument.courses.length - 1)}
           y1={top + fret * fretHeight}
           y2={top + fret * fretHeight}
           className={fret === 0 && start === 1 ? "ca-nut" : "ca-fret"}
@@ -131,7 +132,7 @@ export default function UkeDiagram({
           voice &&
           pitchClassNumber(voice.pitch.note) === pitchClassNumber(chord.root);
         return (
-          <g key={STRING_NAMES[index]}>
+          <g key={course.number}>
             {fret === 0 ? (
               <circle
                 cx={x}
@@ -174,7 +175,7 @@ export default function UkeDiagram({
                 ? voice
                   ? formatNote(voice.pitch.note)
                   : "—"
-                : STRING_NAMES[index]}
+                : stringNames[index]}
             </text>
             {!compact && !reference && (
               <text

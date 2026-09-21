@@ -1,3 +1,4 @@
+import { GUITAR_SHAPES } from "./data/guitar-shapes.ts";
 import { LIBRARY_REVISION, UKULELE_SHAPES } from "./data/ukulele-shapes.ts";
 
 /** Small, instrument-independent music model. All pitches use 12-tone equal temperament. */
@@ -390,37 +391,37 @@ export const BARITONE: FrettedInstrument = {
   ],
 };
 
-/** Four fretted courses, six physical strings. The G course doubles at the octave. */
-export const SIX_STRING_BARITONE: FrettedInstrument = {
-  id: "baritone-six-string-dg-gbe-e",
-  name: "6-string baritone ukulele",
-  courses: [
-    {
-      number: 4,
-      strings: [{ number: 6, open: { note: parseNote("D"), octave: 3 } }],
-    },
-    {
-      number: 3,
+function standardInstrument(
+  id: string,
+  name: string,
+  tuning: [string, number][],
+): FrettedInstrument {
+  return {
+    id,
+    name,
+    courses: tuning.map(([note, octave], i) => ({
+      number: tuning.length - i,
       strings: [
-        { number: 5, open: { note: parseNote("G"), octave: 3 } },
-        { number: 4, open: { note: parseNote("G"), octave: 4 } },
+        { number: tuning.length - i, open: { note: parseNote(note), octave } },
       ],
-    },
-    {
-      number: 2,
-      strings: [{ number: 3, open: { note: parseNote("B"), octave: 3 } }],
-    },
-    {
-      number: 1,
-      strings: [
-        { number: 2, open: { note: parseNote("E"), octave: 4 } },
-        { number: 1, open: { note: parseNote("E"), octave: 4 } },
-      ],
-    },
-  ],
-};
-
-export const INSTRUMENTS = [BARITONE, SIX_STRING_BARITONE];
+    })),
+  };
+}
+export const UKULELE = standardInstrument("ukulele-gcea", "Ukulele", [
+  ["G", 4],
+  ["C", 4],
+  ["E", 4],
+  ["A", 4],
+]);
+export const GUITAR = standardInstrument("guitar-eadgbe", "Guitar", [
+  ["E", 2],
+  ["A", 2],
+  ["D", 3],
+  ["G", 3],
+  ["B", 3],
+  ["E", 4],
+]);
+export const INSTRUMENTS = [GUITAR, UKULELE, BARITONE];
 
 function pitchAtMidi(note: PitchClass, value: number): Pitch {
   return {
@@ -567,7 +568,7 @@ export function pianoVoicing(
 
 const fingeringCache = new Map<string, Fingering[]>();
 
-/** Canonical library positions for DGBE courses; generated fallback for other tunings. */
+/** Canonical library positions for standard tunings; generated fallback for other tunings. */
 export function findFingerings(
   chord: Chord,
   instrument: FrettedInstrument = BARITONE,
@@ -585,7 +586,14 @@ export function findFingerings(
             pitchClassNumber(string.open.note) === [2, 7, 11, 4][index],
         ),
     );
-  if (isBaritone) {
+  const hasTuning = (notes: number[]) =>
+    instrument.courses.length === notes.length &&
+    instrument.courses.every((course, i) =>
+      course.strings.every((s) => pitchClassNumber(s.open.note) === notes[i]),
+    );
+  const isUkulele = hasTuning([7, 0, 4, 9]);
+  const isGuitar = hasTuning([4, 9, 2, 7, 11, 4]);
+  if (isBaritone || isUkulele || isGuitar) {
     // GCEA chord names are a fourth above the same physical shape on DGBE.
     // Recompute every voice from the real instrument, not upstream MIDI/bass data.
     const root = [
@@ -601,48 +609,46 @@ export function findFingerings(
       "A",
       "Bb",
       "B",
-    ][mod(pitchClassNumber(chord.root) + 5, 12)];
+    ][mod(pitchClassNumber(chord.root) + (isBaritone ? 5 : 0), 12)];
     const libraryChord = `${root}:${chord.quality}`;
-    const result = (UKULELE_SHAPES[libraryChord] ?? []).map(
-      (position, index) => {
-        const shape = realizeFingering(chord, position.frets, instrument);
-        shape.source = "library";
-        shape.library = {
-          chord: libraryChord,
-          position: index + 1,
-          revision: LIBRARY_REVISION,
-        };
-        shape.fingers = position.fingers.map((finger) =>
-          finger === 0 ? null : (finger as 1 | 2 | 3 | 4),
+    const result = (
+      (isGuitar ? GUITAR_SHAPES : UKULELE_SHAPES)[libraryChord] ?? []
+    ).map((position, index) => {
+      const shape = realizeFingering(chord, position.frets, instrument);
+      shape.source = "library";
+      shape.library = {
+        chord: libraryChord,
+        position: index + 1,
+        revision: LIBRARY_REVISION,
+      };
+      shape.fingers = position.fingers.map((finger) =>
+        finger === 0 ? null : (finger as 1 | 2 | 3 | 4),
+      );
+      shape.barres = position.barres.map((fret) => {
+        const finger = position.fingers.find(
+          (finger, i) =>
+            finger > 0 &&
+            position.frets[i] === fret &&
+            position.fingers.filter(
+              (other, j) => other === finger && position.frets[j] === fret,
+            ).length > 1,
         );
-        shape.barres = position.barres.map((fret) => {
-          const finger = position.fingers.find(
-            (finger, i) =>
-              finger > 0 &&
-              position.frets[i] === fret &&
-              position.fingers.filter(
-                (other, j) => other === finger && position.frets[j] === fret,
-              ).length > 1,
-          );
-          if (!finger)
-            throw new Error(
-              `Missing barre finger: ${libraryChord}/${index + 1}`,
-            );
-          const courses = position.frets.flatMap((value, i) =>
-            value === fret && position.fingers[i] === finger
-              ? [instrument.courses[i].number]
-              : [],
-          );
-          return {
-            fret,
-            finger: finger as 1 | 2 | 3 | 4,
-            fromCourse: courses[0],
-            toCourse: courses[courses.length - 1],
-          };
-        });
-        return shape;
-      },
-    );
+        if (!finger)
+          throw new Error(`Missing barre finger: ${libraryChord}/${index + 1}`);
+        const courses = position.frets.flatMap((value, i) =>
+          value === fret && position.fingers[i] === finger
+            ? [instrument.courses[i].number]
+            : [],
+        );
+        return {
+          fret,
+          finger: finger as 1 | 2 | 3 | 4,
+          fromCourse: courses[0],
+          toCourse: courses[courses.length - 1],
+        };
+      });
+      return shape;
+    });
     fingeringCache.set(cacheKey, result);
     return result;
   }
