@@ -12,6 +12,8 @@ import {
   pitchClassNumber,
 } from "./index.ts";
 
+export const FRET_MARKERS = [3, 5, 7, 10, 12] as const;
+
 export function noteAt(value: number, key: Key): PitchClass {
   const pc = ((value % 12) + 12) % 12;
   const scale = keyScale(key);

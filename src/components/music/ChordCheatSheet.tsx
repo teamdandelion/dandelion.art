@@ -12,7 +12,7 @@ import {
   ROOT_ALIASES,
   type SheetEntry,
 } from "../../lib/music/cheat-sheet";
-import MusicSettings, { useMusicPreferences } from "./MusicSettings";
+import { useMusicPreferences } from "./MusicSettings";
 import UkeDiagram from "./UkeDiagram";
 import "./chord-atlas.css";
 import "./chord-cheat-sheet.css";
@@ -102,7 +102,6 @@ export default function ChordCheatSheet() {
         </nav>
         <h1>{instrument.name} cheat sheet</h1>
       </header>
-      <MusicSettings />
       <div
         className={`cs-controls${view === "all" ? " cs-controls--all" : ""}`}
       >

@@ -23,7 +23,7 @@ import {
   type Voicing,
 } from "../../lib/music";
 import "./chord-atlas.css";
-import MusicSettings, { useMusicPreferences } from "./MusicSettings";
+import { useMusicPreferences } from "./MusicSettings";
 import ProgressionExplorer from "./ProgressionExplorer";
 import UkeDiagram from "./UkeDiagram";
 import { createVoicingPlayer, type PlaybackState } from "./voicing-audio";
@@ -314,7 +314,6 @@ export default function ChordAtlas() {
           </strong>
         </div>
       </header>
-      <MusicSettings />
 
       <section className="ca-explorer" aria-labelledby={`${id}-explorer`}>
         <div className="ca-controls">

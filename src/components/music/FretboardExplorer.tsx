@@ -15,11 +15,12 @@ import {
   pitchClassNumber,
 } from "../../lib/music";
 import {
+  FRET_MARKERS,
   fretboardPitches,
   identifyChords,
   noteAt,
 } from "../../lib/music/fretboard";
-import MusicSettings, { useMusicPreferences } from "./MusicSettings";
+import { useMusicPreferences } from "./MusicSettings";
 import "./chord-atlas.css";
 import "./chord-cheat-sheet.css";
 import "./fretboard.css";
@@ -128,13 +129,30 @@ function Board({
           </>
         )}
       </section>
-      <section className="fb-scroll" aria-label="Fretboard, high string at top">
-        <div className="fb-board">
+      <section className="fb-scroll" aria-label="Fretboard">
+        <div
+          className="fb-board"
+          style={
+            { "--string-count": instrument.courses.length } as CSSProperties
+          }
+        >
           <div className="fb-row fb-fret-numbers" aria-hidden="true">
-            <span className="fb-string-heading">String</span>
+            <span className="fb-string-heading">
+              <span className="fb-wide-label">String</span>
+              <span className="fb-narrow-label">Fret</span>
+            </span>
             {positions.map((f) => (
               <span key={f ?? "mute"}>
-                {f === null ? "×" : f === 0 ? "Open" : f}
+                {f === null ? (
+                  "×"
+                ) : f === 0 ? (
+                  <>
+                    <span className="fb-wide-label">Open</span>
+                    <span className="fb-narrow-label">○</span>
+                  </>
+                ) : (
+                  f
+                )}
               </span>
             ))}
           </div>
@@ -144,6 +162,7 @@ function Board({
             return (
               <fieldset
                 className="fb-row"
+                style={{ "--string-column": index + 2 } as CSSProperties}
                 key={course.number}
                 aria-label={`String ${course.number}, ${formatNote(open.note)}`}
               >
@@ -164,10 +183,12 @@ function Board({
                       aria-label={`String ${course.number}, ${fret === null ? "mute" : fret === 0 ? `open ${label}` : `fret ${fret}, ${label}`}`}
                       onClick={() => select(index, fret)}
                       onKeyDown={(event) => {
+                        const vertical =
+                          window.matchMedia("(max-width: 640px)").matches;
                         const next =
-                          event.key === "ArrowRight"
+                          event.key === (vertical ? "ArrowDown" : "ArrowRight")
                             ? Math.min(i + 1, positions.length - 1)
-                            : event.key === "ArrowLeft"
+                            : event.key === (vertical ? "ArrowUp" : "ArrowLeft")
                               ? Math.max(i - 1, 0)
                               : event.key === "Home"
                                 ? 0
@@ -194,6 +215,15 @@ function Board({
               </fieldset>
             );
           })}
+          <div className="fb-row fb-markers" aria-hidden="true">
+            <span />
+            {positions.map((fret) => (
+              <span className="fb-marker" key={fret ?? "mute"} data-fret={fret}>
+                {FRET_MARKERS.some((value) => value === fret) && <i />}
+                {fret === 12 && <i />}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
       <dialog
@@ -238,10 +268,14 @@ function Board({
             </button>
           </header>
           <p>
-            Each row is a string, with string 1 at the top. Swipe sideways for
-            higher frets. Tap one fret per string; unmarked strings stay open.
-            Use × to mute a string, or “Mute all” to build a shape from silence.
-            Arrow keys move along a string.
+            On phones, strings run vertically, with string 1 on the right. On
+            wider screens, they run horizontally, with string 1 at the top.
+            Scroll down on a phone or sideways on a laptop for higher frets. Tap
+            one fret per string; unmarked strings stay open. Use × to mute a
+            string, or “Mute all” to build a shape from silence. Arrow keys move
+            along a string: up/down on phones, left/right on wider screens. Side
+            dots mark frets 3, 5, 7, 10, and 12; the double dot marks the
+            octave.
           </p>
           <p>
             The tinted notes belong to your selected key. Chord detection uses
@@ -278,7 +312,6 @@ export default function FretboardExplorer() {
       <header className="cs-intro">
         <h1>Fretboard</h1>
       </header>
-      <MusicSettings />
       <Board key={instrument.id} instrument={instrument} tonalKey={tonalKey} />
     </article>
   );
