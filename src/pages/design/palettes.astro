@@ -5,7 +5,7 @@ import { PALETTES, paletteVariables } from "../../lib/palettes";
 <LayoutDefault title="Palette lab — dandelion.art" noindex>
   <article class="palette-lab">
     <h1>Palette lab</h1>
-    <p>Three directions, each in light and dark. Open a page to try it; use the review bar to switch without losing your place.</p>
+    <p>Four directions, each in light and dark. Open a page to try it; use the review bar to switch without losing your place.</p>
     {PALETTES.map(p => <section>
       <h2>{p.name}</h2><p>{p.description}</p>
       <div class="pair">{(["light", "dark"] as const).map(mode => <div class="sample" style={paletteVariables(p[mode])}>
@@ -13,7 +13,7 @@ import { PALETTES, paletteVariables } from "../../lib/palettes";
         <div class="sample-body">
           <span class="sample-label">DANDELION.ART</span><h3>A little room to explore.</h3>
           <p>Art, music, and unexpected connections.</p>
-          <div class="sample-notes" aria-hidden="true"><span>G₃</span><span class="active">B₃</span><span>D₄</span><span>G₄</span></div>
+          <div class="sample-notes" aria-hidden="true"><span class="root">G₃</span><span class="active">B₃</span><span>D₄</span><span>G₄</span></div>
           <nav aria-label={`${p.name} ${mode} previews`}>
             {[ ["Home", "/"], ["QQL", "/art/qql/"], ["Fretboard", "/music/fretboard/"], ["Chords", "/music/chords/"] ].map(([label, path]) => <a href={`${path}?palette=${p.id}&theme=${mode}&paletteReview=1`}>{label} ↗</a>)}
           </nav>
@@ -37,6 +37,7 @@ import { PALETTES, paletteVariables } from "../../lib/palettes";
   .sample-notes { display: flex; justify-content: space-around; background: var(--site-surface); border: 1px solid var(--site-border); padding: 18px 8px; border-radius: 8px; margin: 24px 0; }
   .sample-notes span { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--site-soft); }
   .sample-notes .active { background: var(--site-accent); color: var(--site-onAccent); }
+  .sample-notes .root { background: var(--site-secondary); color: var(--site-surface); }
   nav { display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; }
   nav a { color: var(--site-accent); text-decoration: underline; text-underline-offset: 3px; }
   @media(max-width: 640px) { .pair { grid-template-columns: 1fr; } }

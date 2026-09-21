@@ -23,6 +23,38 @@ export type Palette = {
 /** The only palette-specific values. Components consume semantic CSS variables. */
 export const PALETTES: Palette[] = [
   {
+    id: "zest",
+    name: "Zest",
+    description:
+      "Soft cyan and tangerine over warm paper or deep blue. Bright accents, quiet surfaces.",
+    light: {
+      page: "#f7f4eb",
+      surface: "#fffdf5",
+      panel: "#eaece3",
+      raised: "#fffdf5",
+      text: "#263b40",
+      muted: "#566764",
+      border: "#b7c8c3",
+      accent: "#006765",
+      soft: "#d6f4ed",
+      onAccent: "#fffdf5",
+      secondary: "#934221",
+    },
+    dark: {
+      page: "#12232a",
+      surface: "#1b3038",
+      panel: "#243d45",
+      raised: "#29464f",
+      text: "#eef5ef",
+      muted: "#b4ccc9",
+      border: "#507078",
+      accent: "#a9fff7",
+      soft: "#224b50",
+      onAccent: "#122d33",
+      secondary: "#ff9b71",
+    },
+  },
+  {
     id: "gallery",
     name: "Gallery",
     description:
