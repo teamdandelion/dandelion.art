@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { GUITAR_SHAPES } from "../src/lib/music/data/guitar-shapes.ts";
 import {
   LIBRARY_REVISION,
   UKULELE_SHAPES,
@@ -8,6 +9,7 @@ import {
   BARITONE,
   CHORD_QUALITIES,
   findFingerings,
+  GUITAR,
   INSTRUMENTS,
   makeChord,
   midi,
@@ -38,16 +40,18 @@ test("the pinned subset covers all supported qualities with four canonical posit
     }
 });
 
-test("all library positions transpose to both baritones without changing fingering or order", () => {
+test("all standard instruments preserve validated library fingering and order", () => {
   for (const instrument of INSTRUMENTS)
     for (const root of [...ROOT_OPTIONS, "Cbb", "B#", "Bbb", "E##"])
       for (const quality of CHORD_QUALITIES) {
         const chord = makeChord(root, quality.id);
-        const source = `${roots[(pitchClassNumber(chord.root) + 5) % 12]}:${quality.id}`;
+        const source = `${roots[(pitchClassNumber(chord.root) + (instrument.id === BARITONE.id ? 5 : 0)) % 12]}:${quality.id}`;
+        const library =
+          instrument.id === GUITAR.id ? GUITAR_SHAPES : UKULELE_SHAPES;
         const shapes = findFingerings(chord, instrument);
-        assert.equal(shapes.length, 4);
+        assert.equal(shapes.length, library[source].length);
         shapes.forEach((shape, index) => {
-          const upstream = UKULELE_SHAPES[source][index];
+          const upstream = library[source][index];
           assert.equal(shape.source, "library");
           assert.deepEqual(shape.library, {
             chord: source,
@@ -63,7 +67,11 @@ test("all library positions transpose to both baritones without changing fingeri
             shape.barres.map((b) => b.fret),
             upstream.barres,
           );
-          assert.deepEqual(voicingCoverage(shape.voicing, chord).omitted, []);
+          assert.ok(
+            voicingCoverage(shape.voicing, chord).omitted.every(
+              (degree) => instrument.id === GUITAR.id && degree === 5,
+            ),
+          );
           for (const barre of shape.barres) {
             const first = instrument.courses.findIndex(
               (c) => c.number === barre.fromCourse,
@@ -77,7 +85,9 @@ test("all library positions transpose to both baritones without changing fingeri
             assert.equal(shape.fingers[first], barre.finger);
             assert.equal(shape.fingers[last], barre.finger);
             for (let i = first; i <= last; i++)
-              assert.ok(shape.frets[i] >= barre.fret);
+              assert.ok(
+                shape.frets[i] === null || shape.frets[i] >= barre.fret,
+              );
           }
           for (let i = 0; i < shape.fingers.length; i++) {
             const finger = shape.fingers[i];

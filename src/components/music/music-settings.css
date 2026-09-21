@@ -1,0 +1,73 @@
+.music-settings {
+  margin: 12px 0 16px;
+  min-width: 0;
+}
+.music-settings fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: flex;
+  min-width: 0;
+}
+.music-settings button {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px 12px;
+  color: var(--ca-muted);
+  background: var(--ca-paper);
+  border: 1px solid var(--ca-line);
+  border-radius: 6px;
+  white-space: nowrap;
+  font-size: 14px;
+  cursor: pointer;
+}
+.music-settings button[aria-pressed="true"] {
+  color: var(--ca-ink);
+  background: var(--ca-accent-soft);
+  border-color: var(--ca-accent);
+}
+.music-settings button:focus-visible {
+  outline: 2px solid var(--ca-accent);
+  outline-offset: -3px;
+}
+.ms-instruments {
+  gap: 6px;
+}
+.ms-instruments button {
+  flex: 1 0 auto;
+}
+.ms-key-controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  min-width: 0;
+}
+.ms-modes {
+  flex-shrink: 0;
+  gap: 2px;
+}
+.ms-key-strip {
+  position: relative;
+  display: flex;
+  overflow-x: auto;
+  min-width: 0;
+  gap: 5px;
+  padding-bottom: 4px;
+  scrollbar-width: thin;
+  scroll-snap-type: x proximity;
+}
+.ms-key-strip button {
+  flex: 0 0 46px;
+  scroll-snap-align: center;
+}
+@media (max-width: 400px) {
+  .music-settings button {
+    padding-inline: 8px;
+    font-size: 13px;
+  }
+}
+@media print {
+  .music-settings {
+    display: none;
+  }
+}

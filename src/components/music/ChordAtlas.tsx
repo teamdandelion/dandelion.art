@@ -7,9 +7,7 @@ import {
   findFingerings,
   formatNote,
   formatPitch,
-  INSTRUMENTS,
   inversionName,
-  KEY_OPTIONS,
   type Key,
   keyContext,
   keyGraph,
@@ -22,10 +20,10 @@ import {
   pianoVoicing,
   pitchClassNumber,
   ROOT_OPTIONS,
-  SIX_STRING_BARITONE,
   type Voicing,
 } from "../../lib/music";
 import "./chord-atlas.css";
+import MusicSettings, { useMusicPreferences } from "./MusicSettings";
 import ProgressionExplorer from "./ProgressionExplorer";
 import UkeDiagram from "./UkeDiagram";
 import { createVoicingPlayer, type PlaybackState } from "./voicing-audio";
@@ -202,12 +200,7 @@ function PlayButton({ voicing }: { voicing: Voicing }) {
 export default function ChordAtlas() {
   const id = useId();
   const [root, setRoot] = useState("C");
-  const [instrumentId, setInstrumentId] = useState(SIX_STRING_BARITONE.id);
-  const instrument =
-    INSTRUMENTS.find((item) => item.id === instrumentId) ?? SIX_STRING_BARITONE;
-  const hasPairedCourses = instrument.courses.some(
-    (course) => course.strings.length > 1,
-  );
+  const { instrument, tonic, mode } = useMusicPreferences();
   const neighborsHeadingRef = useRef<HTMLHeadingElement>(null);
   const explorerHeadingRef = useRef<HTMLHeadingElement>(null);
   const [announcement, setAnnouncement] = useState("");
@@ -215,8 +208,6 @@ export default function ChordAtlas() {
   const [shapeIndex, setShapeIndex] = useState(0);
   const [query, setQuery] = useState("");
   const [searchError, setSearchError] = useState("");
-  const [tonic, setTonic] = useState("C");
-  const [mode, setMode] = useState<Key["mode"]>("major");
   const [sevenths, setSevenths] = useState(false);
   const [pianoMode, setPianoMode] = useState<"same" | "closed">("same");
   const [inversion, setInversion] = useState(0);
@@ -299,9 +290,12 @@ export default function ChordAtlas() {
               .
             </span>
           </h1>
-          <p>Baritone ukulele · piano · progressions</p>
           <a className="ca-view-chord" href="/music/cheat-sheet">
             Chord cheat sheet ↗
+          </a>
+          {" · "}
+          <a className="ca-view-chord" href="/music/fretboard">
+            Fretboard ↗
           </a>
           {" · "}
           <a className="ca-view-chord" href="#progression-playground">
@@ -309,24 +303,6 @@ export default function ChordAtlas() {
           </a>
         </div>
         <div className="ca-tuning">
-          <div className="ca-field ca-instrument-field">
-            <label htmlFor={`${id}-instrument`}>Instrument</label>
-            <select
-              id={`${id}-instrument`}
-              value={instrumentId}
-              onChange={(event) => {
-                setInstrumentId(event.target.value);
-                setShapeIndex(0);
-              }}
-            >
-              {INSTRUMENTS.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.courses.flatMap((course) => course.strings).length}
-                  -string baritone
-                </option>
-              ))}
-            </select>
-          </div>
           <strong className="ca-course-tuning">
             {instrument.courses
               .map((course) =>
@@ -336,13 +312,9 @@ export default function ChordAtlas() {
               )
               .join(" / ")}
           </strong>
-          <span>
-            {hasPairedCourses
-              ? "4 courses · G octave pair · E unison pair"
-              : "4 courses · standard tuning"}
-          </span>
         </div>
       </header>
+      <MusicSettings />
 
       <section className="ca-explorer" aria-labelledby={`${id}-explorer`}>
         <div className="ca-controls">
@@ -455,7 +427,7 @@ export default function ChordAtlas() {
         <div className="ca-instruments">
           <div className="ca-uke-panel">
             <div className="ca-panel-heading">
-              <h3>On baritone ukulele</h3>
+              <h3>On {instrument.name.toLowerCase()}</h3>
               {fingering && (
                 <span
                   className="ca-fret-code"
@@ -476,7 +448,7 @@ export default function ChordAtlas() {
                   <button
                     type="button"
                     className="ca-arrow"
-                    aria-label="Previous ukulele shape"
+                    aria-label="Previous shape"
                     disabled={fingerings.length < 2}
                     onClick={() =>
                       setShapeIndex(
@@ -495,7 +467,7 @@ export default function ChordAtlas() {
                   <button
                     type="button"
                     className="ca-arrow"
-                    aria-label="Next ukulele shape"
+                    aria-label="Next shape"
                     disabled={fingerings.length < 2}
                     onClick={() =>
                       setShapeIndex((shapeIndex + 1) % fingerings.length)
@@ -531,7 +503,7 @@ export default function ChordAtlas() {
                   onClick={() => setPianoMode("same")}
                   disabled={!fingering}
                 >
-                  Match ukulele
+                  Match instrument
                 </button>
                 <button
                   type="button"
@@ -597,8 +569,8 @@ export default function ChordAtlas() {
             </div>
             <p className="ca-piano-note">
               {pianoMode === "same" && fingering
-                ? "Matches the selected uke shape; unison strings share a key."
-                : "Piano voicing, independent of the uke shape."}
+                ? "Matches the selected instrument shape."
+                : "Piano voicing, independent of the instrument shape."}
             </p>
             <div className="ca-color-legend">
               <span>
@@ -628,33 +600,6 @@ export default function ChordAtlas() {
         <div className="ca-section-heading">
           <div>
             <h2 id={`${id}-key-heading`}>Chords in a key</h2>
-          </div>
-          <div className="ca-key-controls">
-            <div className="ca-field">
-              <label htmlFor={`${id}-key`}>Key</label>
-              <select
-                id={`${id}-key`}
-                value={tonic}
-                onChange={(event) => setTonic(event.target.value)}
-              >
-                {KEY_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {formatNote(parseNote(option))}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="ca-field">
-              <label htmlFor={`${id}-mode`}>Scale</label>
-              <select
-                id={`${id}-mode`}
-                value={mode}
-                onChange={(event) => setMode(event.target.value as Key["mode"])}
-              >
-                <option value="major">Major</option>
-                <option value="natural-minor">Natural minor</option>
-              </select>
-            </div>
           </div>
         </div>
         <div className="ca-key-summary">

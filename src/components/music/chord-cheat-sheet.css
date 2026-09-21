@@ -104,6 +104,15 @@
 .cs-nearby-heading {
   margin-top: 16px;
 }
+.cs-nearby-family {
+  margin-top: 16px;
+}
+.cs-nearby-family > h3 {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ca-muted);
+  margin-bottom: 8px;
+}
 .cs-nearby-grid,
 .cs-single-grid {
   display: grid;
@@ -381,5 +390,17 @@
   }
   .cs-row {
     break-inside: avoid;
+  }
+}
+[data-instrument="guitar-eadgbe"] .cs-chord .ca-uke-diagram {
+  width: 208px;
+}
+@media (max-width: 560px) {
+  [data-instrument="guitar-eadgbe"] .cs-chords,
+  [data-instrument="guitar-eadgbe"] .cs-nearby-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  [data-instrument="guitar-eadgbe"] > .cs-columns {
+    display: none;
   }
 }
