@@ -3,6 +3,7 @@ import {
   type Chord,
   type Fingering,
   type FrettedInstrument,
+  formatNote,
   formatPitch,
   midi,
   pitchClassNumber,
@@ -169,7 +170,11 @@ export default function UkeDiagram({
               textAnchor="middle"
               className="ca-string-name"
             >
-              {STRING_NAMES[index]}
+              {reference
+                ? voice
+                  ? formatNote(voice.pitch.note)
+                  : "—"
+                : STRING_NAMES[index]}
             </text>
             {!compact && !reference && (
               <text
