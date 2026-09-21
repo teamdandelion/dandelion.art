@@ -1,0 +1,29 @@
+---
+import { PALETTES, DEFAULT_PALETTE, PALETTE_STORAGE_KEY, paletteCss } from "../lib/palettes";
+import "../styles/palette.css";
+const paletteIds = PALETTES.map(p => p.id);
+---
+<style is:inline set:html={paletteCss} />
+<script is:inline define:vars={{validPalettes: paletteIds, defaultPalette: DEFAULT_PALETTE, paletteStorageKey: PALETTE_STORAGE_KEY}}>
+  (() => {
+    const read = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
+    const save = (key, value) => { try { localStorage.setItem(key, value); } catch {} };
+    const params = new URLSearchParams(location.search);
+    const requested = params.get("palette");
+    const stored = read(paletteStorageKey);
+    const palette = validPalettes.includes(requested) ? requested : validPalettes.includes(stored) ? stored : defaultPalette;
+    const requestedTheme = params.get("theme");
+    const savedTheme = read("theme");
+    const theme = ["light", "dark"].includes(requestedTheme) ? requestedTheme : ["light", "dark"].includes(savedTheme) ? savedTheme : matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.dataset.palette = palette;
+    document.documentElement.dataset.theme = theme;
+    if (validPalettes.includes(requested)) save(paletteStorageKey, palette);
+    if (["light", "dark"].includes(requestedTheme)) save("theme", theme);
+    let review = params.get("paletteReview") === "1" || location.pathname.replace(/\/$/, "") === "/design/palettes";
+    try {
+      review ||= sessionStorage.getItem("palette.review") === "1";
+      if (review) sessionStorage.setItem("palette.review", "1");
+    } catch {}
+    if (review) document.documentElement.dataset.paletteReview = "true";
+  })();
+</script>

@@ -1,14 +1,14 @@
 .chord-atlas {
-  --ca-ink: #263a36;
-  --ca-muted: #5d6962;
-  --ca-paper: #faf8f0;
-  --ca-panel: #f1efe5;
-  --ca-line: #dcded2;
-  --ca-accent: #296d61;
-  --ca-accent-soft: #dfece2;
-  --ca-coral: #a64e36;
-  --ca-focus: #237f79;
-  --ca-white: #fffdf6;
+  --ca-ink: var(--site-text);
+  --ca-muted: var(--site-muted);
+  --ca-paper: var(--site-surface);
+  --ca-panel: var(--site-panel);
+  --ca-line: var(--site-border);
+  --ca-accent: var(--site-accent);
+  --ca-accent-soft: var(--site-soft);
+  --ca-coral: var(--site-secondary);
+  --ca-focus: var(--site-accent);
+  --ca-white: var(--site-raised);
   color: var(--ca-ink);
   font-family:
     ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -18,19 +18,6 @@
   margin: 0 auto;
   padding-bottom: 40px;
   -webkit-tap-highlight-color: transparent;
-}
-
-html[data-theme="dark"] .chord-atlas {
-  --ca-ink: #e7ebe0;
-  --ca-muted: #a5b4aa;
-  --ca-paper: #192b2b;
-  --ca-panel: #223434;
-  --ca-line: #39504b;
-  --ca-accent: #90c9b3;
-  --ca-accent-soft: #2b4740;
-  --ca-coral: #e49f7e;
-  --ca-focus: #a9e8d1;
-  --ca-white: #243735;
 }
 
 .chord-atlas *,
@@ -496,43 +483,46 @@ html[data-theme="dark"] .chord-atlas {
   max-height: 175px;
 }
 .ca-white-key {
-  fill: #fbfaf4;
-  stroke: #c6c9c2;
+  fill: #faf9f5;
+  stroke: #bcbcb5;
   stroke-width: 0.8;
 }
 .ca-black-key {
-  fill: #253631;
-  stroke: #172821;
+  fill: #272825;
+  stroke: #161715;
   stroke-width: 0.6;
 }
 .ca-white-key.ca-key-active {
-  fill: #8ac5af;
-  stroke: #619d87;
+  fill: var(--ca-accent);
+  stroke: var(--ca-accent);
 }
 .ca-black-key.ca-key-active {
-  fill: #347660;
-  stroke: #265944;
+  fill: var(--ca-accent);
+  stroke: var(--ca-accent);
 }
 .ca-white-key.ca-key-root {
-  fill: #dfaa8e;
-  stroke: #bd876a;
+  fill: var(--ca-coral);
+  stroke: var(--ca-coral);
 }
 .ca-black-key.ca-key-root {
-  fill: #9f573b;
-  stroke: #8f4e36;
+  fill: var(--ca-coral);
+  stroke: var(--ca-coral);
 }
 .ca-key-label {
   font-size: 12px;
-  fill: #5e7065;
+  fill: #60635b;
 }
 .ca-key-label--active {
-  fill: #193c31;
+  fill: var(--site-onAccent);
   font-weight: 650;
 }
 .ca-black-key-label {
   font-size: 11px;
-  fill: #fffdf7;
+  fill: var(--site-onAccent);
   font-weight: 600;
+}
+.ca-key-root + text {
+  fill: var(--site-surface);
 }
 .ca-voicing {
   display: flex;

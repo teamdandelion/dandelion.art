@@ -84,21 +84,3 @@ h1 {
   font-family: "Cringe Sans", sans-serif;
   font-size: 3rem; /* 48px */
 }
-
-@plugin "daisyui/theme" {
-  name: "light";
-  default: true;
-  prefersdark: false;
-  color-scheme: light;
-  --color-base-200: oklch(0.9 0.0941 280.23);
-}
-
-@plugin "daisyui/theme" {
-  name: "dark";
-  default: false;
-  prefersdark: true;
-  color-scheme: dark;
-
-  --color-base-100: oklch(0.2679 0.1051 277.23);
-  --color-base-200: oklch(0.2 0.0941 277.23);
-}

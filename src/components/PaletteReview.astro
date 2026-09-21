@@ -1,0 +1,49 @@
+---
+import { PALETTES } from "../lib/palettes";
+---
+<aside class="palette-review" aria-label="Palette review">
+  <a href="/design/palettes/">Palette lab</a>
+  <label>Palette <select data-palette-picker>{PALETTES.map(p => <option value={p.id}>{p.name}</option>)}</select></label>
+  <label>Mode <select data-mode-picker><option value="light">Light</option><option value="dark">Dark</option></select></label>
+  <button type="button" data-copy-palette>Copy link</button>
+  <button type="button" data-hide-palette aria-label="Hide palette review controls">×</button>
+  <span role="status" data-palette-status></span>
+</aside>
+<script>
+  import { setAppearance } from "../lib/palette-client";
+  const picker = document.querySelector<HTMLSelectElement>("[data-palette-picker]")!;
+  const mode = document.querySelector<HTMLSelectElement>("[data-mode-picker]")!;
+  const sync = () => {
+    picker.value = document.documentElement.dataset.palette ?? "gallery";
+    mode.value = document.documentElement.dataset.theme ?? "light";
+  };
+  sync();
+  window.addEventListener("appearance-change", sync);
+  picker.addEventListener("change", () => setAppearance({palette: picker.value}));
+  mode.addEventListener("change", () => setAppearance({theme: mode.value === "dark" ? "dark" : "light"}));
+  document.querySelector("[data-hide-palette]")?.addEventListener("click", () => {
+    delete document.documentElement.dataset.paletteReview;
+    try { sessionStorage.removeItem("palette.review"); } catch {}
+    const url = new URL(location.href);
+    url.searchParams.delete("paletteReview");
+    history.replaceState(null, "", url);
+  });
+  document.querySelector("[data-copy-palette]")?.addEventListener("click", async () => {
+    const url = new URL(location.href);
+    url.searchParams.set("palette", picker.value);
+    url.searchParams.set("theme", mode.value);
+    url.searchParams.set("paletteReview", "1");
+    const status = document.querySelector("[data-palette-status]")!;
+    try { await navigator.clipboard.writeText(url.href); status.textContent = "Copied"; }
+    catch { status.textContent = "Copy this page’s address"; history.replaceState(null, "", url); }
+  });
+</script>
+<style>
+  .palette-review { display: none; gap: 8px 14px; align-items: center; flex-wrap: wrap; padding: 10px max(20px, calc((100vw - 984px) / 2)); background: var(--site-panel); border-bottom: 1px solid var(--site-border); font: 13px/1.4 system-ui, sans-serif; }
+  :global(html[data-palette-review]) .palette-review { display: flex; }
+  label { display: flex; align-items: center; gap: 6px; }
+  select, button { min-height: 36px; border: 1px solid var(--site-border); border-radius: 5px; background: var(--site-surface); color: var(--site-text); padding: 5px 8px; font: inherit; cursor: pointer; }
+  a { color: var(--site-accent); text-decoration: underline; text-underline-offset: 3px; }
+  [role="status"]:empty { display: none; }
+  @media print { .palette-review { display: none !important; } }
+</style>
