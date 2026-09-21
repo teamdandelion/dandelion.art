@@ -77,6 +77,8 @@
   }
 }
 .music-settings {
+  display: grid;
+  gap: 20px;
   margin: 12px 0 16px;
   min-width: 0;
 }
@@ -115,28 +117,23 @@
   flex: 1 0 auto;
 }
 .ms-key-controls {
-  display: flex;
+  display: grid;
   gap: 8px;
-  margin-top: 8px;
   min-width: 0;
 }
 .ms-modes {
   flex-shrink: 0;
   gap: 2px;
 }
-.ms-key-strip {
-  position: relative;
-  display: flex;
-  overflow-x: auto;
-  min-width: 0;
+.music-settings .ms-keys {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(44px, 1fr));
   gap: 5px;
-  padding-bottom: 4px;
-  scrollbar-width: thin;
-  scroll-snap-type: x proximity;
 }
-.ms-key-strip button {
-  flex: 0 0 46px;
-  scroll-snap-align: center;
+@media (max-width: 360px) {
+  .music-settings .ms-keys {
+    grid-template-columns: repeat(4, minmax(44px, 1fr));
+  }
 }
 @media (max-width: 400px) {
   .music-settings button {

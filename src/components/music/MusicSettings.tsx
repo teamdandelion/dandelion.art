@@ -64,46 +64,10 @@ export function useMusicPreferences() {
   };
 }
 
-function MusicSettingsControls({ open }: { open: boolean }) {
+function MusicSettingsControls() {
   const { instrumentId, tonic, mode, update } = useMusicPreferences();
-  const strip = useRef<HTMLFieldSetElement>(null);
-  // biome-ignore lint/correctness/useExhaustiveDependencies: Recenter when a key changes or the dialog becomes visible.
-  useEffect(() => {
-    if (!open) return;
-    const frame = requestAnimationFrame(() => {
-      const rail = strip.current;
-      const selected = rail?.querySelector<HTMLElement>(
-        '[aria-pressed="true"]',
-      );
-      if (rail && selected)
-        rail.scrollTo({
-          left:
-            selected.offsetLeft -
-            rail.clientWidth / 2 +
-            selected.clientWidth / 2,
-          behavior: "instant",
-        });
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [tonic, mode, open]);
   return (
     <div className="music-settings">
-      <fieldset className="ms-instruments" aria-label="Instrument">
-        {INSTRUMENTS.map((item) => (
-          <button
-            type="button"
-            key={item.id}
-            aria-pressed={item.id === instrumentId}
-            onClick={() => update({ instrumentId: item.id })}
-          >
-            {item.id === BARITONE.id
-              ? "Baritone uke"
-              : item.name === "Ukulele"
-                ? "Uke"
-                : item.name}
-          </button>
-        ))}
-      </fieldset>
       <div className="ms-key-controls">
         <fieldset className="ms-modes" aria-label="Key mode">
           {(["major", "natural-minor"] as const).map((value) => (
@@ -128,8 +92,7 @@ function MusicSettingsControls({ open }: { open: boolean }) {
           ))}
         </fieldset>
         <fieldset
-          className="ms-key-strip"
-          ref={strip}
+          className="ms-keys"
           aria-label={`${mode === "major" ? "Major" : "Minor"} key`}
         >
           {KEY_ROOTS[mode].map((root) => (
@@ -145,6 +108,22 @@ function MusicSettingsControls({ open }: { open: boolean }) {
           ))}
         </fieldset>
       </div>
+      <fieldset className="ms-instruments" aria-label="Instrument">
+        {INSTRUMENTS.map((item) => (
+          <button
+            type="button"
+            key={item.id}
+            aria-pressed={item.id === instrumentId}
+            onClick={() => update({ instrumentId: item.id })}
+          >
+            {item.id === BARITONE.id
+              ? "Baritone uke"
+              : item.name === "Ukulele"
+                ? "Uke"
+                : item.name}
+          </button>
+        ))}
+      </fieldset>
     </div>
   );
 }
@@ -244,7 +223,7 @@ export default function MusicSettings() {
             Done
           </button>
         </header>
-        <MusicSettingsControls open={open} />
+        <MusicSettingsControls />
       </dialog>
     </div>
   );
