@@ -8,6 +8,7 @@ import {
 import {
   type FrettedInstrument,
   formatNote,
+  formatPitch,
   type Key,
   keyScale,
   midi,
@@ -18,7 +19,7 @@ import {
   FRET_MARKERS,
   fretboardPitches,
   identifyChords,
-  noteAt,
+  pitchAt,
 } from "../../lib/music/fretboard";
 import { useMusicPreferences } from "./MusicSettings";
 import "./chord-atlas.css";
@@ -52,6 +53,9 @@ function Board({
     };
   }, [helpOpen]);
   const pitches = fretboardPitches(instrument, frets);
+  const noteList = [...new Set(pitches)]
+    .map((p) => formatPitch(pitchAt(p, tonalKey)))
+    .join(" · ");
   const matches = identifyChords(pitches, tonalKey);
   const scale = new Set(keyScale(tonalKey).map(pitchClassNumber));
   const positions = [null, ...Array.from({ length: 13 }, (_, i) => i)];
@@ -93,41 +97,24 @@ function Board({
         aria-live="polite"
       >
         {matches.length ? (
-          <>
-            <div className="fb-matches">
-              {matches.map(({ chord, bass }) => (
-                <a
-                  key={chord.id}
-                  href={`/music/chords?chord=${encodeURIComponent(chord.symbol)}`}
-                >
-                  <strong>{chord.symbol}</strong>
-                  {pitchClassNumber(chord.root) !==
-                    pitchClassNumber(parseNote(bass)) && <span> / {bass}</span>}
-                </a>
-              ))}
-            </div>
-            <p>
-              {[
-                ...new Set(pitches.map((p) => formatNote(noteAt(p, tonalKey)))),
-              ].join(" · ")}
-            </p>
-          </>
+          <div className="fb-matches">
+            {matches.map(({ chord, bass }) => (
+              <a
+                key={chord.id}
+                href={`/music/chords?chord=${encodeURIComponent(chord.symbol)}`}
+              >
+                <strong>{chord.symbol}</strong>
+                {pitchClassNumber(chord.root) !==
+                  pitchClassNumber(parseNote(bass)) && <span> / {bass}</span>}
+              </a>
+            ))}
+          </div>
         ) : (
-          <>
-            <strong>
-              {pitches.length ? "No exact chord match" : "All strings muted"}
-            </strong>
-            <p>
-              {pitches.length
-                ? [
-                    ...new Set(
-                      pitches.map((p) => formatNote(noteAt(p, tonalKey))),
-                    ),
-                  ].join(" · ")
-                : "—"}
-            </p>
-          </>
+          <strong>
+            {pitches.length ? "No exact chord match" : "All strings muted"}
+          </strong>
         )}
+        <p>{noteList || "—"}</p>
       </section>
       <section className="fb-scroll" aria-label="Fretboard">
         <div
@@ -164,15 +151,17 @@ function Board({
                 className="fb-row"
                 style={{ "--string-column": index + 2 } as CSSProperties}
                 key={course.number}
-                aria-label={`String ${course.number}, ${formatNote(open.note)}`}
+                aria-label={`String ${course.number}, ${formatPitch(open)}`}
               >
                 <span className="fb-string-heading" aria-hidden="true">
                   {course.number} · {formatNote(open.note)}
+                  <sub>{open.octave}</sub>
                 </span>
                 {positions.map((fret, i) => {
                   const pitch = fret === null ? null : midi(open) + fret;
-                  const label =
-                    pitch === null ? "×" : formatNote(noteAt(pitch, tonalKey));
+                  const spelled =
+                    pitch === null ? null : pitchAt(pitch, tonalKey);
+                  const label = spelled === null ? "×" : formatPitch(spelled);
                   return (
                     <button
                       key={fret ?? "mute"}
@@ -208,7 +197,16 @@ function Board({
                         } as CSSProperties
                       }
                     >
-                      <span className="fb-note-name">{label}</span>
+                      <span className="fb-note-name">
+                        {spelled ? (
+                          <>
+                            {formatNote(spelled.note)}
+                            <sub>{spelled.octave}</sub>
+                          </>
+                        ) : (
+                          "×"
+                        )}
+                      </span>
                     </button>
                   );
                 })}

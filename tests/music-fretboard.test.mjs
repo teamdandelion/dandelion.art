@@ -5,11 +5,14 @@ import {
   fretboardPitches,
   identifyChords,
   noteAt,
+  pitchAt,
 } from "../src/lib/music/fretboard.ts";
 import {
   BARITONE,
+  formatPitch,
   GUITAR,
   INSTRUMENTS,
+  midi,
   parseNote,
   pitchClassNumber,
   UKULELE,
@@ -21,6 +24,31 @@ import {
 } from "../src/lib/music/preferences.ts";
 
 const key = { tonic: parseNote("G"), mode: "major" };
+
+test("fretboard labels preserve octaves and key-aware spelling", () => {
+  assert.deepEqual(
+    fretboardPitches(BARITONE, [5, 4, 3, 3]).map((p) =>
+      formatPitch(pitchAt(p, key)),
+    ),
+    ["G3", "B3", "D4", "G4"],
+  );
+  assert.equal(formatPitch(pitchAt(59, key)), "B3");
+  assert.equal(formatPitch(pitchAt(60, key)), "C4");
+  assert.equal(
+    formatPitch(pitchAt(60, { tonic: parseNote("C#"), mode: "major" })),
+    "B♯3",
+  );
+  assert.equal(
+    formatPitch(pitchAt(59, { tonic: parseNote("Gb"), mode: "major" })),
+    "C♭4",
+  );
+  for (const instrument of INSTRUMENTS)
+    for (const course of instrument.courses)
+      for (let fret = 0; fret <= 12; fret++) {
+        const value = midi(course.strings[0].open) + fret;
+        assert.equal(midi(pitchAt(value, key)), value);
+      }
+});
 
 test("the first-string third-fret baritone example identifies G with a D bass", () => {
   const pitches = fretboardPitches(BARITONE, [0, 0, 0, 3]);

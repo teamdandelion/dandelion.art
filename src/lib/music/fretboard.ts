@@ -7,6 +7,7 @@ import {
   keyScale,
   makeChord,
   midi,
+  type Pitch,
   type PitchClass,
   parseNote,
   pitchClassNumber,
@@ -27,6 +28,12 @@ export function noteAt(value: number, key: Key): PitchClass {
       ],
     )
   );
+}
+
+/** Preserve the written octave, including spellings such as B♯3 = C4. */
+export function pitchAt(value: number, key: Key): Pitch {
+  const note = noteAt(value, key);
+  return { note, octave: (value - midi({ note, octave: 0 })) / 12 };
 }
 
 /** Unmarked strings stay open; null explicitly mutes a string. */
