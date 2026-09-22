@@ -2,6 +2,8 @@
 
 Zest adds the user’s soft cyan (`#A9FFF7`) and tangerine (`#FF9B71`) as dark-mode accents. Its light mode uses deeper cyan and burnt-orange relatives for legible text, with a pale cyan fill. Gallery, Tide, and Grove remain unchanged.
 
+Three Tide variations inherit its roles: **Bright** changes only the accents and soft highlight; **Sunlit** adds creamier light surfaces and warmer orange; **Surf** adds a sea-glass background tint with aqua and coral. The original Tide is retained beside them for comparison. All variants retain the same contrast requirements.
+
 Edit `src/lib/palettes.ts` to tune a palette or add another. Each has independent light/dark colors for page, surface, panel, raised controls, text, muted text, border, accent, soft accent, text on accent, and secondary accent. `DEFAULT_PALETTE` is the starting choice, currently Gallery for this experiment.
 
 `PaletteHead.astro` emits CSS and applies validated URL or saved preferences before paint. `src/styles/palette.css` maps the roles to DaisyUI; the music styles map their existing `--ca-*` roles to the same values. Components should not invent their own palette. Piano black/white keys and chord-family colors preserve their semantic meaning. Artwork pixels, the QQL viewing backdrop, and Polysome’s full-screen artwork presentation are deliberately independent of the site palette.

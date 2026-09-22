@@ -38,6 +38,26 @@ test("palette IDs and every semantic color are valid", () => {
 });
 
 // WCAG 2.x contrast calculation. This guards tokens, not whole-page conformance.
+test("Tide Bright isolates accent changes for a controlled comparison", () => {
+  const tide = PALETTES.find((p) => p.id === "tide");
+  const bright = PALETTES.find((p) => p.id === "tide-bright");
+  for (const mode of ["light", "dark"]) {
+    for (const role of [
+      "page",
+      "surface",
+      "panel",
+      "raised",
+      "text",
+      "muted",
+      "border",
+      "onAccent",
+    ])
+      assert.equal(bright[mode][role], tide[mode][role]);
+    for (const role of ["accent", "secondary", "soft"])
+      assert.notEqual(bright[mode][role], tide[mode][role]);
+  }
+});
+
 test("all palettes maintain readable text, links, and selected labels", () => {
   for (const p of PALETTES)
     for (const mode of ["light", "dark"]) {

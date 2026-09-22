@@ -21,7 +21,7 @@ export type Palette = {
 };
 
 /** The only palette-specific values. Components consume semantic CSS variables. */
-export const PALETTES: Palette[] = [
+const BASE_PALETTES: Palette[] = [
   {
     id: "zest",
     name: "Zest",
@@ -151,6 +151,97 @@ export const PALETTES: Palette[] = [
     },
   },
 ];
+
+const tide = BASE_PALETTES.find((p) => p.id === "tide");
+if (!tide) throw new Error("Tide variations require the original Tide palette");
+const TIDE_VARIATIONS: Palette[] = [
+  {
+    id: "tide-bright",
+    name: "Tide · Bright",
+    description:
+      "The same cool surfaces as Tide, with livelier teal and mandarin accents. The closest comparison.",
+    light: {
+      ...tide.light,
+      accent: "#00716e",
+      soft: "#d8f0ec",
+      secondary: "#ad4508",
+    },
+    dark: {
+      ...tide.dark,
+      accent: "#5ee3d5",
+      soft: "#20494c",
+      secondary: "#ffac63",
+    },
+  },
+  {
+    id: "tide-sunlit",
+    name: "Tide · Sunlit",
+    description:
+      "Creamier daylight, warm orange, and clear turquoise. A little more sunshine without a louder background.",
+    light: {
+      ...tide.light,
+      page: "#f8f5eb",
+      surface: "#fffdf5",
+      panel: "#eeeee2",
+      raised: "#fffdf5",
+      text: "#263d43",
+      muted: "#536765",
+      border: "#bdcec5",
+      accent: "#006f72",
+      soft: "#d6f2e9",
+      secondary: "#ae4900",
+    },
+    dark: {
+      ...tide.dark,
+      page: "#15272d",
+      surface: "#1d343a",
+      panel: "#274048",
+      raised: "#2a434a",
+      text: "#f5f3e5",
+      muted: "#b6cbc4",
+      border: "#536f70",
+      accent: "#70ead7",
+      soft: "#20494b",
+      secondary: "#ffb15c",
+    },
+  },
+  {
+    id: "tide-surf",
+    name: "Tide · Surf",
+    description:
+      "A sea-glass tint, bright aqua, and coral-orange. The most colorful of the three.",
+    light: {
+      ...tide.light,
+      page: "#eaf5f3",
+      surface: "#f8fffc",
+      panel: "#dceee8",
+      raised: "#f8fffc",
+      text: "#213b43",
+      muted: "#496460",
+      border: "#a8c9c3",
+      accent: "#006b74",
+      soft: "#cff0e9",
+      secondary: "#ad3e1a",
+    },
+    dark: {
+      ...tide.dark,
+      page: "#102b33",
+      surface: "#163942",
+      panel: "#20434c",
+      raised: "#23474e",
+      text: "#e9f8f2",
+      muted: "#b3d0cd",
+      border: "#4a7880",
+      accent: "#54efdc",
+      soft: "#144c51",
+      secondary: "#ffac83",
+    },
+  },
+];
+
+export const PALETTES: Palette[] = BASE_PALETTES.flatMap((p) =>
+  p.id === "tide" ? [p, ...TIDE_VARIATIONS] : [p],
+);
 
 export const DEFAULT_PALETTE = "gallery";
 export const PALETTE_STORAGE_KEY = "site.palette.v1";
