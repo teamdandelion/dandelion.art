@@ -16,6 +16,9 @@ html[data-palette] body {
   background: var(--site-page);
   color: var(--site-text);
 }
+html[data-palette] [data-site-header] {
+  background: var(--site-header);
+}
 html[data-palette] ::selection {
   background: var(--site-soft);
   color: var(--site-text);

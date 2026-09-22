@@ -19,6 +19,7 @@ type BaseColors = {
   secondary: string;
 };
 export type PaletteColors = BaseColors & {
+  header: string;
   accentFill: string;
   secondaryFill: string;
   onSecondary: string;
@@ -196,12 +197,13 @@ export function withSignature(
   ];
   return {
     ...colors,
-    accentFill: signature.teal,
-    secondaryFill: signature.tangerine,
-    onAccent: labelOn(signature.teal),
-    onSecondary: labelOn(signature.tangerine),
-    accent: readableAccent(signature.teal, surfaces, mode),
-    secondary: readableAccent(signature.tangerine, surfaces, mode),
+    header: mode === "light" ? colors.soft : colors.surface,
+    accentFill: signature.tangerine,
+    secondaryFill: signature.teal,
+    onAccent: labelOn(signature.tangerine),
+    onSecondary: labelOn(signature.teal),
+    accent: readableAccent(signature.tangerine, surfaces, mode),
+    secondary: readableAccent(signature.teal, surfaces, mode),
   };
 }
 
@@ -214,6 +216,7 @@ export const PALETTES: Palette[] = [
     const base = palette[mode];
     const resolved = {
       ...base,
+      header: base.surface,
       accentFill: base.accent,
       secondaryFill: base.secondary,
       onSecondary: base.surface,

@@ -235,7 +235,7 @@
   top: 0;
   z-index: 2;
   padding: 12px 0;
-  background: var(--ca-paper);
+  background: var(--site-header);
   border-bottom: 1px solid var(--ca-line);
   text-align: center;
   font-size: 14px;
@@ -307,7 +307,7 @@
   position: sticky;
   top: 0;
   z-index: 2;
-  background: var(--ca-paper);
+  background: var(--site-header);
   border-bottom: 1px solid var(--ca-line);
 }
 .cs-key-header .cs-columns {

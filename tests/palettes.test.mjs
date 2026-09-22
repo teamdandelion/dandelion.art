@@ -68,7 +68,13 @@ test("all palettes maintain readable text, links, and selected labels", () => {
     for (const mode of ["light", "dark"]) {
       const c = p[mode];
       for (const foreground of ["text", "muted", "accent", "secondary"])
-        for (const background of ["page", "surface", "panel", "raised"])
+        for (const background of [
+          "page",
+          "surface",
+          "panel",
+          "raised",
+          "header",
+        ])
           assert.ok(
             contrast(c[foreground], c[background]) >= 4.5,
             `${p.id}/${mode} ${foreground} on ${background}: ${contrast(c[foreground], c[background]).toFixed(2)}`,
@@ -84,8 +90,21 @@ test("Sunlit uses identical signature fills in both modes", () => {
   assert.equal(sunlit.light.accentFill, sunlit.dark.accentFill);
   assert.equal(sunlit.light.secondaryFill, sunlit.dark.secondaryFill);
   assert.notEqual(sunlit.light.accent, sunlit.light.accentFill);
-  assert.equal(sunlit.light.accentFill, "#a8eae0");
-  assert.equal(sunlit.light.secondaryFill, "#ffa647");
+  assert.equal(sunlit.light.accentFill, "#ffa647");
+  assert.equal(sunlit.light.secondaryFill, "#a8eae0");
+});
+
+test("Sunlit uses tangerine for foreground accents and teal for supporting surfaces", () => {
+  const sunlit = PALETTES.find((p) => p.id === "tide-sunlit");
+  const tuned = withSignature(sunlit.light, "light", {
+    teal: "#a8eae0",
+    tangerine: "#ffa647",
+  });
+  assert.equal(tuned.accentFill, "#ffa647");
+  assert.equal(tuned.secondaryFill, "#a8eae0");
+  assert.equal(tuned.header, tuned.soft);
+  assert.equal(tuned.soft, "#d6f2e9");
+  assert.equal(sunlit.dark.header, sunlit.dark.surface);
 });
 
 test("Sunlit keeps its warm light surfaces and uses Bright's cool dark foundation", () => {

@@ -3,7 +3,7 @@ import { hexToHsv, SUNLIT_SIGNATURE } from "../lib/palette-color";
 const channels = [ ["h", "Hue", 360, "°"], ["s", "Saturation", 100, "%"], ["v", "Value", 100, "%"] ] as const;
 ---
 <div class="palette-tuner" data-palette-tuner>
-  <div class="tuner-heading"><strong>Tune Sunlit</strong><span>Same accents in both modes</span></div>
+  <div class="tuner-heading"><strong>Tune Sunlit</strong><span>Tangerine leads · teal supports</span></div>
   <div class="tuner-colors">
     {(["teal", "tangerine"] as const).map(color => <fieldset data-color={color} disabled>
       <legend>{color === "teal" ? "Teal" : "Tangerine"}</legend>
