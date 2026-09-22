@@ -24,6 +24,9 @@ test("palette IDs and every semantic color are valid", () => {
   assert.ok(isPalette(DEFAULT_PALETTE));
   assert.equal(isPalette("unknown"), false);
   assert.equal(isPalette(null), false);
+  assert.equal(isPalette("gallery"), false);
+  assert.equal(isPalette("grove"), false);
+  assert.equal(DEFAULT_PALETTE, "tide");
   assert.equal(new Set(PALETTES.map((p) => p.id)).size, PALETTES.length);
   for (const p of PALETTES)
     for (const mode of ["light", "dark"]) {

@@ -1,4 +1,4 @@
-import { isPalette, PALETTE_STORAGE_KEY } from "./palettes";
+import { DEFAULT_PALETTE, isPalette, PALETTE_STORAGE_KEY } from "./palettes";
 
 export function setAppearance(patch: {
   palette?: string;
@@ -22,7 +22,7 @@ export function setAppearance(patch: {
     url.searchParams.has("theme") ||
     root.dataset.paletteReview
   ) {
-    url.searchParams.set("palette", root.dataset.palette ?? "gallery");
+    url.searchParams.set("palette", root.dataset.palette ?? DEFAULT_PALETTE);
     url.searchParams.set("theme", root.dataset.theme ?? "light");
     history.replaceState(null, "", url);
   }

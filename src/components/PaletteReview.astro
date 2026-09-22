@@ -11,10 +11,11 @@ import { PALETTES } from "../lib/palettes";
 </aside>
 <script>
   import { setAppearance } from "../lib/palette-client";
+  import { DEFAULT_PALETTE } from "../lib/palettes";
   const picker = document.querySelector<HTMLSelectElement>("[data-palette-picker]")!;
   const mode = document.querySelector<HTMLSelectElement>("[data-mode-picker]")!;
   const sync = () => {
-    picker.value = document.documentElement.dataset.palette ?? "gallery";
+    picker.value = document.documentElement.dataset.palette ?? DEFAULT_PALETTE;
     mode.value = document.documentElement.dataset.theme ?? "light";
   };
   sync();
