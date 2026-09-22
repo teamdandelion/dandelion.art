@@ -1,0 +1,91 @@
+---
+import { hexToHsv, SUNLIT_SIGNATURE } from "../lib/palette-color";
+const channels = [ ["h", "Hue", 360, "°"], ["s", "Saturation", 100, "%"], ["v", "Value", 100, "%"] ] as const;
+---
+<div class="palette-tuner" data-palette-tuner>
+  <div class="tuner-heading"><strong>Tune Sunlit</strong><span>Same accents in both modes</span></div>
+  <div class="tuner-colors">
+    {(["teal", "tangerine"] as const).map(color => <fieldset data-color={color} disabled>
+      <legend>{color === "teal" ? "Teal" : "Tangerine"}</legend>
+      <div class="color-value"><i data-swatch style={`background:${SUNLIT_SIGNATURE[color]}`} /><code data-hex>{SUNLIT_SIGNATURE[color]}</code></div>
+      {channels.map(([channel, name, max, unit]) => <div class="channel">
+        <label for={`${color}-${channel}`}>{name}</label>
+        <input id={`${color}-${channel}`} data-channel={channel} type="range" min="0" max={max} step="1" value={Math.round(hexToHsv(SUNLIT_SIGNATURE[color])[channel])} aria-label={`${color} ${name}`} />
+        <input data-number={channel} type="number" min="0" max={max} step="1" value={Math.round(hexToHsv(SUNLIT_SIGNATURE[color])[channel])} aria-label={`${color} ${name} value`} />
+        <span>{unit}</span>
+      </div>)}
+    </fieldset>)}
+  </div>
+  <div class="tuner-actions"><button type="button" data-tuner-reset disabled>Reset Sunlit</button><button type="button" data-tuner-copy disabled>Copy tuned link</button><span data-tuner-status role="status"></span></div>
+  <p>Fills stay exact. Link shades and label colors adjust for contrast. Changes are saved in this browser.</p>
+  <noscript>Enable JavaScript to adjust the colors.</noscript>
+</div>
+<script>
+  import { hexToHsv, hsvToHex, SUNLIT_SIGNATURE, type HSV } from "../lib/palette-color";
+  import { applySignature, getSignature, signatureShareUrl, syncSignatureAddress, updateSignature } from "../lib/palette-custom";
+  const tuner = document.querySelector<HTMLElement>("[data-palette-tuner]")!;
+  let signature = getSignature();
+  const values = { teal: hexToHsv(signature.teal), tangerine: hexToHsv(signature.tangerine) };
+  const status = tuner.querySelector<HTMLElement>("[data-tuner-status]")!;
+  function render() {
+    for (const color of ["teal", "tangerine"] as const) {
+      const field = tuner.querySelector<HTMLElement>(`[data-color="${color}"]`)!;
+      field.querySelector<HTMLElement>("[data-swatch]")!.style.background = signature[color];
+      field.querySelector<HTMLElement>("[data-hex]")!.textContent = signature[color].toUpperCase();
+      for (const channel of ["h", "s", "v"] as const) {
+        const value = String(Math.round(values[color][channel]));
+        field.querySelector<HTMLInputElement>(`[data-channel="${channel}"]`)!.value = value;
+        field.querySelector<HTMLInputElement>(`[data-number="${channel}"]`)!.value = value;
+      }
+    }
+  }
+  tuner.addEventListener("input", (event) => {
+    if (!(event.target instanceof HTMLInputElement)) return;
+    const input = event.target;
+    const channel = (input.dataset.channel ?? input.dataset.number) as keyof HSV;
+    const color = input.closest<HTMLElement>("[data-color]")?.dataset.color as "teal" | "tangerine";
+    if (!channel || !color || input.value === "" || !Number.isFinite(input.valueAsNumber)) return;
+    values[color][channel] = Math.round(Math.max(0, Math.min(Number(input.max), input.valueAsNumber)));
+    signature[color] = hsvToHex(values[color]);
+    updateSignature(signature, false);
+    status.textContent = "";
+    render();
+  });
+  tuner.addEventListener("change", syncSignatureAddress);
+  tuner.querySelector("[data-tuner-reset]")!.addEventListener("click", () => {
+    signature = { ...SUNLIT_SIGNATURE };
+    values.teal = hexToHsv(signature.teal);
+    values.tangerine = hexToHsv(signature.tangerine);
+    updateSignature(signature);
+    render();
+    status.textContent = "Sunlit reset";
+  });
+  tuner.querySelector("[data-tuner-copy]")!.addEventListener("click", async () => {
+    const url = signatureShareUrl();
+    try { await navigator.clipboard.writeText(url); status.textContent = "Copied"; }
+    catch { history.replaceState(null, "", url); status.textContent = "Copy this page’s address"; }
+  });
+  applySignature();
+  render();
+  for (const control of tuner.querySelectorAll<HTMLFieldSetElement | HTMLButtonElement>("fieldset, button")) control.disabled = false;
+</script>
+<style>
+  .palette-tuner { margin-top: 18px; padding: 18px; border: 1px solid var(--site-border); border-radius: 12px; background: var(--site-surface); }
+  .tuner-heading, .tuner-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+  .tuner-heading span, p { color: var(--site-muted); font-size: 13px; }
+  .tuner-colors { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 16px 0; }
+  fieldset { border: 0; min-width: 0; padding: 0; }
+  legend { font-weight: 600; }
+  .color-value { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+  .color-value i { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--site-muted); }
+  code { font-size: 13px; }
+  .channel { display: grid; grid-template-columns: 76px minmax(50px, 1fr) 54px 12px; gap: 8px; align-items: center; font-size: 12px; }
+  input[type="range"] { width: 100%; min-width: 0; height: 40px; accent-color: var(--site-accent); cursor: pointer; }
+  input[type="number"], button { border: 1px solid var(--site-border); background: var(--site-page); color: var(--site-text); border-radius: 5px; padding: 6px; font: inherit; min-height: 36px; }
+  input[type="number"] { width: 100%; font-size: 16px; }
+  button { padding: 8px 12px; min-height: 44px; cursor: pointer; font-size: 13px; }
+  button:disabled { opacity: .5; cursor: wait; }
+  p { margin: 12px 0 0; }
+  [role="status"] { font-size: 13px; }
+  @media(max-width: 700px) { .tuner-colors { grid-template-columns: 1fr; gap: 16px; } }
+</style>

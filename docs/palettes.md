@@ -13,3 +13,11 @@ Open `/design/palettes/` for paired light/dark samples and links to real pages. 
 Run `npm run test:palettes`. The tests check readable text and accent combinations against the WCAG 2.x 4.5:1 threshold; they are token regression tests, not a claim of full-page accessibility conformance. See [W3C’s contrast guidance](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum).
 
 The experiment intentionally leaves typography and layout alone to make color comparisons useful. No final palette has been chosen.
+
+## Sunlit tuner
+
+Sunlit now shares the exact same teal and tangerine fills in both modes. Separate `accentFill` / `secondaryFill` roles drive colored shapes and controls; `accent` / `secondary` are contrast-adjusted text shades. `onAccent` and `onSecondary` select readable labels independently. Other presets are preserved.
+
+The Sunlit section in the lab has HSV sliders and numeric inputs. Both sample cards update together; actual-page preview links carry the tuned colors. Values persist under `site.sunlit-signature.v1` and can be shared with **Copy tuned link**. Valid six-digit `teal` and `tangerine` query parameters take precedence over saved values. Reset restores the original Sunlit pair, not the other presets. Custom values never alter the committed palette or other visitors’ settings.
+
+`palette-color.ts` contains conversion and contrast helpers. The tests cover HSV round trips, malformed colors, identical light/dark fills, and readable text/labels at extreme custom colors. A contrasting edge distinguishes bright fills from light surfaces; accent text remains a darker/lighter relative rather than promising every bright color works as small text.

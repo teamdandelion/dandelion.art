@@ -1,4 +1,11 @@
-export type PaletteColors = {
+import {
+  labelOn,
+  readableAccent,
+  type Signature,
+  SUNLIT_SIGNATURE,
+} from "./palette-color.ts";
+
+type BaseColors = {
   page: string;
   surface: string;
   panel: string;
@@ -11,6 +18,11 @@ export type PaletteColors = {
   onAccent: string;
   secondary: string;
 };
+export type PaletteColors = BaseColors & {
+  accentFill: string;
+  secondaryFill: string;
+  onSecondary: string;
+};
 
 export type Palette = {
   id: string;
@@ -19,9 +31,13 @@ export type Palette = {
   light: PaletteColors;
   dark: PaletteColors;
 };
+type BasePalette = Omit<Palette, "light" | "dark"> & {
+  light: BaseColors;
+  dark: BaseColors;
+};
 
 /** The only palette-specific values. Components consume semantic CSS variables. */
-const BASE_PALETTES: Palette[] = [
+const BASE_PALETTES: BasePalette[] = [
   {
     id: "zest",
     name: "Zest",
@@ -90,7 +106,7 @@ const BASE_PALETTES: Palette[] = [
 
 const tide = BASE_PALETTES.find((p) => p.id === "tide");
 if (!tide) throw new Error("Tide variations require the original Tide palette");
-const TIDE_VARIATIONS: Palette[] = [
+const TIDE_VARIATIONS: BasePalette[] = [
   {
     id: "tide-bright",
     name: "Tide · Bright",
@@ -175,11 +191,48 @@ const TIDE_VARIATIONS: Palette[] = [
   },
 ];
 
+export function withSignature(
+  colors: PaletteColors,
+  mode: "light" | "dark",
+  signature: Signature,
+): PaletteColors {
+  const surfaces = [
+    colors.page,
+    colors.surface,
+    colors.panel,
+    colors.raised,
+    colors.soft,
+  ];
+  return {
+    ...colors,
+    accentFill: signature.teal,
+    secondaryFill: signature.tangerine,
+    onAccent: labelOn(signature.teal),
+    onSecondary: labelOn(signature.tangerine),
+    accent: readableAccent(signature.teal, surfaces, mode),
+    secondary: readableAccent(signature.tangerine, surfaces, mode),
+  };
+}
+
 export const PALETTES: Palette[] = [
   tide,
   ...TIDE_VARIATIONS,
   ...BASE_PALETTES.filter((p) => p.id !== "tide"),
-];
+].map((palette) => {
+  const colors = (mode: "light" | "dark"): PaletteColors => {
+    const base = palette[mode];
+    const resolved = {
+      ...base,
+      accentFill: base.accent,
+      secondaryFill: base.secondary,
+      onSecondary: base.surface,
+    };
+    return palette.id === "tide-sunlit"
+      ? withSignature(resolved, mode, SUNLIT_SIGNATURE)
+      : resolved;
+  };
+  return { ...palette, light: colors("light"), dark: colors("dark") };
+});
 
 export const DEFAULT_PALETTE = "tide";
 export const PALETTE_STORAGE_KEY = "site.palette.v1";

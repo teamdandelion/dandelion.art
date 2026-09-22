@@ -1,6 +1,7 @@
 ---
 import LayoutDefault from "../../layouts/LayoutDefault.astro";
 import { PALETTES, paletteVariables } from "../../lib/palettes";
+import PaletteTuner from "../../components/PaletteTuner.astro";
 ---
 <LayoutDefault title="Palette lab — dandelion.art" noindex>
   <article class="palette-lab">
@@ -9,7 +10,8 @@ import { PALETTES, paletteVariables } from "../../lib/palettes";
     <nav class="palette-jumps" aria-label="Jump to a palette">{PALETTES.map(p => <a href={`#${p.id}`}>{p.name}</a>)}</nav>
     {PALETTES.map(p => <section id={p.id}>
       <h2>{p.name}</h2><p>{p.description}</p>
-      <div class="pair">{(["light", "dark"] as const).map(mode => <div class="sample" style={paletteVariables(p[mode])}>
+      {p.id === "tide-sunlit" && <PaletteTuner />}
+      <div class="pair">{(["light", "dark"] as const).map(mode => <div class="sample" data-sample-palette={p.id} data-sample-mode={mode} style={paletteVariables(p[mode])}>
         <div class="sample-top"><strong>{mode === "light" ? "Light" : "Dark"}</strong><span>Home · Art</span></div>
         <div class="sample-body">
           <span class="sample-label">DANDELION.ART</span><h3>A little room to explore.</h3>
@@ -39,8 +41,8 @@ import { PALETTES, paletteVariables } from "../../lib/palettes";
   .sample-body p { color: var(--site-muted); font-size: 14px; }
   .sample-notes { display: flex; justify-content: space-around; background: var(--site-surface); border: 1px solid var(--site-border); padding: 18px 8px; border-radius: 8px; margin: 24px 0; }
   .sample-notes span { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--site-soft); }
-  .sample-notes .active { background: var(--site-accent); color: var(--site-onAccent); }
-  .sample-notes .root { background: var(--site-secondary); color: var(--site-surface); }
+  .sample-notes .active { background: var(--site-accentFill); color: var(--site-onAccent); outline: 1px solid var(--site-accent); }
+  .sample-notes .root { background: var(--site-secondaryFill); color: var(--site-onSecondary); outline: 1px solid var(--site-secondary); }
   nav { display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; }
   nav a { color: var(--site-accent); text-decoration: underline; text-underline-offset: 3px; }
   @media(max-width: 640px) { .pair { grid-template-columns: 1fr; } }

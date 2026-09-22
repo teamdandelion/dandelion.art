@@ -108,8 +108,8 @@
   color: var(--ca-ink);
 }
 .fb-note[aria-pressed="true"] .fb-note-name {
-  color: var(--ca-paper);
-  background: var(--ca-accent);
+  color: var(--site-onAccent);
+  background: var(--ca-accent-fill);
   border-color: var(--ca-accent);
   font-weight: 700;
 }

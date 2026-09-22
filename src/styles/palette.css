@@ -4,10 +4,10 @@ html[data-palette][data-theme] {
   --color-base-200: var(--site-surface);
   --color-base-300: var(--site-border);
   --color-base-content: var(--site-text);
-  --color-primary: var(--site-accent);
+  --color-primary: var(--site-accentFill);
   --color-primary-content: var(--site-onAccent);
-  --color-secondary: var(--site-secondary);
-  --color-secondary-content: var(--site-page);
+  --color-secondary: var(--site-secondaryFill);
+  --color-secondary-content: var(--site-onSecondary);
   background: var(--site-page);
   color: var(--site-text);
   accent-color: var(--site-accent);
@@ -22,6 +22,12 @@ html[data-palette] ::selection {
 }
 html[data-palette] :focus-visible {
   outline-color: var(--site-accent);
+}
+html[data-palette] .link-primary {
+  color: var(--site-accent);
+}
+html[data-palette] .link-secondary {
+  color: var(--site-secondary);
 }
 /* Semantic families retain distinct colors regardless of the chosen accent. */
 html[data-theme="light"] {

@@ -12,6 +12,8 @@ import { PALETTES } from "../lib/palettes";
 <script>
   import { setAppearance } from "../lib/palette-client";
   import { DEFAULT_PALETTE } from "../lib/palettes";
+  import { applySignature, withSignatureParams } from "../lib/palette-custom";
+  applySignature();
   const picker = document.querySelector<HTMLSelectElement>("[data-palette-picker]")!;
   const mode = document.querySelector<HTMLSelectElement>("[data-mode-picker]")!;
   const sync = () => {
@@ -34,6 +36,7 @@ import { PALETTES } from "../lib/palettes";
     url.searchParams.set("palette", picker.value);
     url.searchParams.set("theme", mode.value);
     url.searchParams.set("paletteReview", "1");
+    withSignatureParams(url);
     const status = document.querySelector("[data-palette-status]")!;
     try { await navigator.clipboard.writeText(url.href); status.textContent = "Copied"; }
     catch { status.textContent = "Copy this page’s address"; history.replaceState(null, "", url); }

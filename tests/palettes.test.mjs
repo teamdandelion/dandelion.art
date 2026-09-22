@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { hexToHsv, hsvToHex, parseHex } from "../src/lib/palette-color.ts";
 import {
   DEFAULT_PALETTE,
   isPalette,
   PALETTES,
   paletteCss,
+  withSignature,
 } from "../src/lib/palettes.ts";
 
 function luminance(hex) {
@@ -71,10 +73,62 @@ test("all palettes maintain readable text, links, and selected labels", () => {
             contrast(c[foreground], c[background]) >= 4.5,
             `${p.id}/${mode} ${foreground} on ${background}: ${contrast(c[foreground], c[background]).toFixed(2)}`,
           );
-      assert.ok(contrast(c.onAccent, c.accent) >= 4.5);
+      assert.ok(contrast(c.onAccent, c.accentFill) >= 4.5);
+      assert.ok(contrast(c.onSecondary, c.secondaryFill) >= 4.5);
       assert.ok(contrast(c.text, c.soft) >= 4.5);
-      // Existing diagrams use the surface color as reversed text on colored notes.
-      assert.ok(contrast(c.surface, c.accent) >= 4.5);
-      assert.ok(contrast(c.surface, c.secondary) >= 4.5);
+    }
+});
+
+test("Sunlit uses identical signature fills in both modes", () => {
+  const sunlit = PALETTES.find((p) => p.id === "tide-sunlit");
+  assert.equal(sunlit.light.accentFill, sunlit.dark.accentFill);
+  assert.equal(sunlit.light.secondaryFill, sunlit.dark.secondaryFill);
+  assert.notEqual(sunlit.light.accent, sunlit.light.accentFill);
+});
+
+test("HSV conversion handles primaries, grayscale, hue wrap, and exact hex round trips", () => {
+  for (const color of [
+    "#70ead7",
+    "#ffb852",
+    "#000000",
+    "#ffffff",
+    "#808080",
+    "#ff0000",
+    "#00ff00",
+    "#0000ff",
+  ])
+    assert.equal(hsvToHex(hexToHsv(color)), color);
+  assert.equal(hsvToHex({ h: 360, s: 100, v: 100 }), "#ff0000");
+  assert.equal(hsvToHex({ h: -120, s: 100, v: 100 }), "#0000ff");
+  assert.equal(parseHex("70EAD7"), "#70ead7");
+  for (const bad of [null, {}, "red", "#fff", "000000;}", "12345678"])
+    assert.equal(parseHex(bad), null);
+});
+
+test("tuned fills stay exact while text and labels stay readable, even at extremes", () => {
+  const sunlit = PALETTES.find((p) => p.id === "tide-sunlit");
+  for (const mode of ["light", "dark"])
+    for (const hex of [
+      "#000000",
+      "#ffffff",
+      "#808080",
+      "#ff0000",
+      "#00ff00",
+      "#0000ff",
+      "#70ead7",
+      "#ffb852",
+    ]) {
+      const c = withSignature(sunlit[mode], mode, {
+        teal: hex,
+        tangerine: hex,
+      });
+      assert.equal(c.accentFill, hex);
+      assert.equal(c.secondaryFill, hex);
+      assert.ok(contrast(c.onAccent, hex) >= 4.5);
+      assert.ok(contrast(c.onSecondary, hex) >= 4.5);
+      for (const surface of [c.page, c.surface, c.panel, c.raised, c.soft]) {
+        assert.ok(contrast(c.accent, surface) >= 4.5);
+        assert.ok(contrast(c.secondary, surface) >= 4.5);
+      }
     }
 });

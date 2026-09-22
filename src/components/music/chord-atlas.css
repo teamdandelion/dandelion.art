@@ -5,6 +5,8 @@
   --ca-panel: var(--site-panel);
   --ca-line: var(--site-border);
   --ca-accent: var(--site-accent);
+  --ca-accent-fill: var(--site-accentFill);
+  --ca-coral-fill: var(--site-secondaryFill);
   --ca-accent-soft: var(--site-soft);
   --ca-coral: var(--site-secondary);
   --ca-focus: var(--site-accent);
@@ -323,15 +325,17 @@
   stroke-width: 1.5;
 }
 .ca-finger {
-  fill: var(--ca-accent);
+  fill: var(--ca-accent-fill);
+  stroke: var(--ca-accent);
+  stroke-width: 1;
 }
 .ca-finger-label {
-  fill: var(--ca-paper);
+  fill: var(--site-onAccent);
   font-size: 14px;
   font-weight: 600;
 }
 .ca-barre {
-  stroke: var(--ca-accent);
+  stroke: var(--ca-accent-fill);
   stroke-width: 16;
   stroke-linecap: round;
 }
@@ -345,7 +349,11 @@
   text-underline-offset: 3px;
 }
 .ca-finger.ca-root {
-  fill: var(--ca-coral);
+  fill: var(--ca-coral-fill);
+  stroke: var(--ca-coral);
+}
+.ca-finger.ca-root + .ca-finger-label {
+  fill: var(--site-onSecondary);
 }
 .ca-open {
   fill: var(--ca-paper);
@@ -493,19 +501,19 @@
   stroke-width: 0.6;
 }
 .ca-white-key.ca-key-active {
-  fill: var(--ca-accent);
+  fill: var(--ca-accent-fill);
   stroke: var(--ca-accent);
 }
 .ca-black-key.ca-key-active {
-  fill: var(--ca-accent);
+  fill: var(--ca-accent-fill);
   stroke: var(--ca-accent);
 }
 .ca-white-key.ca-key-root {
-  fill: var(--ca-coral);
+  fill: var(--ca-coral-fill);
   stroke: var(--ca-coral);
 }
 .ca-black-key.ca-key-root {
-  fill: var(--ca-coral);
+  fill: var(--ca-coral-fill);
   stroke: var(--ca-coral);
 }
 .ca-key-label {
@@ -522,7 +530,7 @@
   font-weight: 600;
 }
 .ca-key-root + text {
-  fill: var(--site-surface);
+  fill: var(--site-onSecondary);
 }
 .ca-voicing {
   display: flex;
@@ -595,10 +603,10 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--ca-accent);
+  background: var(--ca-accent-fill);
 }
 .ca-color-legend i.ca-root-swatch {
-  background: var(--ca-coral);
+  background: var(--ca-coral-fill);
 }
 .ca-audio-note {
   margin-left: auto;
