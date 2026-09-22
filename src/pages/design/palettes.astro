@@ -6,7 +6,7 @@ import PaletteTuner from "../../components/PaletteTuner.astro";
 <LayoutDefault title="Palette lab — dandelion.art" noindex>
   <article class="palette-lab">
     <h1>Palette lab</h1>
-    <p>Teal + tangerine. Compare the balance of warmth, brightness, and background tint in light and dark.</p>
+    <p>Iris is the site palette: blue accents and lavender structure. Earlier experiments remain below for comparison.</p>
     <nav class="palette-jumps" aria-label="Jump to a palette">{PALETTES.map(p => <a href={`#${p.id}`}>{p.name}</a>)}</nav>
     {PALETTES.map(p => <section id={p.id}>
       <h2>{p.name}</h2><p>{p.description}</p>

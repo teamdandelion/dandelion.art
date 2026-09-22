@@ -71,12 +71,12 @@
   min-width: 44px;
   min-height: 50px;
   border: 0;
-  border-right: 1px solid var(--ca-line);
+  border-right: 1px solid var(--site-diagramLine);
   border-radius: 0;
   background: linear-gradient(
     transparent calc(50% - var(--string-width) / 2),
-    var(--ca-line) calc(50% - var(--string-width) / 2),
-    var(--ca-line) calc(50% + var(--string-width) / 2),
+    var(--site-diagramLine) calc(50% - var(--string-width) / 2),
+    var(--site-diagramLine) calc(50% + var(--string-width) / 2),
     transparent calc(50% + var(--string-width) / 2)
   );
   color: var(--ca-muted);
@@ -101,7 +101,7 @@
   vertical-align: baseline;
 }
 .fb-note:nth-of-type(3) {
-  border-left: 3px solid var(--ca-muted);
+  border-left: 3px solid var(--site-diagramNut);
 }
 .fb-note.fb-in-key .fb-note-name {
   background: var(--ca-accent-soft);
@@ -174,13 +174,13 @@
     min-width: 0;
     min-height: 48px;
     border-right: 0;
-    border-bottom: 1px solid var(--ca-line);
+    border-bottom: 1px solid var(--site-diagramLine);
     font-size: 12px;
     background: linear-gradient(
       to right,
       transparent calc(50% - var(--string-width) / 2),
-      var(--ca-line) calc(50% - var(--string-width) / 2),
-      var(--ca-line) calc(50% + var(--string-width) / 2),
+      var(--site-diagramLine) calc(50% - var(--string-width) / 2),
+      var(--site-diagramLine) calc(50% + var(--string-width) / 2),
       transparent calc(50% + var(--string-width) / 2)
     );
   }
@@ -190,7 +190,7 @@
   }
   .fb-note:nth-of-type(3) {
     border-left: 0;
-    border-top: 3px solid var(--ca-muted);
+    border-top: 3px solid var(--site-diagramNut);
   }
   .fb-wide-label {
     display: none;

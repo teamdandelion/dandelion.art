@@ -1,6 +1,14 @@
 # Palette experiments
 
-The signature pair is teal and tangerine. **Tide**, the preview default, uses luminous teal (`#68E5D5`) and tangerine (`#FFB15C`) against deep petrol at night, and deeper accents against pale sea-glass by day. Light-mode text colors are darker relatives to preserve legibility, not literal copies of the bright dark-mode accents.
+## Site palette: Iris
+
+Iris is the site-wide default. Light mode uses `#EBECFC` page backgrounds, `#E0D1FF` lavender headers, navy type, and `#5369CF` blue note fills. Dark mode uses `#1C1B1B` charcoal, `#322D52` violet headers, and a lighter blue for clear markers. Cards, settings, selections, links, and controls share the same semantic roles across the site.
+
+Dedicated `diagramLine` and `diagramNut` roles separate muted lavender fret/string structure from blue playable markers. The nut is stronger than the grid. Grid and marker contrast is tested at 3:1 against diagram surfaces; text and labels at 4.5:1. Piano keys, chord-family distinctions, and artwork retain their existing meanings.
+
+The palette preference key is now `site.palette.v2` so earlier saved experiments do not mask the new default. The independent light/dark preference is unchanged. Explicit preview URLs and newly selected lab presets still override the default. The earlier experiments below remain in the unlisted lab.
+
+The earlier Tide experiments pair teal and tangerine. **Tide** uses luminous teal (`#68E5D5`) and tangerine (`#FFB15C`) against deep petrol at night, and deeper accents against pale sea-glass by day. Light-mode text colors are darker relatives to preserve legibility, not literal copies of the bright dark-mode accents.
 
 Three Tide variations inherit its roles: **Bright** changes only the accents and soft highlight; **Sunlit** pairs warm cream light surfaces with Bright’s cooler dark foundation and the selected teal/tangerine pair; **Surf** adds a stronger sea-glass tint with electric teal and coral-tangerine. **Zest** retains the user’s original soft cyan (`#A9FFF7`) and tangerine (`#FF9B71`) for comparison. All variants retain the same contrast requirements.
 
@@ -12,7 +20,7 @@ Open `/design/palettes/` for paired light/dark samples and links to real pages. 
 
 Run `npm run test:palettes`. The tests check readable text and accent combinations against the WCAG 2.x 4.5:1 threshold; they are token regression tests, not a claim of full-page accessibility conformance. See [W3C’s contrast guidance](https://www.w3.org/WAI/WCAG21/Understanding/contrast-minimum).
 
-The experiment intentionally leaves typography and layout alone to make color comparisons useful. No final palette has been chosen.
+The palette implementation leaves typography and layout alone; Iris is the selected default, with earlier experiments retained for comparison.
 
 ## Sunlit tuner
 

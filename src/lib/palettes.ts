@@ -19,6 +19,8 @@ type BaseColors = {
   secondary: string;
 };
 export type PaletteColors = BaseColors & {
+  diagramLine: string;
+  diagramNut: string;
   header: string;
   accentFill: string;
   secondaryFill: string;
@@ -207,7 +209,7 @@ export function withSignature(
   };
 }
 
-export const PALETTES: Palette[] = [
+const EXPERIMENT_PALETTES: Palette[] = [
   tide,
   ...TIDE_VARIATIONS,
   ...BASE_PALETTES.filter((p) => p.id !== "tide"),
@@ -216,6 +218,8 @@ export const PALETTES: Palette[] = [
     const base = palette[mode];
     const resolved = {
       ...base,
+      diagramLine: base.muted,
+      diagramNut: base.text,
       header: base.surface,
       accentFill: base.accent,
       secondaryFill: base.secondary,
@@ -228,8 +232,56 @@ export const PALETTES: Palette[] = [
   return { ...palette, light: colors("light"), dark: colors("dark") };
 });
 
-export const DEFAULT_PALETTE = "tide";
-export const PALETTE_STORAGE_KEY = "site.palette.v1";
+const IRIS: Palette = {
+  id: "iris",
+  name: "Iris",
+  description:
+    "Blue notes, lavender structure. Pale lilac and navy by day; charcoal and muted violet at night.",
+  light: {
+    page: "#ebecfc",
+    surface: "#f8f8ff",
+    panel: "#e6e2f3",
+    raised: "#ffffff",
+    text: "#16215b",
+    muted: "#605b79",
+    border: "#c8c2db",
+    header: "#e0d1ff",
+    soft: "#ebe2fa",
+    accent: "#3f50a6",
+    accentFill: "#5369cf",
+    onAccent: "#ffffff",
+    secondary: "#714881",
+    secondaryFill: "#795391",
+    onSecondary: "#ffffff",
+    diagramLine: "#8b799f",
+    diagramNut: "#78658f",
+  },
+  dark: {
+    page: "#1c1b1b",
+    surface: "#262525",
+    panel: "#302d35",
+    raised: "#35303e",
+    text: "#e2e2f3",
+    muted: "#b9b4c7",
+    border: "#514b5a",
+    header: "#322d52",
+    soft: "#322d52",
+    accent: "#a2afff",
+    accentFill: "#8595ed",
+    onAccent: "#151b3e",
+    secondary: "#ceb6ee",
+    secondaryFill: "#c2a6de",
+    onSecondary: "#24182f",
+    diagramLine: "#8f829e",
+    diagramNut: "#b6a6c6",
+  },
+};
+
+export const PALETTES: Palette[] = [IRIS, ...EXPERIMENT_PALETTES];
+export const DEFAULT_PALETTE = "iris";
+// Old experiment selections must not silently override the new site default.
+// Explicit palette URLs and new lab selections still work; theme is preserved.
+export const PALETTE_STORAGE_KEY = "site.palette.v2";
 export const isPalette = (id: string | null): id is string =>
   PALETTES.some((p) => p.id === id);
 

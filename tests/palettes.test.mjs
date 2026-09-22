@@ -28,7 +28,7 @@ test("palette IDs and every semantic color are valid", () => {
   assert.equal(isPalette(null), false);
   assert.equal(isPalette("gallery"), false);
   assert.equal(isPalette("grove"), false);
-  assert.equal(DEFAULT_PALETTE, "tide");
+  assert.equal(DEFAULT_PALETTE, "iris");
   assert.equal(new Set(PALETTES.map((p) => p.id)).size, PALETTES.length);
   for (const p of PALETTES)
     for (const mode of ["light", "dark"]) {
@@ -40,6 +40,25 @@ test("palette IDs and every semantic color are valid", () => {
         ),
       );
     }
+});
+
+test("Iris is the default with readable lavender structure and blue markers", () => {
+  const iris = PALETTES.find((p) => p.id === DEFAULT_PALETTE);
+  assert.equal(iris.light.header, "#e0d1ff");
+  assert.equal(iris.dark.header, "#322d52");
+  assert.equal(iris.light.accentFill, "#5369cf");
+  for (const mode of ["light", "dark"]) {
+    const c = iris[mode];
+    for (const background of [c.surface, c.panel]) {
+      assert.ok(contrast(c.diagramLine, background) >= 3);
+      assert.ok(
+        contrast(c.diagramNut, background) >
+          contrast(c.diagramLine, background),
+      );
+      assert.ok(contrast(c.accentFill, background) >= 3);
+    }
+    assert.notEqual(c.diagramLine, c.accentFill);
+  }
 });
 
 // WCAG 2.x contrast calculation. This guards tokens, not whole-page conformance.
