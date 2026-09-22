@@ -129,7 +129,7 @@ const TIDE_VARIATIONS: BasePalette[] = [
     id: "tide-sunlit",
     name: "Tide · Sunlit",
     description:
-      "The warmer version: cream, mellow deep teal, and golden tangerine.",
+      "Warm cream by day, cooler petrol by night. The selected soft teal and tangerine stay the same in both.",
     light: {
       ...tide.light,
       page: "#f8f5eb",
@@ -145,16 +145,7 @@ const TIDE_VARIATIONS: BasePalette[] = [
     },
     dark: {
       ...tide.dark,
-      page: "#172f31",
-      surface: "#203d3f",
-      panel: "#29494a",
-      raised: "#2c4d4e",
-      text: "#f5f3e5",
-      muted: "#b6cbc4",
-      border: "#536f70",
-      accent: "#70ead7",
-      soft: "#20494b",
-      secondary: "#ffb852",
+      soft: "#20494c",
     },
   },
   {

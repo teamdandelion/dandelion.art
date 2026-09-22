@@ -84,10 +84,33 @@ test("Sunlit uses identical signature fills in both modes", () => {
   assert.equal(sunlit.light.accentFill, sunlit.dark.accentFill);
   assert.equal(sunlit.light.secondaryFill, sunlit.dark.secondaryFill);
   assert.notEqual(sunlit.light.accent, sunlit.light.accentFill);
+  assert.equal(sunlit.light.accentFill, "#a8eae0");
+  assert.equal(sunlit.light.secondaryFill, "#ffa647");
+});
+
+test("Sunlit keeps its warm light surfaces and uses Bright's cool dark foundation", () => {
+  const sunlit = PALETTES.find((p) => p.id === "tide-sunlit");
+  const bright = PALETTES.find((p) => p.id === "tide-bright");
+  assert.equal(sunlit.light.page, "#f8f5eb");
+  assert.equal(sunlit.light.surface, "#fffdf5");
+  assert.equal(sunlit.light.panel, "#eeeee2");
+  for (const role of [
+    "page",
+    "surface",
+    "panel",
+    "raised",
+    "text",
+    "muted",
+    "border",
+    "soft",
+  ])
+    assert.equal(sunlit.dark[role], bright.dark[role], role);
 });
 
 test("HSV conversion handles primaries, grayscale, hue wrap, and exact hex round trips", () => {
   for (const color of [
+    "#a8eae0",
+    "#ffa647",
     "#70ead7",
     "#ffb852",
     "#000000",

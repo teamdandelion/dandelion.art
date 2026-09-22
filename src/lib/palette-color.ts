@@ -1,8 +1,8 @@
 export type HSV = { h: number; s: number; v: number };
 export type Signature = { teal: string; tangerine: string };
 export const SUNLIT_SIGNATURE: Signature = {
-  teal: "#70ead7",
-  tangerine: "#ffb852",
+  teal: "#a8eae0",
+  tangerine: "#ffa647",
 };
 
 export function parseHex(value: unknown): string | null {
