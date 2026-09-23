@@ -43,28 +43,16 @@
   margin-right: auto;
 }
 .hp-family-major {
-  --hp-color: #a64e36;
+  --hp-color: var(--family-major);
 }
 .hp-family-minor {
-  --hp-color: #296d61;
+  --hp-color: var(--family-minor);
 }
 .hp-family-dominant {
-  --hp-color: #866007;
+  --hp-color: var(--family-dominant);
 }
 .hp-family-diminished {
-  --hp-color: #864878;
-}
-html[data-theme="dark"] .hp-family-major {
-  --hp-color: #e49f7e;
-}
-html[data-theme="dark"] .hp-family-minor {
-  --hp-color: #90c9b3;
-}
-html[data-theme="dark"] .hp-family-dominant {
-  --hp-color: #eac577;
-}
-html[data-theme="dark"] .hp-family-diminished {
-  --hp-color: #d9a0d3;
+  --hp-color: var(--family-diminished);
 }
 .hp-trail {
   display: flex;

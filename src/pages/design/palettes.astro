@@ -1,0 +1,49 @@
+---
+import LayoutDefault from "../../layouts/LayoutDefault.astro";
+import { PALETTES, paletteVariables } from "../../lib/palettes";
+import PaletteTuner from "../../components/PaletteTuner.astro";
+---
+<LayoutDefault title="Palette lab — dandelion.art" noindex>
+  <article class="palette-lab">
+    <h1>Palette lab</h1>
+    <p>Teal + tangerine. Compare the balance of warmth, brightness, and background tint in light and dark.</p>
+    <nav class="palette-jumps" aria-label="Jump to a palette">{PALETTES.map(p => <a href={`#${p.id}`}>{p.name}</a>)}</nav>
+    {PALETTES.map(p => <section id={p.id}>
+      <h2>{p.name}</h2><p>{p.description}</p>
+      {p.id === "tide-sunlit" && <PaletteTuner />}
+      <div class="pair">{(["light", "dark"] as const).map(mode => <div class="sample" data-sample-palette={p.id} data-sample-mode={mode} style={paletteVariables(p[mode])}>
+        <div class="sample-top"><strong>{mode === "light" ? "Light" : "Dark"}</strong><span>Home · Art</span></div>
+        <div class="sample-body">
+          <span class="sample-label">DANDELION.ART</span><h3>A little room to explore.</h3>
+          <p>Art, music, and unexpected connections.</p>
+          <div class="sample-notes" aria-hidden="true"><span class="root">G₃</span><span class="active">B₃</span><span>D₄</span><span>G₄</span></div>
+          <nav aria-label={`${p.name} ${mode} previews`}>
+            {[ ["Home", "/"], ["QQL", "/art/qql/"], ["Fretboard", "/music/fretboard/"], ["Chords", "/music/chords/"] ].map(([label, path]) => <a href={`${path}?palette=${p.id}&theme=${mode}&paletteReview=1`}>{label} ↗</a>)}
+          </nav>
+        </div>
+      </div>)}</div>
+    </section>)}
+  </article>
+</LayoutDefault>
+<style>
+  .palette-lab { font: 16px/1.6 system-ui, sans-serif; padding-bottom: 40px; }
+  h1 { font: 48px/1.1 Georgia, serif; margin: 14px 0; }
+  h2 { font: 30px/1.2 Georgia, serif; margin: 40px 0 8px; }
+  .palette-lab > p, section > p { color: var(--site-muted); max-width: 44rem; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 18px; }
+  section { scroll-margin-top: 24px; }
+  .palette-jumps { margin-top: 20px; }
+  .sample { background: var(--site-page); color: var(--site-text); border: 1px solid var(--site-border); border-radius: 12px; overflow: hidden; }
+  .sample-top { display: flex; justify-content: space-between; padding: 14px 22px; background: var(--site-header); border-bottom: 1px solid var(--site-border); font-size: 13px; }
+  .sample-body { padding: 24px; }
+  .sample-label { color: var(--site-muted); font-size: 10px; letter-spacing: .15em; }
+  h3 { font: 29px/1.2 Georgia, serif; margin: 12px 0; }
+  .sample-body p { color: var(--site-muted); font-size: 14px; }
+  .sample-notes { display: flex; justify-content: space-around; background: var(--site-surface); border: 1px solid var(--site-border); padding: 18px 8px; border-radius: 8px; margin: 24px 0; }
+  .sample-notes span { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--site-soft); }
+  .sample-notes .active { background: var(--site-accentFill); color: var(--site-onAccent); outline: 1px solid var(--site-accent); }
+  .sample-notes .root { background: var(--site-secondaryFill); color: var(--site-onSecondary); outline: 1px solid var(--site-secondary); }
+  nav { display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; }
+  nav a { color: var(--site-accent); text-decoration: underline; text-underline-offset: 3px; }
+  @media(max-width: 640px) { .pair { grid-template-columns: 1fr; } }
+</style>
