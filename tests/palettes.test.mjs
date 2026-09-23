@@ -80,9 +80,9 @@ test("custom colors validate, stay mode-specific, and reset without mutating def
 
 test("Iris is the default and music token roles stay in the shared design system", () => {
   const iris = PALETTES.find((p) => p.id === DEFAULT_PALETTE);
-  assert.equal(iris.light.header, "#e0d1ff");
+  assert.equal(iris.light.header, "#bebaff");
   assert.equal(iris.dark.header, "#322d52");
-  assert.equal(iris.light.accentFill, "#5369cf");
+  assert.equal(iris.light.accentFill, "#8ca1ff");
   assert.equal("diagramLine" in iris.light, false);
   assert.equal("familyMajor" in iris.light, false);
   assert.equal("pianoWhite" in iris.light, false);
