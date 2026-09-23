@@ -66,12 +66,13 @@ export function updateColors(overrides: Overrides) {
   current = valid;
   save();
   applyColors();
+  window.dispatchEvent(new Event("palette-colors-change"));
 }
 export function syncColorAddress() {
   history.replaceState(null, "", withColorParams(new URL(location.href)));
 }
 export function colorShareUrl() {
-  const url = withColorParams(new URL("/design/palettes/", location.origin));
+  const url = withColorParams(new URL(location.href));
   url.searchParams.set(
     "theme",
     document.documentElement.dataset.theme ?? "light",

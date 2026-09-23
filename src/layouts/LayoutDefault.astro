@@ -4,7 +4,7 @@ import QqlLightbox from "../components/QqlLightbox.astro";
 import ThemeToggle from "../components/ThemeToggle.astro";
 import MusicSettings from "../components/music/MusicSettings";
 import PaletteHead from "../components/PaletteHead.astro";
-import PaletteReview from "../components/PaletteReview.astro";
+import DesignWidget from "../components/DesignWidget.astro";
 import { DEFAULT_PALETTE } from "../lib/palettes";
 import "../styles/style.css";
 import "../styles/tailwind.css";
@@ -84,13 +84,13 @@ const isMusic = pathname === "/music" || pathname.startsWith("/music/");
           </div>
         </div>
       </header>
-      <PaletteReview />
       <main class:list={["max-w-5xl mx-auto px-5 py-8", { "music-page": isMusic }]}>
         <slot />
       </main>
     </div>
     {hasQqlLightbox && <QqlLightbox />}
     {isMusic && <MusicSettings client:load />}
+    <DesignWidget />
   </body>
 </html>
 

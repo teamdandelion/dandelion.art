@@ -1,13 +1,15 @@
 ---
 import { COLOR_ROLES } from "../lib/palettes";
 import PaletteMusicPreview from "./music/PaletteMusicPreview";
+const { compact = false } = Astro.props;
+const tunerId = compact ? "design-widget" : "palette-lab";
 const channels = [["h", "Hue", 360], ["s", "Saturation", 100], ["v", "Value", 100]] as const;
 const groups = [
  { label:"Surfaces", roles:["page","surface","panel","raised","header","soft","border"] },
  { label:"Text and accents", roles:["text","muted","accent","accentFill","onAccent","secondary","secondaryFill","onSecondary"] },
 ] as const;
 ---
-<section class="palette-tuner" aria-label="Color tuner">
+<section class:list={["palette-tuner", { compact }]} aria-label="Color tuner">
  <h2>Adjust every color</h2>
  <p class="tuner-intro">Choose a swatch, then tune it below. The music sample updates with the palette.</p>
  <fieldset disabled data-tuner-controls>
@@ -19,9 +21,9 @@ const groups = [
     {group.roles.map(role => <button type="button" class="role-swatch" data-role={role} aria-pressed="false"><span class="context-chip" data-chip={role} aria-hidden="true"></span><span class="role-name">{COLOR_ROLES[role]}</span><code data-value={role}></code></button>)}
    </div></section>)}
   </div>
-  <section class="music-sample"><h2>Music sample</h2><PaletteMusicPreview client:load /></section>
+  {!compact && <section class="music-sample"><h2>Music sample</h2><PaletteMusicPreview client:load /></section>}
   <div class="color-inputs"><input type="color" data-color-picker aria-label="Pick color" /><label>Hex<input data-color-hex type="text" maxlength="7" spellcheck="false" pattern="#?[0-9a-fA-F]{6}" /></label></div>
-  {channels.map(([key,label,max]) => <div class="channel"><label for={`tune-${key}`}>{label}</label><input id={`tune-${key}`} data-channel={key} type="range" min="0" max={max} step="1" /><input data-channel={key} type="number" min="0" max={max} step="1" aria-label={`${label} value`} /></div>)}
+  {channels.map(([key,label,max]) => <div class="channel"><label for={`${tunerId}-${key}`}>{label}</label><input id={`${tunerId}-${key}`} data-channel={key} type="range" min="0" max={max} step="1" /><input data-channel={key} type="number" min="0" max={max} step="1" aria-label={`${label} value`} /></div>)}
   <div class="actions"><button data-reset-color>Reset color</button><button data-reset-mode>Reset mode</button><button data-reset-all>Reset all</button><button data-copy-colors>Copy tuned link</button></div>
  </fieldset>
  <p>Saved in this browser. Shared links include both modes. Artwork stays unchanged.</p>
@@ -35,7 +37,7 @@ const groups = [
  import { resolvedColors } from "../lib/palette-overrides";
  import { getColors, updateColors, applyColors, syncColorAddress, colorShareUrl } from "../lib/palette-custom";
  import { setAppearance } from "../lib/palette-client";
- const root = document.querySelector<HTMLElement>(".palette-tuner")!;
+ for (const root of document.querySelectorAll<HTMLElement>(".palette-tuner")) {
  const modeInput = root.querySelector<HTMLSelectElement>("[data-edit-mode]")!;
  const picker = root.querySelector<HTMLInputElement>("[data-color-picker]")!;
  const hex = root.querySelector<HTMLInputElement>("[data-color-hex]")!;
@@ -89,6 +91,10 @@ const groups = [
  root.querySelectorAll<HTMLButtonElement>("[data-role]").forEach(button=>button.addEventListener("click",()=>{role=button.dataset.role as ColorRole;render();}));
  modeInput.addEventListener("change", () => { mode=modeInput.value as Mode; setAppearance({theme:mode}); render(); });
  window.addEventListener("appearance-change", () => { mode=document.documentElement.dataset.theme === "dark" ? "dark" : "light"; render(); });
+ window.addEventListener("palette-colors-change", () => {
+  const next=getColors();
+  if (JSON.stringify(next) !== JSON.stringify(overrides)) { overrides=next; render(); }
+ });
  picker.addEventListener("input", () => update(picker.value));
  hex.addEventListener("input", () => { const valid=parseHex(hex.value); if (valid) update(valid); });
  hex.addEventListener("change", () => { const valid=parseHex(hex.value); if (valid) update(valid); else {status.textContent="Enter a six-digit hex color."; render();} });
@@ -114,6 +120,7 @@ const groups = [
  });
  applyColors(); render();
  root.querySelector<HTMLFieldSetElement>("[data-tuner-controls]")!.disabled=false;
+ }
 </script>
 <style>
  .palette-tuner { background:var(--site-surface); color:var(--site-text); border:1px solid var(--site-border); border-radius:12px; padding:20px; margin:24px 0; font:14px/1.45 system-ui,sans-serif; }
@@ -150,4 +157,13 @@ const groups = [
  .palette-tuner :focus-visible { outline:2px solid var(--site-accent); outline-offset:2px; }
  @media(max-width:760px) { .role-board { grid-template-columns:1fr; } }
  @media(max-width:460px) { .role-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .channel { grid-template-columns:65px minmax(0,1fr) 56px; gap:6px; } }
+ .compact { margin:0; padding:0; border:0; }
+ .compact>h2,.compact>.tuner-intro,.compact>p:not([role="status"]) { display:none; }
+ .compact .choices { margin-bottom:10px; }
+ .compact .role-board { grid-template-columns:1fr; max-height:210px; overflow-y:auto; padding:3px; }
+ .compact .role-group { padding:6px; }
+ .compact .role-group h2 { margin-bottom:6px; }
+ .compact .color-inputs { margin-top:10px; }
+ .compact .actions { margin-top:10px; gap:6px; }
+ .compact .actions button { font-size:12px; }
 </style>
