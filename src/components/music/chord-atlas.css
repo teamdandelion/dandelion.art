@@ -491,13 +491,14 @@
   max-height: 175px;
 }
 .ca-white-key {
-  fill: var(--site-surface);
-  stroke: var(--site-border);
+  /* Physical key colors stay recognizable across light and dark themes. */
+  fill: #f8f8ff;
+  stroke: #9993a8;
   stroke-width: 0.8;
 }
 .ca-black-key {
-  fill: var(--site-text);
-  stroke: var(--site-text);
+  fill: #24232c;
+  stroke: #24232c;
   stroke-width: 0.6;
 }
 .ca-white-key.ca-key-active {
@@ -518,7 +519,7 @@
 }
 .ca-key-label {
   font-size: 12px;
-  fill: var(--site-muted);
+  fill: #605b79;
 }
 .ca-key-label--active {
   fill: var(--site-onAccent);
@@ -526,7 +527,7 @@
 }
 .ca-black-key-label {
   font-size: 11px;
-  fill: var(--site-page);
+  fill: #f8f8ff;
   font-weight: 600;
 }
 .ca-black-key-label--active {
