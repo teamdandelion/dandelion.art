@@ -529,6 +529,9 @@
   fill: var(--site-page);
   font-weight: 600;
 }
+.ca-black-key-label--active {
+  fill: var(--site-onAccent);
+}
 .ca-key-root + text {
   fill: var(--site-onSecondary);
 }

@@ -105,7 +105,7 @@ test("piano labels remain readable on natural, highlighted, and root keys", () =
       [".ca-key-label", ".ca-white-key"],
       [".ca-key-label--active", ".ca-white-key.ca-key-active"],
       [".ca-key-root + text", ".ca-white-key.ca-key-root"],
-      [".ca-black-key-label", ".ca-black-key.ca-key-active"],
+      [".ca-black-key-label--active", ".ca-black-key.ca-key-active"],
       [".ca-key-root + text", ".ca-black-key.ca-key-root"],
     ])
       checkContrast(

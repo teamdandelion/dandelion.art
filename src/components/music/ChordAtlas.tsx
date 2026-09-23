@@ -144,7 +144,7 @@ function PianoDiagram({ voicing, chord }: { voicing: Voicing; chord: Chord }) {
                 x={x}
                 y="73"
                 textAnchor="middle"
-                className="ca-black-key-label"
+                className={`ca-black-key-label${voice ? " ca-black-key-label--active" : ""}`}
               >
                 {formatNote(voice.pitch.note)}
               </text>
