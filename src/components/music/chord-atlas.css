@@ -312,16 +312,16 @@
   overflow: visible;
 }
 .ca-fret {
-  stroke: var(--ca-muted);
+  stroke: var(--site-border);
   stroke-opacity: 0.8;
   stroke-width: 1.5;
 }
 .ca-nut {
-  stroke: var(--ca-ink);
+  stroke: var(--site-muted);
   stroke-width: 5;
 }
 .ca-string {
-  stroke: var(--ca-muted);
+  stroke: var(--site-border);
   stroke-width: 1.5;
 }
 .ca-finger {
@@ -491,13 +491,14 @@
   max-height: 175px;
 }
 .ca-white-key {
-  fill: #faf9f5;
-  stroke: #bcbcb5;
+  /* Physical key colors stay recognizable across light and dark themes. */
+  fill: #f8f8ff;
+  stroke: #9993a8;
   stroke-width: 0.8;
 }
 .ca-black-key {
-  fill: #272825;
-  stroke: #161715;
+  fill: #24232c;
+  stroke: #24232c;
   stroke-width: 0.6;
 }
 .ca-white-key.ca-key-active {
@@ -518,7 +519,7 @@
 }
 .ca-key-label {
   font-size: 12px;
-  fill: #60635b;
+  fill: #605b79;
 }
 .ca-key-label--active {
   fill: var(--site-onAccent);
@@ -526,8 +527,11 @@
 }
 .ca-black-key-label {
   font-size: 11px;
-  fill: var(--site-onAccent);
+  fill: #f8f8ff;
   font-weight: 600;
+}
+.ca-black-key-label--active {
+  fill: var(--site-onAccent);
 }
 .ca-key-root + text {
   fill: var(--site-onSecondary);

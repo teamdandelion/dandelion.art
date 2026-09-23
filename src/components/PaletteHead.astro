@@ -19,11 +19,8 @@ const paletteIds = PALETTES.map(p => p.id);
     document.documentElement.dataset.theme = theme;
     if (validPalettes.includes(requested)) save(paletteStorageKey, palette);
     if (["light", "dark"].includes(requestedTheme)) save("theme", theme);
-    let review = params.get("paletteReview") === "1" || location.pathname.replace(/\/$/, "") === "/design/palettes";
-    try {
-      review ||= sessionStorage.getItem("palette.review") === "1";
-      if (review) sessionStorage.setItem("palette.review", "1");
-    } catch {}
-    if (review) document.documentElement.dataset.paletteReview = "true";
+    const designVisit = location.pathname === "/design" || location.pathname.startsWith("/design/");
+    if (designVisit) save("site.design-tools.v1", "1");
+    if (designVisit || read("site.design-tools.v1") === "1") document.documentElement.dataset.designTools = "true";
   })();
 </script>

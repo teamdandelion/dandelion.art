@@ -1,91 +1,169 @@
 ---
-import { hexToHsv, SUNLIT_SIGNATURE } from "../lib/palette-color";
-const channels = [ ["h", "Hue", 360, "°"], ["s", "Saturation", 100, "%"], ["v", "Value", 100, "%"] ] as const;
+import { COLOR_ROLES } from "../lib/palettes";
+import PaletteMusicPreview from "./music/PaletteMusicPreview";
+const { compact = false } = Astro.props;
+const tunerId = compact ? "design-widget" : "palette-lab";
+const channels = [["h", "Hue", 360], ["s", "Saturation", 100], ["v", "Value", 100]] as const;
+const groups = [
+ { label:"Surfaces", roles:["page","surface","panel","raised","header","soft","border"] },
+ { label:"Text and accents", roles:["text","muted","accent","accentFill","onAccent","secondary","secondaryFill","onSecondary"] },
+] as const;
 ---
-<div class="palette-tuner" data-palette-tuner>
-  <div class="tuner-heading"><strong>Tune Sunlit</strong><span>Tangerine leads · teal supports</span></div>
-  <div class="tuner-colors">
-    {(["teal", "tangerine"] as const).map(color => <fieldset data-color={color} disabled>
-      <legend>{color === "teal" ? "Teal" : "Tangerine"}</legend>
-      <div class="color-value"><i data-swatch style={`background:${SUNLIT_SIGNATURE[color]}`} /><code data-hex>{SUNLIT_SIGNATURE[color]}</code></div>
-      {channels.map(([channel, name, max, unit]) => <div class="channel">
-        <label for={`${color}-${channel}`}>{name}</label>
-        <input id={`${color}-${channel}`} data-channel={channel} type="range" min="0" max={max} step="1" value={Math.round(hexToHsv(SUNLIT_SIGNATURE[color])[channel])} aria-label={`${color} ${name}`} />
-        <input data-number={channel} type="number" min="0" max={max} step="1" value={Math.round(hexToHsv(SUNLIT_SIGNATURE[color])[channel])} aria-label={`${color} ${name} value`} />
-        <span>{unit}</span>
-      </div>)}
-    </fieldset>)}
+<section class:list={["palette-tuner", { compact }]} aria-label="Color tuner">
+ <h2>Adjust every color</h2>
+ <p class="tuner-intro">Choose a swatch, then tune it below. The music sample updates with the palette.</p>
+ <fieldset disabled data-tuner-controls>
+  <div class="choices">
+   <label>Mode<select data-edit-mode><option value="light">Light</option><option value="dark">Dark</option></select></label>
   </div>
-  <div class="tuner-actions"><button type="button" data-tuner-reset disabled>Reset Sunlit</button><button type="button" data-tuner-copy disabled>Copy tuned link</button><span data-tuner-status role="status"></span></div>
-  <p>Fills stay exact. Link shades and label colors adjust for contrast. Changes are saved in this browser.</p>
-  <noscript>Enable JavaScript to adjust the colors.</noscript>
-</div>
+  <div class="role-board">
+   {groups.map(group => <section class="role-group"><h2>{group.label}</h2><div class="role-grid">
+    {group.roles.map(role => <button type="button" class="role-swatch" data-role={role} aria-pressed="false"><span class="context-chip" data-chip={role} aria-hidden="true"></span><span class="role-name">{COLOR_ROLES[role]}</span><code data-value={role}></code></button>)}
+   </div></section>)}
+  </div>
+  {!compact && <section class="music-sample"><h2>Music sample</h2><PaletteMusicPreview client:load /></section>}
+  <div class="color-inputs"><input type="color" data-color-picker aria-label="Pick color" /><label>Hex<input data-color-hex type="text" maxlength="7" spellcheck="false" pattern="#?[0-9a-fA-F]{6}" /></label></div>
+  {channels.map(([key,label,max]) => <div class="channel"><label for={`${tunerId}-${key}`}>{label}</label><input id={`${tunerId}-${key}`} data-channel={key} type="range" min="0" max={max} step="1" /><input data-channel={key} type="number" min="0" max={max} step="1" aria-label={`${label} value`} /></div>)}
+  <div class="actions"><button data-reset-color>Reset color</button><button data-reset-mode>Reset mode</button><button data-reset-all>Reset all</button><button data-copy-colors>Copy tuned link</button></div>
+ </fieldset>
+ <p>Saved in this browser. Shared links include both modes. Artwork stays unchanged.</p>
+ <p role="status" data-tuner-status></p>
+ <details><summary>Contrast checks <span data-warning-count></span></summary><ul data-contrast-warnings></ul></details>
+ <noscript>Enable JavaScript to tune colors.</noscript>
+</section>
 <script>
-  import { hexToHsv, hsvToHex, SUNLIT_SIGNATURE, type HSV } from "../lib/palette-color";
-  import { applySignature, getSignature, signatureShareUrl, syncSignatureAddress, updateSignature } from "../lib/palette-custom";
-  const tuner = document.querySelector<HTMLElement>("[data-palette-tuner]")!;
-  let signature = getSignature();
-  const values = { teal: hexToHsv(signature.teal), tangerine: hexToHsv(signature.tangerine) };
-  const status = tuner.querySelector<HTMLElement>("[data-tuner-status]")!;
-  function render() {
-    for (const color of ["teal", "tangerine"] as const) {
-      const field = tuner.querySelector<HTMLElement>(`[data-color="${color}"]`)!;
-      field.querySelector<HTMLElement>("[data-swatch]")!.style.background = signature[color];
-      field.querySelector<HTMLElement>("[data-hex]")!.textContent = signature[color].toUpperCase();
-      for (const channel of ["h", "s", "v"] as const) {
-        const value = String(Math.round(values[color][channel]));
-        field.querySelector<HTMLInputElement>(`[data-channel="${channel}"]`)!.value = value;
-        field.querySelector<HTMLInputElement>(`[data-number="${channel}"]`)!.value = value;
-      }
-    }
+ import { COLOR_ROLES, type ColorRole, type Mode } from "../lib/palettes";
+ import { hexToHsv, hsvToHex, parseHex, contrast, type HSV } from "../lib/palette-color";
+ import { resolvedColors } from "../lib/palette-overrides";
+ import { getColors, updateColors, applyColors, syncColorAddress, colorShareUrl } from "../lib/palette-custom";
+ import { setAppearance } from "../lib/palette-client";
+ for (const root of document.querySelectorAll<HTMLElement>(".palette-tuner")) {
+ const modeInput = root.querySelector<HTMLSelectElement>("[data-edit-mode]")!;
+ const picker = root.querySelector<HTMLInputElement>("[data-color-picker]")!;
+ const hex = root.querySelector<HTMLInputElement>("[data-color-hex]")!;
+ const status = root.querySelector<HTMLElement>("[data-tuner-status]")!;
+ let mode: Mode = document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+ let role: ColorRole = "page";
+ let overrides = getColors();
+ let hsv: HSV;
+ function warnings() {
+  const messages: string[] = [];
+  for (const m of ["light","dark"] as const) {
+   const c = resolvedColors(overrides,m);
+   const pairs: [ColorRole,ColorRole,number][] = [
+    ...(["text","muted","accent","secondary"] as const).flatMap(f => (["page","surface","panel","raised","header"] as const).map(b => [f,b,4.5] as [ColorRole,ColorRole,number])),
+    ["onAccent","accentFill",4.5],["onSecondary","secondaryFill",4.5],["text","soft",4.5],
+    ["muted","surface",4.5],["text","surface",4.5],["accent","surface",4.5],["secondary","surface",4.5]
+   ];
+   for (const [f,b,min] of pairs) {
+    const ratio = contrast(c[f],c[b]);
+    if (ratio < min) messages.push(`${m}: ${COLOR_ROLES[f]} on ${COLOR_ROLES[b]} — ${ratio.toFixed(2)}:1 (aim for ${min}:1)`);
+   }
   }
-  tuner.addEventListener("input", (event) => {
-    if (!(event.target instanceof HTMLInputElement)) return;
-    const input = event.target;
-    const channel = (input.dataset.channel ?? input.dataset.number) as keyof HSV;
-    const color = input.closest<HTMLElement>("[data-color]")?.dataset.color as "teal" | "tangerine";
-    if (!channel || !color || input.value === "" || !Number.isFinite(input.valueAsNumber)) return;
-    values[color][channel] = Math.round(Math.max(0, Math.min(Number(input.max), input.valueAsNumber)));
-    signature[color] = hsvToHex(values[color]);
-    updateSignature(signature, false);
-    status.textContent = "";
-    render();
-  });
-  tuner.addEventListener("change", syncSignatureAddress);
-  tuner.querySelector("[data-tuner-reset]")!.addEventListener("click", () => {
-    signature = { ...SUNLIT_SIGNATURE };
-    values.teal = hexToHsv(signature.teal);
-    values.tangerine = hexToHsv(signature.tangerine);
-    updateSignature(signature);
-    render();
-    status.textContent = "Sunlit reset";
-  });
-  tuner.querySelector("[data-tuner-copy]")!.addEventListener("click", async () => {
-    const url = signatureShareUrl();
-    try { await navigator.clipboard.writeText(url); status.textContent = "Copied"; }
-    catch { history.replaceState(null, "", url); status.textContent = "Copy this page’s address"; }
-  });
-  applySignature();
-  render();
-  for (const control of tuner.querySelectorAll<HTMLFieldSetElement | HTMLButtonElement>("fieldset, button")) control.disabled = false;
+  root.querySelector("[data-warning-count]")!.textContent = messages.length ? `(${messages.length})` : "(pass)";
+  const list = root.querySelector("[data-contrast-warnings]")!;
+  list.replaceChildren(...messages.map(message => { const li=document.createElement("li"); li.textContent=message; return li; }));
+ }
+ function render(resetHsv = true) {
+  const color = resolvedColors(overrides,mode)[role];
+  if (resetHsv) hsv = hexToHsv(color);
+  modeInput.value=mode;
+  picker.value=color;
+  hex.value=color;
+  for (const input of root.querySelectorAll<HTMLInputElement>("[data-channel]")) input.value=String(Math.round(hsv[input.dataset.channel as keyof HSV]));
+  for(const button of root.querySelectorAll<HTMLButtonElement>("[data-role]")) {
+   const swatchRole=button.dataset.role as ColorRole;
+   const swatchColor=resolvedColors(overrides,mode)[swatchRole];
+   button.setAttribute("aria-pressed",String(role===swatchRole));
+   button.querySelector("[data-value]")!.textContent=swatchColor.toUpperCase();
+   const chip=button.querySelector<HTMLElement>(".context-chip")!;
+   chip.style.setProperty("--swatch",swatchColor);
+  }
+  warnings();
+ }
+ function update(color: string, resetHsv = true) {
+  overrides = { ...overrides, [mode]: {...overrides[mode], [role]:color} };
+  updateColors(overrides);
+  overrides=getColors();
+  status.textContent="";
+  render(resetHsv);
+ }
+ root.querySelectorAll<HTMLButtonElement>("[data-role]").forEach(button=>button.addEventListener("click",()=>{role=button.dataset.role as ColorRole;render();}));
+ modeInput.addEventListener("change", () => { mode=modeInput.value as Mode; setAppearance({theme:mode}); render(); });
+ window.addEventListener("appearance-change", () => { mode=document.documentElement.dataset.theme === "dark" ? "dark" : "light"; render(); });
+ window.addEventListener("palette-colors-change", () => {
+  const next=getColors();
+  if (JSON.stringify(next) !== JSON.stringify(overrides)) { overrides=next; render(); }
+ });
+ picker.addEventListener("input", () => update(picker.value));
+ hex.addEventListener("input", () => { const valid=parseHex(hex.value); if (valid) update(valid); });
+ hex.addEventListener("change", () => { const valid=parseHex(hex.value); if (valid) update(valid); else {status.textContent="Enter a six-digit hex color."; render();} });
+ for (const input of root.querySelectorAll<HTMLInputElement>("[data-channel]")) input.addEventListener("input", () => {
+  if (input.value==="" || !Number.isFinite(input.valueAsNumber)) return;
+  hsv[input.dataset.channel as keyof HSV]=Math.max(0,Math.min(Number(input.max),input.valueAsNumber));
+  update(hsvToHex(hsv),false);
+ });
+ root.addEventListener("change",syncColorAddress);
+ root.addEventListener("focusout",syncColorAddress);
+ function reset(scope: "color"|"mode"|"all") {
+  if (scope==="all") overrides={};
+  else if (scope==="mode") delete overrides[mode];
+  else if (overrides[mode]) delete overrides[mode]![role];
+  updateColors(overrides); syncColorAddress(); render(); status.textContent="Reset to Iris defaults.";
+ }
+ for (const scope of ["color","mode","all"] as const) root.querySelector(`[data-reset-${scope}]`)!.addEventListener("click",()=>reset(scope));
+ root.querySelector("[data-copy-colors]")!.addEventListener("click",async()=>{
+  syncColorAddress();
+  const url=colorShareUrl();
+  try {await navigator.clipboard.writeText(url);status.textContent="Copied";}
+  catch {history.replaceState(null,"",url);status.textContent="Copy this page’s address.";}
+ });
+ applyColors(); render();
+ root.querySelector<HTMLFieldSetElement>("[data-tuner-controls]")!.disabled=false;
+ }
 </script>
 <style>
-  .palette-tuner { margin-top: 18px; padding: 18px; border: 1px solid var(--site-border); border-radius: 12px; background: var(--site-surface); }
-  .tuner-heading, .tuner-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
-  .tuner-heading span, p { color: var(--site-muted); font-size: 13px; }
-  .tuner-colors { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 16px 0; }
-  fieldset { border: 0; min-width: 0; padding: 0; }
-  legend { font-weight: 600; }
-  .color-value { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
-  .color-value i { width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--site-muted); }
-  code { font-size: 13px; }
-  .channel { display: grid; grid-template-columns: 76px minmax(50px, 1fr) 54px 12px; gap: 8px; align-items: center; font-size: 12px; }
-  input[type="range"] { width: 100%; min-width: 0; height: 40px; accent-color: var(--site-accent); cursor: pointer; }
-  input[type="number"], button { border: 1px solid var(--site-border); background: var(--site-page); color: var(--site-text); border-radius: 5px; padding: 6px; font: inherit; min-height: 36px; }
-  input[type="number"] { width: 100%; font-size: 16px; }
-  button { padding: 8px 12px; min-height: 44px; cursor: pointer; font-size: 13px; }
-  button:disabled { opacity: .5; cursor: wait; }
-  p { margin: 12px 0 0; }
-  [role="status"] { font-size: 13px; }
-  @media(max-width: 700px) { .tuner-colors { grid-template-columns: 1fr; gap: 16px; } }
+ .palette-tuner { background:var(--site-surface); color:var(--site-text); border:1px solid var(--site-border); border-radius:12px; padding:20px; margin:24px 0; font:14px/1.45 system-ui,sans-serif; }
+ .palette-tuner h2 { font:600 16px/1.3 system-ui,sans-serif; margin:0 0 10px; color:inherit; }
+ .tuner-intro,.palette-tuner>p { color:var(--site-muted); font-size:13px; margin:8px 0 16px; }
+ fieldset { border:0; padding:0; min-width:0; }
+ .choices { margin-bottom:16px; }
+ label { display:grid; gap:4px; }
+ select,input[type="text"],input[type="number"],button { color:var(--site-text); background:var(--site-raised); border:1px solid var(--site-border); border-radius:6px; font:inherit; min-height:44px; padding:8px; min-width:0; }
+ select { min-width:120px; }
+ select,input[type="text"],input[type="number"] { font-size:16px; }
+ .role-board { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+ .role-group { min-width:0; border:1px solid var(--site-border); border-radius:8px; padding:10px; }
+ .role-group h2 { font-size:13px; }
+ .role-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+ .role-swatch { display:grid; grid-template-columns:34px minmax(0,1fr); align-items:center; gap:4px 8px; min-height:54px; padding:5px; text-align:left; cursor:pointer; }
+ .role-swatch[aria-pressed="true"] { background:var(--site-soft); outline:2px solid var(--site-accent); outline-offset:1px; }
+ .context-chip { grid-row:span 2; display:block; width:32px; height:32px; border:1px solid var(--site-border); border-radius:6px; background:var(--swatch); }
+ .role-name { overflow:hidden; font-size:11px; line-height:1.2; }
+ .role-swatch code { color:var(--site-muted); font:10px ui-monospace,monospace; }
+ .music-sample { margin-top:12px; border:1px solid var(--site-border); border-radius:8px; padding:12px; }
+ .music-sample h2 { margin-bottom:10px; }
+ .color-inputs { display:flex; align-items:end; gap:16px; margin:18px 0 10px; }
+ input[type="color"] { width:56px; height:44px; cursor:pointer; background:var(--site-raised); border:1px solid var(--site-border); border-radius:6px; }
+ .color-inputs label { flex:1; }
+ .channel { display:grid; grid-template-columns:80px minmax(0,1fr) 66px; align-items:center; gap:12px; margin:6px 0; }
+ input[type="range"] { width:100%; min-width:0; min-height:44px; accent-color:var(--site-accent); }
+ .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
+ button { cursor:pointer; }
+ [role="status"]:empty { display:none; }
+ details { margin-top:12px; }
+ summary { cursor:pointer; }
+ ul { padding-left:20px; }
+ .palette-tuner :focus-visible { outline:2px solid var(--site-accent); outline-offset:2px; }
+ @media(max-width:760px) { .role-board { grid-template-columns:1fr; } }
+ @media(max-width:460px) { .role-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .channel { grid-template-columns:65px minmax(0,1fr) 56px; gap:6px; } }
+ .compact { margin:0; padding:0; border:0; }
+ .compact>h2,.compact>.tuner-intro,.compact>p:not([role="status"]) { display:none; }
+ .compact .choices { margin-bottom:10px; }
+ .compact .role-board { grid-template-columns:1fr; max-height:210px; overflow-y:auto; padding:3px; }
+ .compact .role-group { padding:6px; }
+ .compact .role-group h2 { margin-bottom:6px; }
+ .compact .color-inputs { margin-top:10px; }
+ .compact .actions { margin-top:10px; gap:6px; }
+ .compact .actions button { font-size:12px; }
 </style>

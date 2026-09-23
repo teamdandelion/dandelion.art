@@ -43,16 +43,16 @@
   margin-right: auto;
 }
 .hp-family-major {
-  --hp-color: var(--family-major);
+  --hp-color: var(--site-accent);
 }
 .hp-family-minor {
-  --hp-color: var(--family-minor);
+  --hp-color: var(--site-secondary);
 }
 .hp-family-dominant {
-  --hp-color: var(--family-dominant);
+  --hp-color: var(--site-text);
 }
 .hp-family-diminished {
-  --hp-color: var(--family-diminished);
+  --hp-color: var(--site-muted);
 }
 .hp-trail {
   display: flex;

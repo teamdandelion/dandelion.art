@@ -53,6 +53,7 @@ function Board({
     };
   }, [helpOpen]);
   const pitches = fretboardPitches(instrument, frets);
+  const soundingNotes = new Set(pitches.map((pitch) => pitch % 12));
   const noteList = [...new Set(pitches)]
     .map((p) => formatPitch(pitchAt(p, tonalKey)))
     .join(" · ");
@@ -166,7 +167,7 @@ function Board({
                     <button
                       key={fret ?? "mute"}
                       type="button"
-                      className={`fb-note${pitch !== null && scale.has(pitch % 12) ? " fb-in-key" : ""}`}
+                      className={`fb-note${pitch !== null && scale.has(pitch % 12) ? " fb-in-key" : ""}${pitch !== null && soundingNotes.has(pitch % 12) ? " fb-in-chord" : ""}`}
                       aria-pressed={frets[index] === fret}
                       tabIndex={frets[index] === fret ? 0 : -1}
                       aria-label={`String ${course.number}, ${fret === null ? "mute" : fret === 0 ? `open ${label}` : `fret ${fret}, ${label}`}`}
@@ -276,11 +277,13 @@ function Board({
             octave.
           </p>
           <p>
-            The tinted notes belong to your selected key. Chord detection uses
-            every sounding string, including open strings, and matches pitch
-            classes exactly against the supported chord vocabulary. Slash names
-            show a bass note other than the root. A shape can have multiple
-            valid names; its musical context decides which is useful.
+            Purple marks selected frets; blue marks other positions with the
+            same pitch classes as your sounding notes. Faint blue marks other
+            notes in your selected key. Chord detection uses every sounding
+            string, including open strings, and matches pitch classes exactly
+            against the supported chord vocabulary. Slash names show a bass note
+            other than the root. A shape can have multiple valid names; its
+            musical context decides which is useful.
           </p>
           <p>
             On baritone uke, leave D, G, and B open and fret string 1 at 3:

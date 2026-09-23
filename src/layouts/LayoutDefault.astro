@@ -4,7 +4,7 @@ import QqlLightbox from "../components/QqlLightbox.astro";
 import ThemeToggle from "../components/ThemeToggle.astro";
 import MusicSettings from "../components/music/MusicSettings";
 import PaletteHead from "../components/PaletteHead.astro";
-import PaletteReview from "../components/PaletteReview.astro";
+import DesignWidget from "../components/DesignWidget.astro";
 import { DEFAULT_PALETTE } from "../lib/palettes";
 import "../styles/style.css";
 import "../styles/tailwind.css";
@@ -72,17 +72,29 @@ const isMusic = pathname === "/music" || pathname.startsWith("/music/");
               >
                 Art
               </a>
+              <a href="/music" class="music-link" aria-label="Music" title="Music" aria-current={isMusic ? "page" : undefined}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M9 18V5l12-2v13M9 9l12-2" />
+                  <ellipse cx="6" cy="18" rx="3" ry="3" />
+                  <ellipse cx="18" cy="16" rx="3" ry="3" />
+                </svg>
+              </a>
             </nav>
             <ThemeToggle />
           </div>
         </div>
       </header>
-      <PaletteReview />
       <main class:list={["max-w-5xl mx-auto px-5 py-8", { "music-page": isMusic }]}>
         <slot />
       </main>
     </div>
     {hasQqlLightbox && <QqlLightbox />}
     {isMusic && <MusicSettings client:load />}
+    <DesignWidget />
   </body>
 </html>
+
+<style>
+  .music-link { display:grid; place-items:center; min-width:44px; min-height:44px; }
+  .music-link:focus-visible { outline:2px solid var(--site-accent); outline-offset:2px; border-radius:6px; }
+</style>
