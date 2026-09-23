@@ -1,18 +1,15 @@
 ---
 import { COLOR_ROLES } from "../lib/palettes";
+import PaletteMusicPreview from "./music/PaletteMusicPreview";
 const channels = [["h", "Hue", 360], ["s", "Saturation", 100], ["v", "Value", 100]] as const;
 const groups = [
  { label:"Surfaces", roles:["page","surface","panel","raised","header","soft","border"] },
  { label:"Text and accents", roles:["text","muted","accent","accentFill","onAccent","secondary","secondaryFill","onSecondary"] },
 ] as const;
-const musicMappings = [
- ["Major chords","accent"],["Minor chords","secondary"],["Dominant chords","text"],["Diminished chords","muted"],
- ["Strings and frets","muted"],["Nut","text"],["White piano keys","surface"],["Black piano keys","text"],["Piano labels","muted"],
-] as const;
 ---
 <section class="palette-tuner" aria-label="Color tuner">
  <h2>Adjust every color</h2>
- <p class="tuner-intro">Choose a swatch, then tune it below. Music diagrams use the shared site colors shown in the map.</p>
+ <p class="tuner-intro">Choose a swatch, then tune it below. The music sample updates with the palette.</p>
  <fieldset disabled data-tuner-controls>
   <div class="choices">
    <label>Mode<select data-edit-mode><option value="light">Light</option><option value="dark">Dark</option></select></label>
@@ -21,10 +18,8 @@ const musicMappings = [
    {groups.map(group => <section class="role-group"><h2>{group.label}</h2><div class="role-grid">
     {group.roles.map(role => <button type="button" class="role-swatch" data-role={role} aria-pressed="false"><span class="context-chip" data-chip={role}><span>Aa</span><i></i></span><span class="role-name">{COLOR_ROLES[role]}</span><code data-value={role}></code></button>)}
    </div></section>)}
-   <section class="role-group music-group"><h2>Music uses these colors</h2><div class="music-map">
-    {musicMappings.map(([label,role]) => <div class="music-role"><span class="mapping-chip" data-mapping={role}></span><span>{label}</span><span>uses {COLOR_ROLES[role]}</span><code data-map-hex={role}></code></div>)}
-   </div></section>
   </div>
+  <section class="music-sample"><h2>Music sample</h2><PaletteMusicPreview client:load /></section>
   <div class="color-inputs"><input type="color" data-color-picker aria-label="Pick color" /><label>Hex<input data-color-hex type="text" maxlength="7" spellcheck="false" pattern="#?[0-9a-fA-F]{6}" /></label></div>
   {channels.map(([key,label,max]) => <div class="channel"><label for={`tune-${key}`}>{label}</label><input id={`tune-${key}`} data-channel={key} type="range" min="0" max={max} step="1" /><input data-channel={key} type="number" min="0" max={max} step="1" aria-label={`${label} value`} /></div>)}
   <div class="actions"><button data-reset-color>Reset color</button><button data-reset-mode>Reset mode</button><button data-reset-all>Reset all</button><button data-copy-colors>Copy tuned link</button></div>
@@ -90,13 +85,6 @@ const musicMappings = [
    chip.style.setProperty("--chip-background",fillRole||fillBackground?c[fillRole??fillBackground!]:onSurface?c.surface:swatchColor);
    chip.style.setProperty("--chip-border",swatchRole==="border"?swatchColor:c.border);
   }
-  for(const el of root.querySelectorAll<HTMLElement>("[data-mapping]")) {
-   const mapped=el.dataset.mapping as ColorRole;
-   const color=resolvedColors(overrides,mode)[mapped];
-   el.style.background=color;
-   el.nextElementSibling!.nextElementSibling!.textContent="uses "+COLOR_ROLES[mapped];
-   root.querySelector<HTMLElement>(`[data-map-hex="${mapped}"]`)!.textContent=color.toUpperCase();
-  }
   warnings();
  }
  function update(color: string, resetHsv = true) {
@@ -156,11 +144,9 @@ const musicMappings = [
  .context-chip > span { color:var(--text); }
  .context-chip i { position:absolute; width:11px; height:11px; right:-3px; bottom:-3px; border-radius:50%; background:var(--swatch); border:1px solid #fff; z-index:1; }
  .role-name { overflow:hidden; font-size:11px; line-height:1.2; }
- .role-swatch code,.music-role code { color:#585967; font:10px ui-monospace,monospace; }
- .music-group { grid-column:1/-1; }
- .music-map { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px 12px; }
- .music-role { display:grid; grid-template-columns:18px 1fr auto; gap:6px; align-items:center; min-width:0; font-size:11px; }
- .mapping-chip { display:block; width:14px; height:14px; border:1px solid #717382; border-radius:50%; }
+ .role-swatch code { color:#585967; font:10px ui-monospace,monospace; }
+ .music-sample { margin-top:12px; border:1px solid #d0d1da; border-radius:8px; padding:12px; }
+ .music-sample h2 { margin-bottom:10px; }
  .color-inputs { display:flex; align-items:end; gap:16px; margin:18px 0 10px; }
  input[type="color"] { width:56px; height:44px; cursor:pointer; }
  .color-inputs label { flex:1; }
@@ -173,6 +159,6 @@ const musicMappings = [
  summary { cursor:pointer; }
  ul { padding-left:20px; }
  .palette-tuner :focus-visible { outline:2px solid #394b9c; outline-offset:2px; }
- @media(max-width:760px) { .role-board { grid-template-columns:1fr; } .music-group { grid-column:auto; } .music-map { grid-template-columns:1fr 1fr; } }
- @media(max-width:460px) { .role-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .music-map { grid-template-columns:1fr; } .channel { grid-template-columns:65px minmax(0,1fr) 56px; gap:6px; } }
+ @media(max-width:760px) { .role-board { grid-template-columns:1fr; } }
+ @media(max-width:460px) { .role-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .channel { grid-template-columns:65px minmax(0,1fr) 56px; gap:6px; } }
 </style>
