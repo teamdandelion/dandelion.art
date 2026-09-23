@@ -16,7 +16,7 @@ const groups = [
   </div>
   <div class="role-board">
    {groups.map(group => <section class="role-group"><h2>{group.label}</h2><div class="role-grid">
-    {group.roles.map(role => <button type="button" class="role-swatch" data-role={role} aria-pressed="false"><span class="context-chip" data-chip={role}><span>Aa</span><i></i></span><span class="role-name">{COLOR_ROLES[role]}</span><code data-value={role}></code></button>)}
+    {group.roles.map(role => <button type="button" class="role-swatch" data-role={role} aria-pressed="false"><span class="context-chip" data-chip={role} aria-hidden="true"></span><span class="role-name">{COLOR_ROLES[role]}</span><code data-value={role}></code></button>)}
    </div></section>)}
   </div>
   <section class="music-sample"><h2>Music sample</h2><PaletteMusicPreview client:load /></section>
@@ -76,14 +76,7 @@ const groups = [
    button.querySelector("[data-value]")!.textContent=swatchColor.toUpperCase();
    const chip=button.querySelector<HTMLElement>(".context-chip")!;
    chip.style.setProperty("--swatch",swatchColor);
-   const c=resolvedColors(overrides,mode);
-   const fillRole=swatchRole==="accentFill"?"onAccent":swatchRole==="secondaryFill"?"onSecondary":null;
-   const fillBackground=swatchRole==="onAccent"?"accentFill":swatchRole==="onSecondary"?"secondaryFill":null;
-   const textRole=["text","muted","accent","secondary"].includes(swatchRole);
-   const onSurface=textRole||swatchRole==="border";
-   chip.style.setProperty("--text",fillRole?c[fillRole]:textRole?swatchColor:swatchRole==="onAccent"||swatchRole==="onSecondary"?swatchColor:c.text);
-   chip.style.setProperty("--chip-background",fillRole||fillBackground?c[fillRole??fillBackground!]:onSurface?c.surface:swatchColor);
-   chip.style.setProperty("--chip-border",swatchRole==="border"?swatchColor:c.border);
+   chip.style.setProperty("--swatch",swatchColor);
   }
   warnings();
  }
@@ -139,10 +132,7 @@ const groups = [
  .role-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
  .role-swatch { display:grid; grid-template-columns:34px minmax(0,1fr); align-items:center; gap:4px 8px; min-height:54px; padding:5px; text-align:left; cursor:pointer; }
  .role-swatch[aria-pressed="true"] { outline:2px solid #3f50a6; outline-offset:1px; }
- .context-chip { grid-row:span 2; position:relative; display:grid; place-items:center; width:32px; height:32px; border:2px solid var(--chip-border); border-radius:6px; background:var(--chip-background); color:var(--text); font-weight:650; }
- .context-chip { background:var(--chip-background); }
- .context-chip > span { color:var(--text); }
- .context-chip i { position:absolute; width:11px; height:11px; right:-3px; bottom:-3px; border-radius:50%; background:var(--swatch); border:1px solid #fff; z-index:1; }
+ .context-chip { grid-row:span 2; display:block; width:32px; height:32px; border:1px solid rgb(0 0 0 / 18%); border-radius:6px; background:var(--swatch); }
  .role-name { overflow:hidden; font-size:11px; line-height:1.2; }
  .role-swatch code { color:#585967; font:10px ui-monospace,monospace; }
  .music-sample { margin-top:12px; border:1px solid #d0d1da; border-radius:8px; padding:12px; }
