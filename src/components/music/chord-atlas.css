@@ -312,16 +312,16 @@
   overflow: visible;
 }
 .ca-fret {
-  stroke: var(--site-diagramLine);
+  stroke: var(--site-border);
   stroke-opacity: 0.8;
   stroke-width: 1.5;
 }
 .ca-nut {
-  stroke: var(--site-diagramNut);
+  stroke: var(--site-muted);
   stroke-width: 5;
 }
 .ca-string {
-  stroke: var(--site-diagramLine);
+  stroke: var(--site-border);
   stroke-width: 1.5;
 }
 .ca-finger {
@@ -491,13 +491,13 @@
   max-height: 175px;
 }
 .ca-white-key {
-  fill: var(--site-pianoWhite);
-  stroke: var(--site-pianoWhiteBorder);
+  fill: var(--site-surface);
+  stroke: var(--site-border);
   stroke-width: 0.8;
 }
 .ca-black-key {
-  fill: var(--site-pianoBlack);
-  stroke: var(--site-pianoBlackBorder);
+  fill: var(--site-text);
+  stroke: var(--site-text);
   stroke-width: 0.6;
 }
 .ca-white-key.ca-key-active {
@@ -518,7 +518,7 @@
 }
 .ca-key-label {
   font-size: 12px;
-  fill: var(--site-pianoLabel);
+  fill: var(--site-muted);
 }
 .ca-key-label--active {
   fill: var(--site-onAccent);
@@ -526,7 +526,7 @@
 }
 .ca-black-key-label {
   font-size: 11px;
-  fill: var(--site-onAccent);
+  fill: var(--site-page);
   font-weight: 600;
 }
 .ca-key-root + text {

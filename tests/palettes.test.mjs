@@ -78,28 +78,21 @@ test("custom colors validate, stay mode-specific, and reset without mutating def
     assert.equal(validateOverrides(bad), null);
 });
 
-test("Iris is the default with readable lavender structure and blue markers", () => {
+test("Iris is the default and music token roles stay in the shared design system", () => {
   const iris = PALETTES.find((p) => p.id === DEFAULT_PALETTE);
   assert.equal(iris.light.header, "#e0d1ff");
   assert.equal(iris.dark.header, "#322d52");
   assert.equal(iris.light.accentFill, "#5369cf");
-  for (const mode of ["light", "dark"]) {
-    const c = iris[mode];
-    for (const background of [c.surface, c.panel]) {
-      assert.ok(contrast(c.diagramLine, background) >= 3);
-      assert.ok(
-        contrast(c.diagramNut, background) >
-          contrast(c.diagramLine, background),
-      );
-      assert.ok(contrast(c.accentFill, background) >= 3);
-    }
-    assert.notEqual(c.diagramLine, c.accentFill);
-  }
+  assert.equal("diagramLine" in iris.light, false);
+  assert.equal("familyMajor" in iris.light, false);
+  assert.equal("pianoWhite" in iris.light, false);
+  for (const mode of ["light", "dark"])
+    assert.ok(contrast(iris[mode].muted, iris[mode].surface) >= 4.5);
 });
 
 // WCAG 2.x contrast calculation. This guards tokens, not whole-page conformance.
 
-test("all palettes maintain readable text, links, and selected labels", () => {
+test("Iris maintains readable text, links, and selected labels", () => {
   for (const p of PALETTES)
     for (const mode of ["light", "dark"]) {
       const c = p[mode];

@@ -32,16 +32,3 @@ html[data-palette] .link-primary {
 html[data-palette] .link-secondary {
   color: var(--site-secondary);
 }
-/* Semantic families retain distinct colors regardless of the chosen accent. */
-html[data-theme="light"] {
-  --family-major: var(--site-familyMajor);
-  --family-minor: var(--site-familyMinor);
-  --family-dominant: var(--site-familyDominant);
-  --family-diminished: var(--site-familyDiminished);
-}
-html[data-theme="dark"] {
-  --family-major: var(--site-familyMajor);
-  --family-minor: var(--site-familyMinor);
-  --family-dominant: var(--site-familyDominant);
-  --family-diminished: var(--site-familyDiminished);
-}

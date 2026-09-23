@@ -1,12 +1,29 @@
 ---
 import { COLOR_ROLES } from "../lib/palettes";
 const channels = [["h", "Hue", 360], ["s", "Saturation", 100], ["v", "Value", 100]] as const;
+const groups = [
+ { label:"Surfaces", roles:["page","surface","panel","raised","header","soft","border"] },
+ { label:"Text and accents", roles:["text","muted","accent","accentFill","onAccent","secondary","secondaryFill","onSecondary"] },
+] as const;
+const musicMappings = [
+ ["Major chords","accent"],["Minor chords","secondary"],["Dominant chords","text"],["Diminished chords","muted"],
+ ["Strings and frets","muted"],["Nut","text"],["White piano keys","surface"],["Black piano keys","text"],["Piano labels","muted"],
+] as const;
 ---
 <section class="palette-tuner" aria-label="Color tuner">
+ <h2>Adjust every color</h2>
+ <p class="tuner-intro">Choose a swatch, then tune it below. Music diagrams use the shared site colors shown in the map.</p>
  <fieldset disabled data-tuner-controls>
   <div class="choices">
    <label>Mode<select data-edit-mode><option value="light">Light</option><option value="dark">Dark</option></select></label>
-   <label>Color<select data-edit-role>{Object.entries(COLOR_ROLES).map(([key,label]) => <option value={key}>{label}</option>)}</select></label>
+  </div>
+  <div class="role-board">
+   {groups.map(group => <section class="role-group"><h2>{group.label}</h2><div class="role-grid">
+    {group.roles.map(role => <button type="button" class="role-swatch" data-role={role} aria-pressed="false"><span class="context-chip" data-chip={role}><span>Aa</span><i></i></span><span class="role-name">{COLOR_ROLES[role]}</span><code data-value={role}></code></button>)}
+   </div></section>)}
+   <section class="role-group music-group"><h2>Music uses these colors</h2><div class="music-map">
+    {musicMappings.map(([label,role]) => <div class="music-role"><span class="mapping-chip" data-mapping={role}></span><span>{label}</span><span>uses {COLOR_ROLES[role]}</span><code data-map-hex={role}></code></div>)}
+   </div></section>
   </div>
   <div class="color-inputs"><input type="color" data-color-picker aria-label="Pick color" /><label>Hex<input data-color-hex type="text" maxlength="7" spellcheck="false" pattern="#?[0-9a-fA-F]{6}" /></label></div>
   {channels.map(([key,label,max]) => <div class="channel"><label for={`tune-${key}`}>{label}</label><input id={`tune-${key}`} data-channel={key} type="range" min="0" max={max} step="1" /><input data-channel={key} type="number" min="0" max={max} step="1" aria-label={`${label} value`} /></div>)}
@@ -25,7 +42,6 @@ const channels = [["h", "Hue", 360], ["s", "Saturation", 100], ["v", "Value", 10
  import { setAppearance } from "../lib/palette-client";
  const root = document.querySelector<HTMLElement>(".palette-tuner")!;
  const modeInput = root.querySelector<HTMLSelectElement>("[data-edit-mode]")!;
- const roleInput = root.querySelector<HTMLSelectElement>("[data-edit-role]")!;
  const picker = root.querySelector<HTMLInputElement>("[data-color-picker]")!;
  const hex = root.querySelector<HTMLInputElement>("[data-color-hex]")!;
  const status = root.querySelector<HTMLElement>("[data-tuner-status]")!;
@@ -40,9 +56,7 @@ const channels = [["h", "Hue", 360], ["s", "Saturation", 100], ["v", "Value", 10
    const pairs: [ColorRole,ColorRole,number][] = [
     ...(["text","muted","accent","secondary"] as const).flatMap(f => (["page","surface","panel","raised","header"] as const).map(b => [f,b,4.5] as [ColorRole,ColorRole,number])),
     ["onAccent","accentFill",4.5],["onSecondary","secondaryFill",4.5],["text","soft",4.5],
-    ["diagramLine","surface",3],["diagramNut","surface",3],
-    ["pianoLabel","pianoWhite",4.5],
-    ...(["familyMajor","familyMinor","familyDominant","familyDiminished"] as const).map(f => [f,"surface",4.5] as [ColorRole,ColorRole,number])
+    ["muted","surface",4.5],["text","surface",4.5],["accent","surface",4.5],["secondary","surface",4.5]
    ];
    for (const [f,b,min] of pairs) {
     const ratio = contrast(c[f],c[b]);
@@ -60,6 +74,29 @@ const channels = [["h", "Hue", 360], ["s", "Saturation", 100], ["v", "Value", 10
   picker.value=color;
   hex.value=color;
   for (const input of root.querySelectorAll<HTMLInputElement>("[data-channel]")) input.value=String(Math.round(hsv[input.dataset.channel as keyof HSV]));
+  for(const button of root.querySelectorAll<HTMLButtonElement>("[data-role]")) {
+   const swatchRole=button.dataset.role as ColorRole;
+   const swatchColor=resolvedColors(overrides,mode)[swatchRole];
+   button.setAttribute("aria-pressed",String(role===swatchRole));
+   button.querySelector("[data-value]")!.textContent=swatchColor.toUpperCase();
+   const chip=button.querySelector<HTMLElement>(".context-chip")!;
+   chip.style.setProperty("--swatch",swatchColor);
+   const c=resolvedColors(overrides,mode);
+   const fillRole=swatchRole==="accentFill"?"onAccent":swatchRole==="secondaryFill"?"onSecondary":null;
+   const fillBackground=swatchRole==="onAccent"?"accentFill":swatchRole==="onSecondary"?"secondaryFill":null;
+   const textRole=["text","muted","accent","secondary"].includes(swatchRole);
+   const onSurface=textRole||swatchRole==="border";
+   chip.style.setProperty("--text",fillRole?c[fillRole]:textRole?swatchColor:swatchRole==="onAccent"||swatchRole==="onSecondary"?swatchColor:c.text);
+   chip.style.setProperty("--chip-background",fillRole||fillBackground?c[fillRole??fillBackground!]:onSurface?c.surface:swatchColor);
+   chip.style.setProperty("--chip-border",swatchRole==="border"?swatchColor:c.border);
+  }
+  for(const el of root.querySelectorAll<HTMLElement>("[data-mapping]")) {
+   const mapped=el.dataset.mapping as ColorRole;
+   const color=resolvedColors(overrides,mode)[mapped];
+   el.style.background=color;
+   el.nextElementSibling!.nextElementSibling!.textContent="uses "+COLOR_ROLES[mapped];
+   root.querySelector<HTMLElement>(`[data-map-hex="${mapped}"]`)!.textContent=color.toUpperCase();
+  }
   warnings();
  }
  function update(color: string, resetHsv = true) {
@@ -69,7 +106,7 @@ const channels = [["h", "Hue", 360], ["s", "Saturation", 100], ["v", "Value", 10
   status.textContent="";
   render(resetHsv);
  }
- roleInput.addEventListener("change", () => { role=roleInput.value as ColorRole; render(); });
+ root.querySelectorAll<HTMLButtonElement>("[data-role]").forEach(button=>button.addEventListener("click",()=>{role=button.dataset.role as ColorRole;render();}));
  modeInput.addEventListener("change", () => { mode=modeInput.value as Mode; setAppearance({theme:mode}); render(); });
  window.addEventListener("appearance-change", () => { mode=document.documentElement.dataset.theme === "dark" ? "dark" : "light"; render(); });
  picker.addEventListener("input", () => update(picker.value));
@@ -99,24 +136,43 @@ const channels = [["h", "Hue", 360], ["s", "Saturation", 100], ["v", "Value", 10
  root.querySelector<HTMLFieldSetElement>("[data-tuner-controls]")!.disabled=false;
 </script>
 <style>
- .palette-tuner { background:#f5f5f7; color:#22232c; border:1px solid #9294a2; border-radius:12px; padding:20px; margin:24px 0; color-scheme:light; font:14px/1.5 system-ui,sans-serif; }
+ .palette-tuner { background:#f5f5f7; color:#22232c; border:1px solid #9294a2; border-radius:12px; padding:20px; margin:24px 0; color-scheme:light; font:14px/1.45 system-ui,sans-serif; }
+ .palette-tuner h2 { font:600 16px/1.3 system-ui,sans-serif; margin:0 0 10px; color:inherit; }
+ .tuner-intro,.palette-tuner>p { color:#555866; font-size:13px; margin:8px 0 16px; }
  fieldset { border:0; padding:0; min-width:0; }
- .choices { display:grid; grid-template-columns:100px minmax(0,1fr); gap:16px; }
+ .choices { margin-bottom:16px; }
  label { display:grid; gap:4px; }
  select,input[type="text"],input[type="number"],button { color:#22232c; background:#fff; border:1px solid #9294a2; border-radius:6px; font:inherit; min-height:44px; padding:8px; min-width:0; }
- select { width:100%; }
+ select { min-width:120px; }
  select,input[type="text"],input[type="number"] { font-size:16px; }
- .color-inputs { display:flex; align-items:end; gap:16px; margin:16px 0; }
+ .role-board { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+ .role-group { min-width:0; border:1px solid #d0d1da; border-radius:8px; padding:10px; }
+ .role-group h2 { font-size:13px; }
+ .role-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+ .role-swatch { display:grid; grid-template-columns:34px minmax(0,1fr); align-items:center; gap:4px 8px; min-height:54px; padding:5px; text-align:left; cursor:pointer; }
+ .role-swatch[aria-pressed="true"] { outline:2px solid #3f50a6; outline-offset:1px; }
+ .context-chip { grid-row:span 2; position:relative; display:grid; place-items:center; width:32px; height:32px; border:2px solid var(--chip-border); border-radius:6px; background:var(--chip-background); color:var(--text); font-weight:650; }
+ .context-chip { background:var(--chip-background); }
+ .context-chip > span { color:var(--text); }
+ .context-chip i { position:absolute; width:11px; height:11px; right:-3px; bottom:-3px; border-radius:50%; background:var(--swatch); border:1px solid #fff; z-index:1; }
+ .role-name { overflow:hidden; font-size:11px; line-height:1.2; }
+ .role-swatch code,.music-role code { color:#585967; font:10px ui-monospace,monospace; }
+ .music-group { grid-column:1/-1; }
+ .music-map { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px 12px; }
+ .music-role { display:grid; grid-template-columns:18px 1fr auto; gap:6px; align-items:center; min-width:0; font-size:11px; }
+ .mapping-chip { display:block; width:14px; height:14px; border:1px solid #717382; border-radius:50%; }
+ .color-inputs { display:flex; align-items:end; gap:16px; margin:18px 0 10px; }
  input[type="color"] { width:56px; height:44px; cursor:pointer; }
  .color-inputs label { flex:1; }
  .channel { display:grid; grid-template-columns:80px minmax(0,1fr) 66px; align-items:center; gap:12px; margin:6px 0; }
  input[type="range"] { width:100%; min-width:0; min-height:44px; accent-color:#5369cf; }
  .actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
  button { cursor:pointer; }
- p { margin:12px 0 0; }
  [role="status"]:empty { display:none; }
  details { margin-top:12px; }
  summary { cursor:pointer; }
  ul { padding-left:20px; }
  .palette-tuner :focus-visible { outline:2px solid #394b9c; outline-offset:2px; }
+ @media(max-width:760px) { .role-board { grid-template-columns:1fr; } .music-group { grid-column:auto; } .music-map { grid-template-columns:1fr 1fr; } }
+ @media(max-width:460px) { .role-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .music-map { grid-template-columns:1fr; } .channel { grid-template-columns:65px minmax(0,1fr) 56px; gap:6px; } }
 </style>
