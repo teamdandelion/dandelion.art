@@ -2,11 +2,14 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { hexToHsv, hsvToHex, parseHex } from "../src/lib/palette-color.ts";
 import {
+  resolvedColors,
+  validateOverrides,
+} from "../src/lib/palette-overrides.ts";
+import {
   DEFAULT_PALETTE,
   isPalette,
   PALETTES,
   paletteCss,
-  withSignature,
 } from "../src/lib/palettes.ts";
 
 function luminance(hex) {
@@ -23,6 +26,10 @@ function contrast(a, b) {
 }
 
 test("palette IDs and every semantic color are valid", () => {
+  assert.deepEqual(
+    PALETTES.map((p) => p.id),
+    ["iris"],
+  );
   assert.ok(isPalette(DEFAULT_PALETTE));
   assert.equal(isPalette("unknown"), false);
   assert.equal(isPalette(null), false);
@@ -40,6 +47,35 @@ test("palette IDs and every semantic color are valid", () => {
         ),
       );
     }
+});
+
+test("custom colors validate, stay mode-specific, and reset without mutating defaults", () => {
+  const original = structuredClone(PALETTES[0]);
+  const custom = validateOverrides({
+    light: { page: "123ABC", unknown: "bad" },
+    dark: { accent: "#aabbcc" },
+  });
+  assert.deepEqual(custom, {
+    light: { page: "#123abc" },
+    dark: { accent: "#aabbcc" },
+  });
+  assert.equal(resolvedColors(custom, "light").page, "#123abc");
+  assert.equal(resolvedColors(custom, "dark").page, original.dark.page);
+  assert.deepEqual(resolvedColors({}, "light"), original.light);
+  assert.deepEqual(PALETTES[0], original);
+  assert.deepEqual(validateOverrides({ light: original.light }), {});
+  assert.deepEqual(
+    validateOverrides(JSON.parse(JSON.stringify(custom))),
+    custom,
+  );
+  for (const bad of [
+    null,
+    [],
+    { light: [] },
+    { dark: { page: "red" } },
+    { light: { page: "#ffffff;}body{display:none" } },
+  ])
+    assert.equal(validateOverrides(bad), null);
 });
 
 test("Iris is the default with readable lavender structure and blue markers", () => {
@@ -62,25 +98,6 @@ test("Iris is the default with readable lavender structure and blue markers", ()
 });
 
 // WCAG 2.x contrast calculation. This guards tokens, not whole-page conformance.
-test("Tide Bright isolates accent changes for a controlled comparison", () => {
-  const tide = PALETTES.find((p) => p.id === "tide");
-  const bright = PALETTES.find((p) => p.id === "tide-bright");
-  for (const mode of ["light", "dark"]) {
-    for (const role of [
-      "page",
-      "surface",
-      "panel",
-      "raised",
-      "text",
-      "muted",
-      "border",
-      "onAccent",
-    ])
-      assert.equal(bright[mode][role], tide[mode][role]);
-    for (const role of ["accent", "secondary", "soft"])
-      assert.notEqual(bright[mode][role], tide[mode][role]);
-  }
-});
 
 test("all palettes maintain readable text, links, and selected labels", () => {
   for (const p of PALETTES)
@@ -104,47 +121,6 @@ test("all palettes maintain readable text, links, and selected labels", () => {
     }
 });
 
-test("Sunlit uses identical signature fills in both modes", () => {
-  const sunlit = PALETTES.find((p) => p.id === "tide-sunlit");
-  assert.equal(sunlit.light.accentFill, sunlit.dark.accentFill);
-  assert.equal(sunlit.light.secondaryFill, sunlit.dark.secondaryFill);
-  assert.notEqual(sunlit.light.accent, sunlit.light.accentFill);
-  assert.equal(sunlit.light.accentFill, "#ffa647");
-  assert.equal(sunlit.light.secondaryFill, "#a8eae0");
-});
-
-test("Sunlit uses tangerine for foreground accents and teal for supporting surfaces", () => {
-  const sunlit = PALETTES.find((p) => p.id === "tide-sunlit");
-  const tuned = withSignature(sunlit.light, "light", {
-    teal: "#a8eae0",
-    tangerine: "#ffa647",
-  });
-  assert.equal(tuned.accentFill, "#ffa647");
-  assert.equal(tuned.secondaryFill, "#a8eae0");
-  assert.equal(tuned.header, tuned.soft);
-  assert.equal(tuned.soft, "#d6f2e9");
-  assert.equal(sunlit.dark.header, sunlit.dark.surface);
-});
-
-test("Sunlit keeps its warm light surfaces and uses Bright's cool dark foundation", () => {
-  const sunlit = PALETTES.find((p) => p.id === "tide-sunlit");
-  const bright = PALETTES.find((p) => p.id === "tide-bright");
-  assert.equal(sunlit.light.page, "#f8f5eb");
-  assert.equal(sunlit.light.surface, "#fffdf5");
-  assert.equal(sunlit.light.panel, "#eeeee2");
-  for (const role of [
-    "page",
-    "surface",
-    "panel",
-    "raised",
-    "text",
-    "muted",
-    "border",
-    "soft",
-  ])
-    assert.equal(sunlit.dark[role], bright.dark[role], role);
-});
-
 test("HSV conversion handles primaries, grayscale, hue wrap, and exact hex round trips", () => {
   for (const color of [
     "#a8eae0",
@@ -164,32 +140,4 @@ test("HSV conversion handles primaries, grayscale, hue wrap, and exact hex round
   assert.equal(parseHex("70EAD7"), "#70ead7");
   for (const bad of [null, {}, "red", "#fff", "000000;}", "12345678"])
     assert.equal(parseHex(bad), null);
-});
-
-test("tuned fills stay exact while text and labels stay readable, even at extremes", () => {
-  const sunlit = PALETTES.find((p) => p.id === "tide-sunlit");
-  for (const mode of ["light", "dark"])
-    for (const hex of [
-      "#000000",
-      "#ffffff",
-      "#808080",
-      "#ff0000",
-      "#00ff00",
-      "#0000ff",
-      "#70ead7",
-      "#ffb852",
-    ]) {
-      const c = withSignature(sunlit[mode], mode, {
-        teal: hex,
-        tangerine: hex,
-      });
-      assert.equal(c.accentFill, hex);
-      assert.equal(c.secondaryFill, hex);
-      assert.ok(contrast(c.onAccent, hex) >= 4.5);
-      assert.ok(contrast(c.onSecondary, hex) >= 4.5);
-      for (const surface of [c.page, c.surface, c.panel, c.raised, c.soft]) {
-        assert.ok(contrast(c.accent, surface) >= 4.5);
-        assert.ok(contrast(c.secondary, surface) >= 4.5);
-      }
-    }
 });

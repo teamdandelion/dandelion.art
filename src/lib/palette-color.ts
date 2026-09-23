@@ -1,10 +1,4 @@
 export type HSV = { h: number; s: number; v: number };
-export type Signature = { teal: string; tangerine: string };
-export const SUNLIT_SIGNATURE: Signature = {
-  teal: "#a8eae0",
-  tangerine: "#ffa647",
-};
-
 export function parseHex(value: unknown): string | null {
   return typeof value === "string" && /^#?[\da-f]{6}$/i.test(value)
     ? `#${value.replace(/^#/, "").toLowerCase()}`
@@ -60,26 +54,4 @@ function luminance(color: string) {
 export function contrast(a: string, b: string) {
   const [low, high] = [luminance(a), luminance(b)].sort((x, y) => x - y);
   return (high + 0.05) / (low + 0.05);
-}
-export function labelOn(fill: string) {
-  const ink = "#122e34";
-  if (contrast(ink, fill) >= 4.5) return ink;
-  return contrast("#000000", fill) > contrast("#ffffff", fill)
-    ? "#000000"
-    : "#ffffff";
-}
-/** Keep the signature fill exact; only tint/shade its text counterpart. */
-export function readableAccent(
-  color: string,
-  surfaces: string[],
-  mode: "light" | "dark",
-) {
-  const channels = rgb(color);
-  const target = mode === "light" ? 0 : 255;
-  for (let step = 0; step <= 100; step++) {
-    const candidate = hex(channels.map((n) => n + ((target - n) * step) / 100));
-    if (surfaces.every((surface) => contrast(candidate, surface) >= 4.5))
-      return candidate;
-  }
-  return target === 0 ? "#000000" : "#ffffff";
 }

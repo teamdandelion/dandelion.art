@@ -491,13 +491,13 @@
   max-height: 175px;
 }
 .ca-white-key {
-  fill: #faf9f5;
-  stroke: #bcbcb5;
+  fill: var(--site-pianoWhite);
+  stroke: var(--site-pianoWhiteBorder);
   stroke-width: 0.8;
 }
 .ca-black-key {
-  fill: #272825;
-  stroke: #161715;
+  fill: var(--site-pianoBlack);
+  stroke: var(--site-pianoBlackBorder);
   stroke-width: 0.6;
 }
 .ca-white-key.ca-key-active {
@@ -518,7 +518,7 @@
 }
 .ca-key-label {
   font-size: 12px;
-  fill: #60635b;
+  fill: var(--site-pianoLabel);
 }
 .ca-key-label--active {
   fill: var(--site-onAccent);
