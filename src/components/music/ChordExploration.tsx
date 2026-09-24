@@ -37,9 +37,10 @@ export default function ChordExploration({
           <a
             key={section.id}
             href={`#explore-${section.id}`}
+            aria-label={section.title}
             onClick={() => setVisible((n) => Math.max(n, index + 1))}
           >
-            {section.title}
+            {["Triads", "7ths", "Colors", "Pull", "Borrow"][index]}
           </a>
         ))}
       </nav>

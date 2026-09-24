@@ -673,3 +673,15 @@
   padding: 1rem;
   text-align: center;
 }
+.cs-explore .cs-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  position: static;
+  padding: 0;
+}
+.cs-explore .cs-jump a {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.8rem;
+  min-width: 0;
+}
