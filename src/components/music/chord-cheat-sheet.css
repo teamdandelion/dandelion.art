@@ -572,3 +572,30 @@
     display: none;
   }
 }
+
+@media (max-width: 640px) {
+  .chord-sheet .cs-chords,
+  .chord-sheet .cs-nearby-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .cs-chord {
+    max-width: none;
+  }
+  .cs-intro .cs-title {
+    margin: 0;
+  }
+  .cs-controls {
+    margin: 4px 0;
+  }
+  .cs-section-heading {
+    margin: 0;
+  }
+  .cs-row {
+    padding-top: 4px;
+  }
+  .cs-card-controls {
+    margin-top: 0;
+    grid-template-rows: 14px auto;
+  }
+}

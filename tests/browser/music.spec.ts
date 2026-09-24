@@ -193,7 +193,8 @@ test("compact sheet layout at phone and tablet widths", async ({ page }) => {
     await expect(page.locator(".cs-family-filters")).not.toBeVisible();
     const card = page.locator(".cs-chord").first();
     await expect(card).toBeVisible();
-    expect((await card.boundingBox())?.width).toBeLessThanOrEqual(300);
+    if (width > 640)
+      expect((await card.boundingBox())?.width).toBeLessThanOrEqual(300);
     await expect
       .poll(async () => (await card.boundingBox())?.y ?? Infinity)
       .toBeLessThan(400);
@@ -205,4 +206,57 @@ test("compact sheet layout at phone and tablet widths", async ({ page }) => {
     ).toBe(true);
     await page.screenshot({ path: `/tmp/chord-sheet-review-${width}.png` });
   }
+});
+
+test("guitar cards fill phone widths without clipping heading controls", async ({
+  browser,
+}) => {
+  const context = await browser.newContext({ isMobile: true, hasTouch: true });
+  const page = await context.newPage();
+  await page.goto("/music/cheat-sheet?theme=dark");
+  await expect(page.locator(".chord-sheet")).toHaveAttribute(
+    "data-preferences-ready",
+    "true",
+  );
+  await expect(page.locator(".cs-title select")).toHaveValue("guitar-eadgbe");
+  for (const width of [375, 390, 430]) {
+    await page.setViewportSize({ width, height: 760 });
+    const cards = page.locator(".cs-chord");
+    const grid = await page.locator(".cs-chords").first().boundingBox();
+    for (const index of [0, 1]) {
+      const card = cards.nth(index);
+      const bounds = await card.boundingBox();
+      expect(Math.abs((bounds?.width ?? 0) - (grid?.width ?? 0))).toBeLessThan(
+        1,
+      );
+      for (const button of await card.locator("button").all()) {
+        const box = await button.boundingBox();
+        expect(box?.x).toBeGreaterThanOrEqual(bounds?.x ?? 0);
+        expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(
+          (bounds?.x ?? 0) + (bounds?.width ?? 0),
+        );
+      }
+    }
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: `/tmp/guitar-mobile-${width}.png`,
+      fullPage: false,
+    });
+  }
+  await page
+    .locator(".cs-chord")
+    .first()
+    .getByRole("button", { name: "B bass for G", exact: true })
+    .tap();
+  await expect(
+    page
+      .locator(".cs-chord")
+      .first()
+      .getByRole("button", { name: "B bass for G", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await context.close();
 });
