@@ -72,21 +72,7 @@ function Board({
     );
   return (
     <>
-      <div className="fb-toolbar">
-        <button
-          className="ca-button"
-          type="button"
-          onClick={() => setFrets(instrument.courses.map(() => 0))}
-        >
-          Open strings
-        </button>
-        <button
-          className="ca-button"
-          type="button"
-          onClick={() => setFrets(instrument.courses.map(() => null))}
-        >
-          Mute all
-        </button>
+      <div className="fb-help">
         <button
           className="cs-help-button"
           ref={opener}
@@ -113,7 +99,9 @@ function Board({
                 <strong>{chord.symbol}</strong>
                 {pitchClassNumber(chord.root) !==
                   pitchClassNumber(parseNote(bass)) && <span> / {bass}</span>}
-                {coverage?.kind === "omitted" && <small> (no 5)</small>}
+                {coverage?.kind === "omitted" && (
+                  <small> (fifth omitted)</small>
+                )}
               </a>
             ))}
           </div>
@@ -253,6 +241,22 @@ function Board({
             ))}
           </div>
         </div>
+        <div className="fb-reset-controls">
+          <button
+            type="button"
+            aria-label="Mute all strings"
+            onClick={() => setFrets(instrument.courses.map(() => null))}
+          >
+            × all
+          </button>
+          <button
+            type="button"
+            aria-label="Open all strings"
+            onClick={() => setFrets(instrument.courses.map(() => 0))}
+          >
+            ○ all
+          </button>
+        </div>
       </section>
       <dialog
         ref={help}
@@ -295,32 +299,15 @@ function Board({
               ×
             </button>
           </header>
+          <p>Tap a note to change one string. × mutes it; ○ plays it open.</p>
+          <ul>
+            <li>Purple: selected notes.</li>
+            <li>Blue: a one-string change that forms a recognized chord.</li>
+            <li>Muted color: other notes in your key.</li>
+          </ul>
           <p>
-            On phones, strings run vertically, with string 1 on the right. On
-            wider screens, they run horizontally, with string 1 at the top.
-            Scroll down on a phone or sideways on a laptop for higher frets. Tap
-            one fret per string; unmarked strings stay open. Use × to mute a
-            string, or “Mute all” to build a shape from silence. Arrow keys move
-            along a string: up/down on phones, left/right on wider screens. Side
-            dots mark frets 3, 5, 7, 10, and 12; the double dot marks the
-            octave.
-          </p>
-          <p>
-            Purple marks selected frets. Blue means replacing that string’s note
-            with this position produces a recognized chord, with all other
-            strings unchanged. Muted notes belong to the selected key. Blue
-            suggestions may be outside the key; recognition is not a
-            recommendation. Chord detection uses every sounding string,
-            including open strings. Exact matches come first; “no 5” identifies
-            a permitted omitted fifth. Slash names show a bass note other than
-            the root. A shape can have multiple valid names; its musical context
-            decides which is useful.
-          </p>
-          <p>
-            On baritone uke, leave D, G, and B open and fret string 1 at 3:
-            D–G–B–G is G/D, a G chord with D in the bass. “No chord match” does
-            not mean the notes are wrong; incomplete chords and other extensions
-            are not named yet.
+            G/B means G with B in the bass. “Fifth omitted” means that chord
+            tone isn’t being played.
           </p>
         </div>
       </dialog>

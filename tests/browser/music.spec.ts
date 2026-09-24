@@ -14,6 +14,19 @@ test("predictive fretboard advertises the chord that tapping produces", async ({
   await fret.click();
   await expect(fret).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(".fb-matches")).toContainText("G");
+  await page
+    .getByRole("button", { name: "Mute all strings", exact: true })
+    .click();
+  await expect(
+    page.getByRole("region", { name: "Chord matches" }),
+  ).toContainText("All strings muted");
+  await page
+    .getByRole("button", { name: "Open all strings", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "String 2, mute", exact: true })
+    .click();
+  await expect(page.locator(".fb-matches")).toContainText("fifth omitted");
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
