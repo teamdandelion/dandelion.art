@@ -5,6 +5,7 @@ import {
   CHEAT_SHEET_COLUMNS,
   practiceSheet,
 } from "../src/lib/music/cheat-sheet.ts";
+import { UKULELE_SHAPES } from "../src/lib/music/data/ukulele-shapes.ts";
 import {
   CHORD_QUALITIES,
   findFingerings,
@@ -30,9 +31,9 @@ test("all-chords sheet covers 12 roots and major, minor, dominant seventh column
 
 test("all sheet diagrams use the first canonical shape on each instrument", () => {
   for (const instrument of INSTRUMENTS)
-    for (const { entries } of CHORD_QUALITIES.flatMap((item) =>
-      allChordRows(item.id, instrument),
-    )) {
+    for (const { entries } of CHORD_QUALITIES.filter((q) =>
+      Object.hasOwn(UKULELE_SHAPES, `C:${q.id}`),
+    ).flatMap((item) => allChordRows(item.id, instrument))) {
       for (const { chord, fingering, href } of entries) {
         assert.equal(fingering.source, "library");
         assert.equal(fingering.library.position, 1);

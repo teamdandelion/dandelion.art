@@ -19,7 +19,7 @@ export function sheetEntry(
   return {
     chord,
     instrument,
-    fingering: findFingerings(chord, instrument)[0],
+    fingering: findFingerings(chord, instrument)[0] ?? null,
     href: `/music/chords?chord=${encodeURIComponent(chord.symbol)}`,
   };
 }
