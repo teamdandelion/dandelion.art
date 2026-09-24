@@ -16,6 +16,7 @@ export {
 
 import { GUITAR_SHAPES } from "./data/guitar-shapes.ts";
 import { LIBRARY_REVISION, UKULELE_SHAPES } from "./data/ukulele-shapes.ts";
+import { realizePosition } from "./positions.ts";
 
 /** Small, instrument-independent music model. All pitches use 12-tone equal temperament. */
 export type Letter = "C" | "D" | "E" | "F" | "G" | "A" | "B";
@@ -275,37 +276,35 @@ export function realizeFingering(
   frets: (number | null)[],
   instrument: FrettedInstrument = BARITONE,
 ): Fingering {
-  if (frets.length !== instrument.courses.length)
-    throw new Error("One fret or mute is required per course.");
   const id = `${instrument.id}/${chord.id}/${frets.map((fret) => fret ?? "x").join("-")}`;
   const voices: Voice[] = [];
-  const strings = instrument.courses.flatMap((course, index) => {
-    const fret = frets[index];
-    if (fret !== null && (!Number.isInteger(fret) || fret < 0))
-      throw new Error("Frets must be non-negative integers or null.");
-    return course.strings.map((string) => {
-      const position = {
-        courseNumber: course.number,
-        stringNumber: string.number,
-        fret,
+  const strings = realizePosition(instrument, frets).map((position) => {
+    if (position.midi === null)
+      return {
+        courseNumber: position.courseNumber,
+        stringNumber: position.stringNumber,
+        fret: position.fret,
+        voiceId: null,
       };
-      if (fret === null) return { ...position, voiceId: null };
-      const value = midi(string.open) + fret;
-      const tone = chord.tones.find(
-        (candidate) => pitchClassNumber(candidate.note) === mod(value, 12),
+    const tone = chord.tones.find(
+      (t) => pitchClassNumber(t.note) === mod(position.midi as number, 12),
+    );
+    if (!tone)
+      throw new Error(
+        `String ${position.stringNumber} is not a tone of ${chord.symbol}.`,
       );
-      if (!tone)
-        throw new Error(
-          `String ${string.number} is not a tone of ${chord.symbol}.`,
-        );
-      const voiceId = `string-${string.number}`;
-      voices.push({
-        id: voiceId,
-        pitch: pitchAtMidi(tone.note, value),
-        toneDegree: tone.degree,
-      });
-      return { ...position, voiceId };
+    const voiceId = `string-${position.stringNumber}`;
+    voices.push({
+      id: voiceId,
+      pitch: pitchAtMidi(tone.note, position.midi),
+      toneDegree: tone.degree,
     });
+    return {
+      courseNumber: position.courseNumber,
+      stringNumber: position.stringNumber,
+      fret: position.fret,
+      voiceId,
+    };
   });
   if (!voices.length)
     throw new Error("A voicing must sound at least one note.");

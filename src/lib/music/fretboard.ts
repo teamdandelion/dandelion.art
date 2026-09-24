@@ -1,3 +1,4 @@
+import { analyzeCoverage } from "./analysis.ts";
 import {
   CHORD_QUALITIES,
   type FrettedInstrument,
@@ -12,6 +13,7 @@ import {
   parseNote,
   pitchClassNumber,
 } from "./index.ts";
+import { realizePosition } from "./positions.ts";
 
 export const FRET_MARKERS = [3, 5, 7, 10, 12] as const;
 
@@ -41,36 +43,31 @@ export function fretboardPitches(
   instrument: FrettedInstrument,
   frets: (number | null)[],
 ) {
-  if (
-    frets.length !== instrument.courses.length ||
-    frets.some((f) => f !== null && (!Number.isInteger(f) || f < 0 || f > 24))
-  )
-    throw new Error("Invalid fretboard positions");
-  return instrument.courses.flatMap((course, i) =>
-    frets[i] === null
-      ? []
-      : course.strings.map(
-          (string) => midi(string.open) + (frets[i] as number),
-        ),
+  return realizePosition(instrument, frets).flatMap((position) =>
+    position.midi === null ? [] : [position.midi],
   );
 }
 
 /** Exact pitch-class matches only: no implied roots, omitted notes, or guessed extensions. */
-export function identifyChords(pitches: number[], key: Key) {
+export function identifyChords(
+  pitches: number[],
+  key: Key,
+  allowOmissions = false,
+) {
   if (!pitches.length) return [];
-  const pcs = new Set(pitches.map((p) => ((p % 12) + 12) % 12));
   const bass = Math.min(...pitches) % 12;
   return Array.from({ length: 12 }, (_, pc) => noteAt(pc, key))
     .flatMap((root) =>
       CHORD_QUALITIES.map((quality) => makeChord(root, quality.id)),
     )
-    .filter(
-      (chord) =>
-        chord.tones.length === pcs.size &&
-        chord.tones.every((tone) => pcs.has(pitchClassNumber(tone.note))),
-    )
+    .filter((chord) => {
+      const coverage = analyzeCoverage(chord, pitches);
+      return coverage && (allowOmissions || coverage.kind === "exact");
+    })
     .sort(
       (a, b) =>
+        Number(analyzeCoverage(a, pitches)?.kind === "omitted") -
+          Number(analyzeCoverage(b, pitches)?.kind === "omitted") ||
         Number(pitchClassNumber(b.root) === bass) -
           Number(pitchClassNumber(a.root) === bass) ||
         Number(keyContext(b, key).fitsPitchClasses) -
@@ -78,6 +75,7 @@ export function identifyChords(pitches: number[], key: Key) {
     )
     .map((chord) => ({
       chord,
+      coverage: analyzeCoverage(chord, pitches),
       bass: formatNote(
         chord.tones.find((t) => pitchClassNumber(t.note) === bass)?.note ??
           noteAt(bass, key),
