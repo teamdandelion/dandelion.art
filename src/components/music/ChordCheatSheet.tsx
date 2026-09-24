@@ -26,6 +26,7 @@ import {
 } from "../../lib/music/practice";
 import { KEY_ROOTS } from "../../lib/music/preferences";
 import { searchVoicings } from "../../lib/music/voicing-search";
+import ChordExploration from "./ChordExploration";
 import ChordTheoryHelp from "./ChordTheoryHelp";
 import { useMusicPreferences } from "./MusicSettings";
 import UkeDiagram from "./UkeDiagram";
@@ -145,6 +146,15 @@ export default function ChordCheatSheet() {
   const { tonic, mode, instrument, update, ready } = useMusicPreferences();
   const [view, setView] = useState<"key" | "all">("key");
   const [optionsOpen, setOptionsOpen] = useState(false);
+  const [explore, setExplore] = useState(true);
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("view") === "reference")
+      setExplore(false);
+  }, []);
+  const musicalKey = useMemo(
+    () => ({ tonic: parseNote(tonic), mode }),
+    [tonic, mode],
+  );
   const [groups, setGroups] = useState<ChordGroup[]>(DEFAULT_GROUPS);
   const [groupsLoaded, setGroupsLoaded] = useState(false);
   useEffect(() => {
@@ -282,7 +292,31 @@ export default function ChordCheatSheet() {
           </button>
         </div>
       </header>
+      {view === "key" && (
+        <fieldset className="cs-explore-mode" aria-label="Browse style">
+          <button
+            type="button"
+            aria-pressed={explore}
+            onClick={() => setExplore(true)}
+          >
+            Explore
+          </button>
+          <button
+            type="button"
+            aria-pressed={!explore}
+            onClick={() => setExplore(false)}
+          >
+            Reference
+          </button>
+        </fieldset>
+      )}
       <div className="cs-options" id={`${id}-options`} hidden={!optionsOpen}>
+        {explore && view === "key" && (
+          <p>
+            Family filters apply to Reference and All chords. Explore follows a
+            curated learning order.
+          </p>
+        )}
         <fieldset className="cs-family-filters" aria-label="Chord families">
           {PRACTICE_GROUPS.map((group) => (
             <div key={group.id}>
@@ -308,90 +342,105 @@ export default function ChordCheatSheet() {
           ))}
         </fieldset>
       </div>
-      <output className="cs-status" aria-live="polite">
+      <output
+        className="cs-status"
+        aria-live="polite"
+        hidden={explore && view === "key"}
+      >
         {view === "key"
           ? `${keyName}: ${rows.reduce((n, row) => n + row.entries.length, 0)} chords.`
           : `${dictionary.length * dictionary[0].entries.length} chords across all 12 roots.`}
       </output>
       {view === "key" ? (
-        <>
-          <h2 className="cs-status">In {keyName}</h2>
-          <div className="cs-paired">
-            <div className="cs-section-heading">
-              <h2>{keyName}</h2>
-              {helpButton("practice", "How to practice chords in a key")}
-            </div>
-            <div className="cs-degree-grid">
-              {rows
-                .filter((row) => row.entries.length > 0)
-                .map((row) => (
-                  <section
-                    key={row.degree}
-                    className="cs-row"
-                    aria-labelledby={`${id}-degree-${row.degree}`}
-                  >
-                    <h2 id={`${id}-degree-${row.degree}`}>{row.roman}</h2>
-                    <div className="cs-chords">
-                      {row.entries.map((entry) => (
-                        <ChordCard key={entry.chord.id} entry={entry} />
-                      ))}
-                    </div>
-                  </section>
-                ))}
-            </div>
-          </div>
-          {practice.nearby.some((entry) =>
-            groups.includes(chordFormula(entry.chord.quality).group),
-          ) && (
-            <section aria-labelledby={`${id}-nearby`}>
-              <div className="cs-section-heading cs-nearby-heading">
-                <h2 id={`${id}-nearby`}>Outside key</h2>
-                {helpButton("nearby", "About outside-key chords")}
+        explore ? (
+          <ChordExploration
+            renderCard={(entry) => <ChordCard entry={entry} />}
+            key={`${tonic}:${mode}:${instrument.id}`}
+            musicalKey={musicalKey}
+            instrument={instrument}
+          />
+        ) : (
+          <>
+            <h2 className="cs-status">In {keyName}</h2>
+            <div className="cs-paired">
+              <div className="cs-section-heading">
+                <h2>{keyName}</h2>
+                {helpButton("practice", "How to practice chords in a key")}
               </div>
-              {(
-                [
-                  ["applied", "Dominants"],
-                  ["ii-v", "ii–V approaches"],
-                  ["borrowed", "Borrowed chords"],
-                  ["diminished", "Diminished approaches"],
-                ] as const
-              )
-                .filter(([kind]) =>
-                  practice.nearby.some(
-                    (entry) =>
-                      entry.kind === kind &&
-                      groups.includes(chordFormula(entry.chord.quality).group),
-                  ),
-                )
-                .map(([kind, title]) => (
-                  <section
-                    key={kind}
-                    className="cs-nearby-family"
-                    aria-label={title}
-                  >
-                    <h3>{title}</h3>
-                    <div className="cs-nearby-grid">
-                      {practice.nearby
-                        .filter(
-                          (entry) =>
-                            entry.kind === kind &&
-                            groups.includes(
-                              chordFormula(entry.chord.quality).group,
-                            ),
-                        )
-                        .map((entry) => (
-                          <div key={entry.chord.id} className="cs-related">
-                            <p className="cs-roman">{entry.roman}</p>
-                            <ChordCard entry={entry} />
-                            <p className="cs-destination">{entry.move}</p>
-                          </div>
+              <div className="cs-degree-grid">
+                {rows
+                  .filter((row) => row.entries.length > 0)
+                  .map((row) => (
+                    <section
+                      key={row.degree}
+                      className="cs-row"
+                      aria-labelledby={`${id}-degree-${row.degree}`}
+                    >
+                      <h2 id={`${id}-degree-${row.degree}`}>{row.roman}</h2>
+                      <div className="cs-chords">
+                        {row.entries.map((entry) => (
+                          <ChordCard key={entry.chord.id} entry={entry} />
                         ))}
-                    </div>
-                  </section>
-                ))}
-            </section>
-          )}
-        </>
+                      </div>
+                    </section>
+                  ))}
+              </div>
+            </div>
+            {practice.nearby.some((entry) =>
+              groups.includes(chordFormula(entry.chord.quality).group),
+            ) && (
+              <section aria-labelledby={`${id}-nearby`}>
+                <div className="cs-section-heading cs-nearby-heading">
+                  <h2 id={`${id}-nearby`}>Outside key</h2>
+                  {helpButton("nearby", "About outside-key chords")}
+                </div>
+                {(
+                  [
+                    ["applied", "Dominants"],
+                    ["ii-v", "ii–V approaches"],
+                    ["borrowed", "Borrowed chords"],
+                    ["diminished", "Diminished approaches"],
+                  ] as const
+                )
+                  .filter(([kind]) =>
+                    practice.nearby.some(
+                      (entry) =>
+                        entry.kind === kind &&
+                        groups.includes(
+                          chordFormula(entry.chord.quality).group,
+                        ),
+                    ),
+                  )
+                  .map(([kind, title]) => (
+                    <section
+                      key={kind}
+                      className="cs-nearby-family"
+                      aria-label={title}
+                    >
+                      <h3>{title}</h3>
+                      <div className="cs-nearby-grid">
+                        {practice.nearby
+                          .filter(
+                            (entry) =>
+                              entry.kind === kind &&
+                              groups.includes(
+                                chordFormula(entry.chord.quality).group,
+                              ),
+                          )
+                          .map((entry) => (
+                            <div key={entry.chord.id} className="cs-related">
+                              <p className="cs-roman">{entry.roman}</p>
+                              <ChordCard entry={entry} />
+                              <p className="cs-destination">{entry.move}</p>
+                            </div>
+                          ))}
+                      </div>
+                    </section>
+                  ))}
+              </section>
+            )}
+          </>
+        )
       ) : (
         <>
           <nav className="cs-jump" aria-label="Jump to chord root">
