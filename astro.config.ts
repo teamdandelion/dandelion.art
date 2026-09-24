@@ -7,6 +7,7 @@ export default defineConfig({
   integrations: [mdx(), react()],
   redirects: {
     "/polysome": "/art/polysome",
+    "/music/cheat-sheet": "/music/chords/",
   },
   vite: {
     plugins: [tailwindcss()],

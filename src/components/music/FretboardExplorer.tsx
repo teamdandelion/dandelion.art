@@ -94,7 +94,7 @@ function Board({
             {matches.map(({ chord, bass, coverage }) => (
               <a
                 key={chord.id}
-                href={`/music/chords?${new URLSearchParams({ chord: `${chord.symbol}/${bass}`, instrument: instrument.id, frets: frets.map((fret) => fret ?? "x").join(",") })}`}
+                href={`/music/atlas?${new URLSearchParams({ chord: `${chord.symbol}/${bass}`, instrument: instrument.id, frets: frets.map((fret) => fret ?? "x").join(",") })}`}
               >
                 <strong>{chord.symbol}</strong>
                 {pitchClassNumber(chord.root) !==
@@ -325,8 +325,8 @@ export default function FretboardExplorer() {
     <article className="chord-atlas fretboard-explorer">
       <nav className="cs-nav" aria-label="Music tools">
         <a href="/music">Music</a>
-        <a href="/music/cheat-sheet">Cheat sheet ↗</a>
-        <a href="/music/chords">Chord atlas ↗</a>
+        <a href="/music/chords">Chords ↗</a>
+        <a href="/music/atlas">Chord atlas ↗</a>
       </nav>
       <header className="cs-intro">
         <h1>Fretboard</h1>

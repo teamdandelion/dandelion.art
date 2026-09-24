@@ -57,7 +57,7 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
   const symbol = fingering
     ? voicingSymbol(chord, fingering.voicing)
     : chord.symbol;
-  const href = `/music/chords?chord=${encodeURIComponent(symbol)}`;
+  const href = `/music/atlas?chord=${encodeURIComponent(symbol)}`;
   const availableBass = new Set(
     shapes.map((s) => pitchClassNumber(bassPitch(s.voicing).note)),
   );
@@ -217,7 +217,7 @@ export default function ChordCheatSheet() {
         <nav className="cs-nav" aria-label="Music tools">
           <a href="/music">Music</a>
           <a href="/music/fretboard">Fretboard ↗</a>
-          <a className="cs-atlas-link" href="/music/chords">
+          <a className="cs-atlas-link" href="/music/atlas">
             Chord atlas ↗
           </a>
         </nav>
@@ -273,7 +273,7 @@ export default function ChordCheatSheet() {
           <button
             className="cs-settings-toggle"
             type="button"
-            aria-label="Cheat sheet settings"
+            aria-label="Chords settings"
             aria-expanded={optionsOpen}
             aria-controls={`${id}-options`}
             onClick={() => setOptionsOpen(!optionsOpen)}
