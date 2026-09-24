@@ -39,7 +39,9 @@ test("server default stays hidden until saved preferences are ready", async ({
     "data-preferences-ready",
     "true",
   );
-  await expect(page.locator(".cs-title select")).toHaveValue("baritone-dgbe");
+  await expect(
+    page.locator('.cs-title select[aria-label="Instrument"]'),
+  ).toHaveValue("baritone-dgbe");
 });
 
 test("new visitors get guitar and heading selection persists", async ({
@@ -53,10 +55,16 @@ test("new visitors get guitar and heading selection persists", async ({
     "true",
   );
   await expect(page.locator("astro-island[ssr]")).toHaveCount(0);
-  await expect(page.locator(".cs-title select")).toHaveValue("guitar-eadgbe");
-  await page.locator(".cs-title select").selectOption("baritone-dgbe");
+  await expect(
+    page.locator('.cs-title select[aria-label="Instrument"]'),
+  ).toHaveValue("guitar-eadgbe");
+  await page
+    .locator('.cs-title select[aria-label="Instrument"]')
+    .selectOption("baritone-dgbe");
   await page.reload();
-  await expect(page.locator(".cs-title select")).toHaveValue("baritone-dgbe");
+  await expect(
+    page.locator('.cs-title select[aria-label="Instrument"]'),
+  ).toHaveValue("baritone-dgbe");
   await context.close();
 });
 
@@ -208,7 +216,7 @@ test("compact sheet layout at phone and tablet widths", async ({ page }) => {
   }
 });
 
-test("guitar cards fill phone widths without clipping heading controls", async ({
+test("guitar cards use two phone columns without clipping controls", async ({
   browser,
 }) => {
   const context = await browser.newContext({ isMobile: true, hasTouch: true });
@@ -218,7 +226,9 @@ test("guitar cards fill phone widths without clipping heading controls", async (
     "data-preferences-ready",
     "true",
   );
-  await expect(page.locator(".cs-title select")).toHaveValue("guitar-eadgbe");
+  await expect(
+    page.locator('.cs-title select[aria-label="Instrument"]'),
+  ).toHaveValue("guitar-eadgbe");
   for (const width of [375, 390, 430]) {
     await page.setViewportSize({ width, height: 760 });
     const cards = page.locator(".cs-chord");
@@ -226,9 +236,9 @@ test("guitar cards fill phone widths without clipping heading controls", async (
     for (const index of [0, 1]) {
       const card = cards.nth(index);
       const bounds = await card.boundingBox();
-      expect(Math.abs((bounds?.width ?? 0) - (grid?.width ?? 0))).toBeLessThan(
-        1,
-      );
+      expect(
+        Math.abs((bounds?.width ?? 0) * 2 + 6 - (grid?.width ?? 0)),
+      ).toBeLessThan(1);
       for (const button of await card.locator("button").all()) {
         const box = await button.boundingBox();
         expect(box?.x).toBeGreaterThanOrEqual(bounds?.x ?? 0);
@@ -259,4 +269,27 @@ test("guitar cards fill phone widths without clipping heading controls", async (
       .getByRole("button", { name: "B bass for G", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
   await context.close();
+});
+
+test("heading key selector persists key and offers all chords", async ({
+  page,
+}) => {
+  await page.goto("/music/cheat-sheet");
+  await expect(page.locator(".chord-sheet")).toHaveAttribute(
+    "data-preferences-ready",
+    "true",
+  );
+  const key = page.getByRole("combobox", { name: "Key", exact: true });
+  await key.selectOption("major:C");
+  await expect(page.locator(".cs-chord h3").first()).toHaveText("C");
+  await page.reload();
+  await expect(key).toHaveValue("major:C");
+  await key.selectOption("all");
+  await expect(
+    page.getByRole("navigation", { name: "Jump to chord root" }),
+  ).toBeVisible();
+  await key.selectOption("natural-minor:C#");
+  await expect(page.locator(".cs-section-heading").first()).toContainText(
+    "C♯ minor",
+  );
 });

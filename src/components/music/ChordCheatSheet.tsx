@@ -24,6 +24,7 @@ import {
   parseGroups,
   practiceRows,
 } from "../../lib/music/practice";
+import { KEY_ROOTS } from "../../lib/music/preferences";
 import { searchVoicings } from "../../lib/music/voicing-search";
 import ChordTheoryHelp from "./ChordTheoryHelp";
 import { useMusicPreferences } from "./MusicSettings";
@@ -236,7 +237,38 @@ export default function ChordCheatSheet() {
                 </option>
               ))}
             </select>{" "}
-            Cheat Sheet
+            {view === "key" && <span className="cs-title-join">in the</span>}
+            <select
+              aria-label="Key"
+              value={view === "all" ? "all" : `${mode}:${tonic}`}
+              onChange={(event) => {
+                const value = event.target.value;
+                if (value === "all") {
+                  setView("all");
+                  return;
+                }
+                const [nextMode, nextTonic] = value.split(":");
+                if (nextMode === "major" || nextMode === "natural-minor") {
+                  update({ mode: nextMode, tonic: nextTonic });
+                  setView("key");
+                }
+              }}
+            >
+              {(["major", "natural-minor"] as const).map((keyMode) => (
+                <optgroup
+                  key={keyMode}
+                  label={keyMode === "major" ? "Major keys" : "Minor keys"}
+                >
+                  {KEY_ROOTS[keyMode].map((keyRoot) => (
+                    <option key={keyRoot} value={`${keyMode}:${keyRoot}`}>
+                      key of {formatNote(parseNote(keyRoot))}
+                      {keyMode === "natural-minor" ? " minor" : ""}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+              <option value="all">All chords</option>
+            </select>
           </h1>
           <button
             className="cs-settings-toggle"
@@ -250,26 +282,6 @@ export default function ChordCheatSheet() {
           </button>
         </div>
       </header>
-      <div
-        className={`cs-controls${view === "all" ? " cs-controls--all" : ""}`}
-      >
-        <fieldset className="cs-view" aria-label="Sheet view">
-          <button
-            type="button"
-            aria-pressed={view === "key"}
-            onClick={() => setView("key")}
-          >
-            Key
-          </button>
-          <button
-            type="button"
-            aria-pressed={view === "all"}
-            onClick={() => setView("all")}
-          >
-            All chords
-          </button>
-        </fieldset>
-      </div>
       <div className="cs-options" id={`${id}-options`} hidden={!optionsOpen}>
         <fieldset className="cs-family-filters" aria-label="Chord families">
           {PRACTICE_GROUPS.map((group) => (
