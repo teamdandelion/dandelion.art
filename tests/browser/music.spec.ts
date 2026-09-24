@@ -1,5 +1,26 @@
 import { expect, test } from "@playwright/test";
 
+test("fretboard chord link preserves the exact open and muted positions", async ({
+  page,
+}) => {
+  await page.goto("/music/fretboard");
+  await expect(page.locator("astro-island[ssr]")).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "String 2, mute", exact: true })
+    .click();
+  const match = page.locator(".fb-matches a").first();
+  await expect(match).toHaveAttribute("href", /frets=0%2C0%2Cx%2C0/);
+  await match.click();
+  await expect(page.locator("astro-island[ssr]")).toHaveCount(0);
+  await expect(
+    page.locator('[title="Fret pattern: 0, 0, muted, 0"]'),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.locator('[title="Fret pattern: 0, 0, muted, 0"]'),
+  ).toBeVisible();
+});
+
 test("predictive fretboard advertises the chord that tapping produces", async ({
   page,
 }) => {

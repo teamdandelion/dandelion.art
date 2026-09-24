@@ -4,9 +4,11 @@ import {
   CHORD_QUALITIES,
   type Chord,
   type ChordQuality,
+  type Fingering,
   findFingerings,
   formatNote,
   formatPitch,
+  INSTRUMENTS,
   inversionName,
   type Key,
   keyContext,
@@ -19,9 +21,14 @@ import {
   pianoVoicing,
   pitchClassNumber,
   ROOT_OPTIONS,
+  realizeFingering,
   type Voicing,
 } from "../../lib/music";
-import { parseChordSelection, voicingSymbol } from "../../lib/music/analysis";
+import {
+  analyzeCoverage,
+  parseChordSelection,
+  voicingSymbol,
+} from "../../lib/music/analysis";
 import { searchVoicings } from "../../lib/music/voicing-search";
 import ChordTheoryHelp from "./ChordTheoryHelp";
 import "./chord-atlas.css";
@@ -202,7 +209,9 @@ function PlayButton({ voicing }: { voicing: Voicing }) {
 export default function ChordAtlas() {
   const id = useId();
   const [root, setRoot] = useState("C");
-  const { instrument, tonic, mode } = useMusicPreferences();
+  const { instrument, tonic, mode, update } = useMusicPreferences();
+  const initialPreferencesUpdate = useRef(update);
+  const [linkedShape, setLinkedShape] = useState<Fingering | null>(null);
   const neighborsHeadingRef = useRef<HTMLHeadingElement>(null);
   const explorerHeadingRef = useRef<HTMLHeadingElement>(null);
   const [announcement, setAnnouncement] = useState("");
@@ -215,7 +224,8 @@ export default function ChordAtlas() {
   const [pianoMode, setPianoMode] = useState<"same" | "closed">("same");
   const [inversion, setInversion] = useState(0);
   useEffect(() => {
-    const requested = new URLSearchParams(window.location.search).get("chord");
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get("chord");
     const initial = requested ? parseChordSelection(requested) : null;
     if (initial) {
       setRoot(asciiNote(initial.chord.root));
@@ -223,13 +233,64 @@ export default function ChordAtlas() {
       setRequestedBass(
         initial.bass ? pitchClassNumber(initial.bass) : undefined,
       );
+      const targetInstrument = INSTRUMENTS.find(
+        (item) => item.id === params.get("instrument"),
+      );
+      const positions = params.get("frets");
+      if (
+        targetInstrument &&
+        positions &&
+        /^(x|\d+)(,(x|\d+))*$/.test(positions)
+      ) {
+        try {
+          const shape = realizeFingering(
+            initial.chord,
+            positions
+              .split(",")
+              .map((value) => (value === "x" ? null : Number(value))),
+            targetInstrument,
+          );
+          const coverage = analyzeCoverage(
+            initial.chord,
+            shape.voicing.voices.map((voice) => midi(voice.pitch)),
+          );
+          if (
+            coverage &&
+            (!initial.bass ||
+              pitchClassNumber(bassPitch(shape.voicing).note) ===
+                pitchClassNumber(initial.bass))
+          ) {
+            setLinkedShape(shape);
+            initialPreferencesUpdate.current({
+              instrumentId: targetInstrument.id,
+            });
+          }
+        } catch {
+          // Invalid or incompatible links fall back to the normal chord search.
+        }
+      }
     }
   }, []);
   const chord = useMemo(() => makeChord(root, quality), [root, quality]);
-  const fingerings = useMemo(
-    () => searchVoicings(chord, instrument, { bass: requestedBass }),
-    [chord, instrument, requestedBass],
-  );
+  const fingerings = useMemo(() => {
+    const shapes = searchVoicings(chord, instrument, { bass: requestedBass });
+    if (
+      !linkedShape ||
+      !linkedShape.id.startsWith(`${instrument.id}/${chord.id}/`) ||
+      (requestedBass !== undefined &&
+        pitchClassNumber(bassPitch(linkedShape.voicing).note) !== requestedBass)
+    )
+      return shapes;
+    const existing = shapes.find(
+      (shape) => shape.frets.join(",") === linkedShape.frets.join(","),
+    );
+    return [
+      existing ?? linkedShape,
+      ...shapes.filter(
+        (shape) => shape.frets.join(",") !== linkedShape.frets.join(","),
+      ),
+    ];
+  }, [chord, instrument, requestedBass, linkedShape]);
   const fingering = fingerings[shapeIndex % Math.max(fingerings.length, 1)];
   const key = useMemo<Key>(
     () => ({ tonic: parseNote(tonic), mode }),

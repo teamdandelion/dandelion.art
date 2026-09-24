@@ -94,7 +94,7 @@ function Board({
             {matches.map(({ chord, bass, coverage }) => (
               <a
                 key={chord.id}
-                href={`/music/chords?chord=${encodeURIComponent(`${chord.symbol}/${bass}`)}`}
+                href={`/music/chords?${new URLSearchParams({ chord: `${chord.symbol}/${bass}`, instrument: instrument.id, frets: frets.map((fret) => fret ?? "x").join(",") })}`}
               >
                 <strong>{chord.symbol}</strong>
                 {pitchClassNumber(chord.root) !==
