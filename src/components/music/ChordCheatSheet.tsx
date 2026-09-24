@@ -141,8 +141,9 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
 
 export default function ChordCheatSheet() {
   const id = useId();
-  const { tonic, mode, instrument, update } = useMusicPreferences();
+  const { tonic, mode, instrument, update, ready } = useMusicPreferences();
   const [view, setView] = useState<"key" | "all">("key");
+  const [optionsOpen, setOptionsOpen] = useState(false);
   const [groups, setGroups] = useState<ChordGroup[]>(DEFAULT_GROUPS);
   const [groupsLoaded, setGroupsLoaded] = useState(false);
   useEffect(() => {
@@ -207,6 +208,9 @@ export default function ChordCheatSheet() {
     <article
       className="chord-atlas chord-sheet"
       data-instrument={instrument.id}
+      data-preferences-ready={ready}
+      style={{ visibility: ready ? "visible" : "hidden" }}
+      inert={!ready}
     >
       <header className="cs-intro">
         <nav className="cs-nav" aria-label="Music tools">
@@ -216,20 +220,35 @@ export default function ChordCheatSheet() {
             Chord atlas ↗
           </a>
         </nav>
-        <h1 className="cs-title">
-          <select
-            aria-label="Instrument"
-            value={instrument.id}
-            onChange={(event) => update({ instrumentId: event.target.value })}
+        <div className="cs-heading-row">
+          <h1 className="cs-title">
+            <select
+              aria-label="Instrument"
+              value={instrument.id}
+              style={{
+                width: `${(instrument.id === "baritone-dgbe" ? "Baritone uke" : instrument.name).length + 3}ch`,
+              }}
+              onChange={(event) => update({ instrumentId: event.target.value })}
+            >
+              {INSTRUMENTS.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.id === "baritone-dgbe" ? "Baritone uke" : item.name}
+                </option>
+              ))}
+            </select>{" "}
+            Cheat Sheet
+          </h1>
+          <button
+            className="cs-settings-toggle"
+            type="button"
+            aria-label="Cheat sheet settings"
+            aria-expanded={optionsOpen}
+            aria-controls={`${id}-options`}
+            onClick={() => setOptionsOpen(!optionsOpen)}
           >
-            {INSTRUMENTS.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.id === "baritone-dgbe" ? "Baritone uke" : item.name}
-              </option>
-            ))}
-          </select>{" "}
-          Cheat Sheet
-        </h1>
+            <span aria-hidden="true">⚙</span>
+          </button>
+        </div>
       </header>
       <div
         className={`cs-controls${view === "all" ? " cs-controls--all" : ""}`}
@@ -251,8 +270,7 @@ export default function ChordCheatSheet() {
           </button>
         </fieldset>
       </div>
-      <details className="cs-options">
-        <summary>Options</summary>
+      <div className="cs-options" id={`${id}-options`} hidden={!optionsOpen}>
         <fieldset className="cs-family-filters" aria-label="Chord families">
           {PRACTICE_GROUPS.map((group) => (
             <div key={group.id}>
@@ -277,7 +295,7 @@ export default function ChordCheatSheet() {
             </div>
           ))}
         </fieldset>
-      </details>
+      </div>
       <output className="cs-status" aria-live="polite">
         {view === "key"
           ? `${keyName}: ${rows.reduce((n, row) => n + row.entries.length, 0)} chords.`

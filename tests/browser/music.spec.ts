@@ -14,12 +14,44 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
+test("server default stays hidden until saved preferences are ready", async ({
+  browser,
+  page,
+}) => {
+  const noScript = await browser.newContext({ javaScriptEnabled: false });
+  const serverPage = await noScript.newPage();
+  await serverPage.goto("/music/cheat-sheet");
+  await expect(serverPage.locator(".chord-sheet")).toBeHidden();
+  await expect(serverPage.locator(".chord-sheet")).toHaveAttribute("inert", "");
+  await noScript.close();
+  await page.goto("/music/cheat-sheet");
+  await expect(page.locator(".chord-sheet")).toHaveAttribute(
+    "data-preferences-ready",
+    "true",
+  );
+  await expect(page.locator(".chord-sheet")).toHaveAttribute(
+    "data-instrument",
+    "baritone-dgbe",
+  );
+  await expect(page.locator(".chord-sheet")).toBeVisible();
+  await page.reload();
+  await expect(page.locator(".chord-sheet")).toHaveAttribute(
+    "data-preferences-ready",
+    "true",
+  );
+  await expect(page.locator(".cs-title select")).toHaveValue("baritone-dgbe");
+});
+
 test("new visitors get guitar and heading selection persists", async ({
   browser,
 }) => {
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto("/music/cheat-sheet");
+  await expect(page.locator(".chord-sheet")).toHaveAttribute(
+    "data-preferences-ready",
+    "true",
+  );
   await expect(page.locator("astro-island[ssr]")).toHaveCount(0);
   await expect(page.locator(".cs-title select")).toHaveValue("guitar-eadgbe");
   await page.locator(".cs-title select").selectOption("baritone-dgbe");
@@ -87,16 +119,20 @@ test("family filters persist and wrap on phone and desktop", async ({
   page,
 }) => {
   await page.goto("/music/cheat-sheet");
+  await expect(page.locator(".chord-sheet")).toHaveAttribute(
+    "data-preferences-ready",
+    "true",
+  );
   await expect(page.locator("astro-island[ssr]")).toHaveCount(0);
   const filters = page.getByRole("group", { name: "Chord families" });
   await expect(filters).not.toBeVisible();
-  await page.locator(".cs-options summary").click();
+  await page.getByRole("button", { name: "Cheat sheet settings" }).click();
   await filters.getByRole("button", { name: "sus2", exact: true }).click();
   await expect(
     page.locator(".cs-chord h3").filter({ hasText: "Gsus2" }).first(),
   ).toBeVisible();
   await page.reload();
-  await page.locator(".cs-options summary").click();
+  await page.getByRole("button", { name: "Cheat sheet settings" }).click();
   await expect(
     filters.getByRole("button", { name: "sus2", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
@@ -114,6 +150,10 @@ test("voicing controls, theory help and slash link work on mobile", async ({
   page,
 }) => {
   await page.goto("/music/cheat-sheet");
+  await expect(page.locator(".chord-sheet")).toHaveAttribute(
+    "data-preferences-ready",
+    "true",
+  );
   await expect(
     page.locator('astro-island[component-export="default"][ssr]'),
   ).toHaveCount(0);
@@ -143,6 +183,10 @@ test("voicing controls, theory help and slash link work on mobile", async ({
 
 test("compact sheet layout at phone and tablet widths", async ({ page }) => {
   await page.goto("/music/cheat-sheet");
+  await expect(page.locator(".chord-sheet")).toHaveAttribute(
+    "data-preferences-ready",
+    "true",
+  );
   await expect(page.locator("astro-island[ssr]")).toHaveCount(0);
   for (const width of [390, 661]) {
     await page.setViewportSize({ width, height: 850 });

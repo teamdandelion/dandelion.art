@@ -11,6 +11,20 @@
 .cs-options {
   margin: -4px 0 8px;
 }
+.cs-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.cs-settings-toggle {
+  flex: 0 0 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--ca-muted);
+  font-size: 22px;
+}
 .cs-options summary {
   width: fit-content;
   min-height: 44px;
@@ -108,7 +122,9 @@
   color: var(--site-onSecondary);
 }
 .cs-bass-notes button.cs-root-hint {
-  background: color-mix(in srgb, var(--ca-muted) 20%, var(--site-page));
+  background: var(--site-secondaryFill);
+  color: var(--site-onSecondary);
+  font-weight: 600;
 }
 .cs-bass-notes button:disabled {
   opacity: 0.4;
@@ -127,13 +143,17 @@
   gap: 8px;
 }
 .cs-title select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='m2 2 4 4 4-4' fill='none' stroke='%23888' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
   font: inherit;
   font-size: 0.85em;
   color: var(--ca-ink);
-  background: var(--ca-paper);
+  background-color: var(--ca-paper);
   border: 1px solid var(--ca-line);
   border-radius: 6px;
-  padding: 6px 8px;
+  padding: 4px 28px 4px 8px;
   min-height: 44px;
   max-width: 100%;
   cursor: pointer;
@@ -406,7 +426,7 @@
   border: 1px solid var(--ca-line);
   border-radius: 8px;
   padding: 6px 10px;
-  background: var(--site-page);
+  background: var(--ca-paper);
   text-align: center;
   text-decoration: none;
   scroll-margin-top: 60px;
@@ -425,7 +445,7 @@
 }
 .cs-chord .ca-uke-diagram {
   background: var(--ca-paper);
-  padding: 12px;
+  padding: 4px;
   border-radius: 6px;
   width: 172px;
   max-width: 100%;
