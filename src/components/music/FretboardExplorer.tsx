@@ -21,6 +21,7 @@ import {
   identifyChords,
   pitchAt,
   predictFretboard,
+  recognitionLabel,
 } from "../../lib/music/fretboard";
 import { useMusicPreferences } from "./MusicSettings";
 import "./chord-atlas.css";
@@ -178,15 +179,12 @@ function Board({
                       type="button"
                       className={`fb-note${pitch !== null && scale.has(pitch % 12) ? " fb-in-key" : ""}${predictions[index][i].matches.length ? " fb-in-chord" : ""}`}
                       title={predictions[index][i].matches
-                        .map(
-                          (m) =>
-                            `${m.chord.symbol}/${m.bass}${m.coverage?.kind === "omitted" ? " (no 5)" : ""}`,
-                        )
+                        .map(recognitionLabel)
                         .join(" · ")}
                       onMouseEnter={() =>
                         setPreview(
                           predictions[index][i].matches
-                            .map((m) => m.chord.symbol)
+                            .map(recognitionLabel)
                             .join(" · "),
                         )
                       }
@@ -194,7 +192,7 @@ function Board({
                       onFocus={() =>
                         setPreview(
                           predictions[index][i].matches
-                            .map((m) => m.chord.symbol)
+                            .map(recognitionLabel)
                             .join(" · "),
                         )
                       }

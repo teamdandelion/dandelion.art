@@ -120,3 +120,14 @@ export function predictFretboard(
     }),
   );
 }
+
+export function recognitionLabel(
+  match: ReturnType<typeof identifyChords>[number],
+) {
+  const slash =
+    pitchClassNumber(parseNote(match.bass)) ===
+    pitchClassNumber(match.chord.root)
+      ? ""
+      : `/${match.bass}`;
+  return `${match.chord.symbol}${slash}${match.coverage?.kind === "omitted" ? " (no 5)" : ""}`;
+}
