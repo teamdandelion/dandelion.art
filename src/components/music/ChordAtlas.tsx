@@ -358,8 +358,8 @@ export default function ChordAtlas() {
               .
             </span>
           </h1>
-          <a className="ca-view-chord" href="/music/cheat-sheet">
-            Chord cheat sheet ↗
+          <a className="ca-view-chord" href="/music/chords">
+            Chords ↗
           </a>
           {" · "}
           <a className="ca-view-chord" href="/music/fretboard">

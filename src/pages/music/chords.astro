@@ -1,18 +1,17 @@
 ---
-import ChordAtlas from "../../components/music/ChordAtlas";
+import ChordCheatSheet from "../../components/music/ChordCheatSheet";
 import LayoutDefault from "../../layouts/LayoutDefault.astro";
 ---
 
 <LayoutDefault
-  title="Chord atlas — dandelion.art"
-  description="Guitar and ukulele chord diagrams, exact piano voicings, inversions, and an interactive map of shared notes."
+  title="Chords — dandelion.art"
+  description="Guitar, ukulele, and baritone chords by key, with related chords and a full chromatic reference."
   noindex
 >
-  <ChordAtlas client:load />
+  <ChordCheatSheet client:load />
   <noscript>
     <p>
-      JavaScript is needed to select other chords, explore the graph, and play
-      audio. The C-major reference above is available without it.
+      Enable JavaScript to load your instrument and the interactive chord sheet.
     </p>
   </noscript>
 </LayoutDefault>

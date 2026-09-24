@@ -1,5 +1,20 @@
 import { expect, test } from "@playwright/test";
 
+test("music links to Chords and the old sheet address redirects", async ({
+  page,
+}) => {
+  await page.goto("/music");
+  await page.getByRole("link", { name: /Chords by key/ }).click();
+  await expect(page).toHaveURL(/\/music\/chords\/?$/);
+  await expect(page).toHaveTitle("Chords — dandelion.art");
+  await page.goto("/music/cheat-sheet");
+  await expect(page).toHaveURL(/\/music\/chords\/?$/);
+  await expect(page.locator(".chord-sheet")).toBeVisible();
+  await page.getByRole("link", { name: "Chord atlas ↗" }).click();
+  await expect(page).toHaveURL(/\/music\/atlas\/?$/);
+  await expect(page).toHaveTitle("Chord atlas — dandelion.art");
+});
+
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
     if (!localStorage.getItem("music.preferences.v1"))
@@ -20,11 +35,11 @@ test("server default stays hidden until saved preferences are ready", async ({
 }) => {
   const noScript = await browser.newContext({ javaScriptEnabled: false });
   const serverPage = await noScript.newPage();
-  await serverPage.goto("/music/cheat-sheet");
+  await serverPage.goto("/music/chords");
   await expect(serverPage.locator(".chord-sheet")).toBeHidden();
   await expect(serverPage.locator(".chord-sheet")).toHaveAttribute("inert", "");
   await noScript.close();
-  await page.goto("/music/cheat-sheet");
+  await page.goto("/music/chords");
   await expect(page.locator(".chord-sheet")).toHaveAttribute(
     "data-preferences-ready",
     "true",
@@ -49,7 +64,7 @@ test("new visitors get guitar and heading selection persists", async ({
 }) => {
   const context = await browser.newContext();
   const page = await context.newPage();
-  await page.goto("/music/cheat-sheet");
+  await page.goto("/music/chords");
   await expect(page.locator(".chord-sheet")).toHaveAttribute(
     "data-preferences-ready",
     "true",
@@ -126,7 +141,7 @@ test("predictive fretboard advertises the chord that tapping produces", async ({
 test("family filters persist and wrap on phone and desktop", async ({
   page,
 }) => {
-  await page.goto("/music/cheat-sheet");
+  await page.goto("/music/chords");
   await expect(page.locator(".chord-sheet")).toHaveAttribute(
     "data-preferences-ready",
     "true",
@@ -134,13 +149,13 @@ test("family filters persist and wrap on phone and desktop", async ({
   await expect(page.locator("astro-island[ssr]")).toHaveCount(0);
   const filters = page.getByRole("group", { name: "Chord families" });
   await expect(filters).not.toBeVisible();
-  await page.getByRole("button", { name: "Cheat sheet settings" }).click();
+  await page.getByRole("button", { name: "Chords settings" }).click();
   await filters.getByRole("button", { name: "sus2", exact: true }).click();
   await expect(
     page.locator(".cs-chord h3").filter({ hasText: "Gsus2" }).first(),
   ).toBeVisible();
   await page.reload();
-  await page.getByRole("button", { name: "Cheat sheet settings" }).click();
+  await page.getByRole("button", { name: "Chords settings" }).click();
   await expect(
     filters.getByRole("button", { name: "sus2", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
@@ -157,7 +172,7 @@ test("family filters persist and wrap on phone and desktop", async ({
 test("heading bass controls and slash link work on mobile", async ({
   page,
 }) => {
-  await page.goto("/music/cheat-sheet");
+  await page.goto("/music/chords");
   await expect(page.locator(".chord-sheet")).toHaveAttribute(
     "data-preferences-ready",
     "true",
@@ -190,7 +205,7 @@ test("heading bass controls and slash link work on mobile", async ({
 });
 
 test("compact sheet layout at phone and tablet widths", async ({ page }) => {
-  await page.goto("/music/cheat-sheet");
+  await page.goto("/music/chords");
   await expect(page.locator(".chord-sheet")).toHaveAttribute(
     "data-preferences-ready",
     "true",
@@ -221,7 +236,7 @@ test("guitar cards use two phone columns without clipping controls", async ({
 }) => {
   const context = await browser.newContext({ isMobile: true, hasTouch: true });
   const page = await context.newPage();
-  await page.goto("/music/cheat-sheet?theme=dark");
+  await page.goto("/music/chords?theme=dark");
   await expect(page.locator(".chord-sheet")).toHaveAttribute(
     "data-preferences-ready",
     "true",
@@ -274,7 +289,7 @@ test("guitar cards use two phone columns without clipping controls", async ({
 test("heading key selector persists key and offers all chords", async ({
   page,
 }) => {
-  await page.goto("/music/cheat-sheet");
+  await page.goto("/music/chords");
   await expect(page.locator(".chord-sheet")).toHaveAttribute(
     "data-preferences-ready",
     "true",
