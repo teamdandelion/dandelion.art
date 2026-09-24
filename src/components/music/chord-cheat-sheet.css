@@ -634,3 +634,62 @@
     grid-template-rows: 14px auto;
   }
 }
+.cs-explore-mode {
+  display: flex;
+  gap: 0.4rem;
+  border: 0;
+  padding: 0;
+  margin: 0.5rem 0 1rem;
+}
+.cs-explore-mode button {
+  border: 1px solid var(--ca-line);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.8rem;
+}
+.cs-explore-mode button[aria-pressed="true"] {
+  background: var(--ca-accent);
+  color: var(--ca-paper);
+}
+.cs-explore-section {
+  margin: 1.5rem 0 2rem;
+  scroll-margin-top: 1rem;
+}
+.cs-explore-section h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+.cs-explore-description {
+  color: var(--ca-muted);
+  font-size: 0.9rem;
+  margin: 0.4rem 0 1rem;
+}
+.cs-explore-entry {
+  min-width: 0;
+}
+.cs-explore-entry .cs-chord {
+  width: 100%;
+}
+@media (min-width: 900px) {
+  .chord-sheet .cs-explore .cs-chords {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .cs-explore-entry .cs-chord {
+    max-width: none;
+  }
+}
+.cs-explore-more {
+  padding: 1rem;
+  text-align: center;
+}
+.cs-explore .cs-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  position: static;
+  padding: 0;
+}
+.cs-explore .cs-jump a {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.8rem;
+  min-width: 0;
+}

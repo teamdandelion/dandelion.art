@@ -1,5 +1,93 @@
 import { expect, test } from "@playwright/test";
 
+test("Explore uses three desktop columns and two phone columns", async ({
+  page,
+}) => {
+  await page.goto("/music/chords?theme=dark");
+  for (const instrument of ["guitar-eadgbe", "baritone-dgbe"]) {
+    await page
+      .getByRole("combobox", { name: "Instrument", exact: true })
+      .selectOption(instrument);
+    for (const width of [390, 900, 1280, 1440]) {
+      await page.setViewportSize({ width, height: 1000 });
+      const grid = page.locator(".cs-explore .cs-chords").first();
+      await expect(grid.locator(".cs-chord")).toHaveCount(7);
+      const columns = width < 900 ? 2 : 3;
+      await expect
+        .poll(() =>
+          grid.evaluate(
+            (el) => getComputedStyle(el).gridTemplateColumns.split(" ").length,
+          ),
+        )
+        .toBe(columns);
+      const boxes = await grid.locator(".cs-chord").evaluateAll((els) =>
+        els.map((el) => {
+          const r = el.getBoundingClientRect();
+          return { x: r.x, y: r.y, right: r.right };
+        }),
+      );
+      for (let i = 1; i < columns; i++) {
+        expect(Math.abs(boxes[i].y - boxes[0].y)).toBeLessThan(2);
+        expect(boxes[i].x).toBeGreaterThan(boxes[i - 1].right);
+      }
+      expect(boxes[columns].y).toBeGreaterThan(boxes[0].y);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      if (width === 1280 && instrument === "guitar-eadgbe")
+        await page.screenshot({ path: "/tmp/explore-desktop-three.png" });
+    }
+  }
+});
+
+test("exploration scrolls through chapters and resets for a new key", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/music/chords");
+  const home = page.getByRole("region", { name: "Your key", exact: true });
+  await expect(home.locator(".cs-chord")).toHaveCount(7);
+  const cards = home.locator(".cs-chord");
+  const first = await cards.nth(0).boundingBox();
+  const second = await cards.nth(1).boundingBox();
+  if (!first || !second) throw new Error("Expected visible chord cards");
+  expect(Math.abs(first.y - second.y)).toBeLessThan(2);
+  await page.screenshot({ path: "/tmp/chords-explore-first-screen.png" });
+  await page
+    .getByRole("button", { name: "Explore more ↓" })
+    .scrollIntoViewIfNeeded();
+  await expect(
+    page.getByRole("region", { name: "Add sevenths", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("link", { name: "Borrow a different mood", exact: true })
+    .click();
+  await expect(
+    page.getByRole("region", { name: "Borrow a different mood", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".cs-explore")).toContainText("Try:");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page.screenshot({
+    path: "/tmp/chords-explore-mobile.png",
+    fullPage: true,
+  });
+  await page
+    .getByRole("combobox", { name: "Key", exact: true })
+    .selectOption("natural-minor:A");
+  await expect(
+    page.getByRole("region", { name: "Your key", exact: true }),
+  ).toContainText("E7");
+  await expect(
+    page.getByRole("region", { name: "Borrow a different mood", exact: true }),
+  ).toHaveCount(0);
+});
+
 test("music links to Chords and the old sheet address redirects", async ({
   page,
 }) => {
@@ -35,11 +123,11 @@ test("server default stays hidden until saved preferences are ready", async ({
 }) => {
   const noScript = await browser.newContext({ javaScriptEnabled: false });
   const serverPage = await noScript.newPage();
-  await serverPage.goto("/music/chords");
+  await serverPage.goto("/music/chords?view=reference");
   await expect(serverPage.locator(".chord-sheet")).toBeHidden();
   await expect(serverPage.locator(".chord-sheet")).toHaveAttribute("inert", "");
   await noScript.close();
-  await page.goto("/music/chords");
+  await page.goto("/music/chords?view=reference");
   await expect(page.locator(".chord-sheet")).toHaveAttribute(
     "data-preferences-ready",
     "true",
@@ -64,7 +152,7 @@ test("new visitors get guitar and heading selection persists", async ({
 }) => {
   const context = await browser.newContext();
   const page = await context.newPage();
-  await page.goto("/music/chords");
+  await page.goto("/music/chords?view=reference");
   await expect(page.locator(".chord-sheet")).toHaveAttribute(
     "data-preferences-ready",
     "true",
@@ -141,7 +229,7 @@ test("predictive fretboard advertises the chord that tapping produces", async ({
 test("family filters persist and wrap on phone and desktop", async ({
   page,
 }) => {
-  await page.goto("/music/chords");
+  await page.goto("/music/chords?view=reference");
   await expect(page.locator(".chord-sheet")).toHaveAttribute(
     "data-preferences-ready",
     "true",
@@ -172,7 +260,7 @@ test("family filters persist and wrap on phone and desktop", async ({
 test("heading bass controls and slash link work on mobile", async ({
   page,
 }) => {
-  await page.goto("/music/chords");
+  await page.goto("/music/chords?view=reference");
   await expect(page.locator(".chord-sheet")).toHaveAttribute(
     "data-preferences-ready",
     "true",
@@ -205,7 +293,7 @@ test("heading bass controls and slash link work on mobile", async ({
 });
 
 test("compact sheet layout at phone and tablet widths", async ({ page }) => {
-  await page.goto("/music/chords");
+  await page.goto("/music/chords?view=reference");
   await expect(page.locator(".chord-sheet")).toHaveAttribute(
     "data-preferences-ready",
     "true",
@@ -236,7 +324,7 @@ test("guitar cards use two phone columns without clipping controls", async ({
 }) => {
   const context = await browser.newContext({ isMobile: true, hasTouch: true });
   const page = await context.newPage();
-  await page.goto("/music/chords?theme=dark");
+  await page.goto("/music/chords?view=reference&theme=dark");
   await expect(page.locator(".chord-sheet")).toHaveAttribute(
     "data-preferences-ready",
     "true",
@@ -289,7 +377,7 @@ test("guitar cards use two phone columns without clipping controls", async ({
 test("heading key selector persists key and offers all chords", async ({
   page,
 }) => {
-  await page.goto("/music/chords");
+  await page.goto("/music/chords?view=reference");
   await expect(page.locator(".chord-sheet")).toHaveAttribute(
     "data-preferences-ready",
     "true",
