@@ -104,8 +104,14 @@
   border-left: 3px solid var(--site-muted);
 }
 .fb-note.fb-in-key .fb-note-name {
-  background: color-mix(in srgb, var(--site-secondaryFill) 18%, var(--ca-paper));
-  color: var(--ca-ink);
+  background: color-mix(in srgb, var(--site-muted) 12%, var(--ca-paper));
+  color: var(--site-muted);
+}
+.fb-preview {
+  display: block;
+  min-height: 1.5em;
+  font-size: 13px;
+  color: var(--ca-muted);
 }
 .fb-note.fb-in-chord .fb-note-name {
   background: var(--site-secondaryFill);

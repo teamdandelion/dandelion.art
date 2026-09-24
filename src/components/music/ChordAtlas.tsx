@@ -492,7 +492,9 @@ export default function ChordAtlas() {
                   </button>
                 </div>
                 <p className="ca-help ca-center">
-                  1 index · 2 middle · 3 ring · 4 pinky
+                  {fingering.source === "generated"
+                    ? "Generated position · finger assignments unknown"
+                    : "1 index · 2 middle · 3 ring · 4 pinky"}
                 </p>
                 <p className="ca-help ca-center">
                   ○ open · × muted · joined dots = barre

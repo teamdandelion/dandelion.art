@@ -101,7 +101,7 @@ export const CHORD_QUALITIES = [
     aliases: ["maj6"],
     family: "major",
     group: "sixths",
-    optionalDegrees: [],
+    optionalDegrees: [5],
     name: "Major sixth",
     suffix: "6",
     description: "A major triad with an added major sixth. No seventh implied.",
@@ -145,7 +145,7 @@ export const CHORD_QUALITIES = [
     aliases: [],
     family: "major",
     group: "added",
-    optionalDegrees: [],
+    optionalDegrees: [5],
     name: "Added ninth",
     suffix: "add9",
     description:

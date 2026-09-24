@@ -1,5 +1,26 @@
 import { expect, test } from "@playwright/test";
 
+test("predictive fretboard advertises the chord that tapping produces", async ({
+  page,
+}) => {
+  await page.goto("/music/fretboard");
+  await expect(page.locator("astro-island[ssr]")).toHaveCount(0);
+  const fret = page.getByRole("button", {
+    name: "String 1, fret 3, G4",
+    exact: true,
+  });
+  await expect(fret).toHaveClass(/fb-in-chord/);
+  await expect(fret).toHaveAttribute("title", /G\/D/);
+  await fret.click();
+  await expect(fret).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".fb-matches")).toContainText("G");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+});
+
 test("family filters persist and wrap on phone and desktop", async ({
   page,
 }) => {

@@ -1,6 +1,7 @@
 import { analyzeCoverage } from "./analysis.ts";
 import {
   CHORD_QUALITIES,
+  type Chord,
   type FrettedInstrument,
   formatNote,
   type Key,
@@ -48,7 +49,22 @@ export function fretboardPitches(
   );
 }
 
-/** Exact pitch-class matches only: no implied roots, omitted notes, or guessed extensions. */
+const catalogs = new Map<string, Chord[]>();
+function recognitionCatalog(key: Key) {
+  const id = `${formatNote(key.tonic)}/${key.mode}`;
+  let chords = catalogs.get(id);
+  if (!chords) {
+    chords = Array.from({ length: 12 }, (_, pc) => noteAt(pc, key)).flatMap(
+      (root) => CHORD_QUALITIES.map((quality) => makeChord(root, quality.id)),
+    );
+    if (catalogs.size >= 32)
+      catalogs.delete(catalogs.keys().next().value as string);
+    catalogs.set(id, chords);
+  }
+  return chords;
+}
+
+/** Exact matches rank first; permitted omissions must be requested explicitly. */
 export function identifyChords(
   pitches: number[],
   key: Key,
@@ -56,10 +72,7 @@ export function identifyChords(
 ) {
   if (!pitches.length) return [];
   const bass = Math.min(...pitches) % 12;
-  return Array.from({ length: 12 }, (_, pc) => noteAt(pc, key))
-    .flatMap((root) =>
-      CHORD_QUALITIES.map((quality) => makeChord(root, quality.id)),
-    )
+  return recognitionCatalog(key)
     .filter((chord) => {
       const coverage = analyzeCoverage(chord, pitches);
       return coverage && (allowOmissions || coverage.kind === "exact");
@@ -81,4 +94,29 @@ export function identifyChords(
           noteAt(bass, key),
       ),
     }));
+}
+
+export function predictFretboard(
+  instrument: FrettedInstrument,
+  frets: (number | null)[],
+  key: Key,
+  maxFret = 12,
+) {
+  if (!Number.isInteger(maxFret) || maxFret < 0 || maxFret > 24)
+    throw new Error("Invalid fret limit");
+  return instrument.courses.map((_, index) =>
+    [null, ...Array.from({ length: maxFret + 1 }, (_, f) => f)].map((fret) => {
+      const candidate = frets.map((current, i) =>
+        i === index ? fret : current,
+      );
+      return {
+        fret,
+        matches: identifyChords(
+          fretboardPitches(instrument, candidate),
+          key,
+          true,
+        ),
+      };
+    }),
+  );
 }
