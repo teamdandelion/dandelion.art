@@ -15,13 +15,14 @@ import {
   makeChord,
   midi,
   type PitchClass,
-  parseChord,
   parseNote,
   pianoVoicing,
   pitchClassNumber,
   ROOT_OPTIONS,
   type Voicing,
 } from "../../lib/music";
+import { parseChordSelection, voicingSymbol } from "../../lib/music/analysis";
+import { searchVoicings } from "../../lib/music/voicing-search";
 import ChordTheoryHelp from "./ChordTheoryHelp";
 import "./chord-atlas.css";
 import { useMusicPreferences } from "./MusicSettings";
@@ -207,6 +208,7 @@ export default function ChordAtlas() {
   const [announcement, setAnnouncement] = useState("");
   const [quality, setQuality] = useState<ChordQuality>("major");
   const [shapeIndex, setShapeIndex] = useState(0);
+  const [requestedBass, setRequestedBass] = useState<number | undefined>();
   const [query, setQuery] = useState("");
   const [searchError, setSearchError] = useState("");
   const [sevenths, setSevenths] = useState(false);
@@ -214,16 +216,19 @@ export default function ChordAtlas() {
   const [inversion, setInversion] = useState(0);
   useEffect(() => {
     const requested = new URLSearchParams(window.location.search).get("chord");
-    const initial = requested ? parseChord(requested) : null;
+    const initial = requested ? parseChordSelection(requested) : null;
     if (initial) {
-      setRoot(asciiNote(initial.root));
-      setQuality(initial.quality);
+      setRoot(asciiNote(initial.chord.root));
+      setQuality(initial.chord.quality);
+      setRequestedBass(
+        initial.bass ? pitchClassNumber(initial.bass) : undefined,
+      );
     }
   }, []);
   const chord = useMemo(() => makeChord(root, quality), [root, quality]);
   const fingerings = useMemo(
-    () => findFingerings(chord, instrument),
-    [chord, instrument],
+    () => searchVoicings(chord, instrument, { bass: requestedBass }),
+    [chord, instrument, requestedBass],
   );
   const fingering = fingerings[shapeIndex % Math.max(fingerings.length, 1)];
   const key = useMemo<Key>(
@@ -271,6 +276,7 @@ export default function ChordAtlas() {
   }));
 
   function chooseChord(next: Chord) {
+    setRequestedBass(undefined);
     setRoot(asciiNote(next.root));
     setQuality(next.quality);
     setShapeIndex(0);
@@ -355,9 +361,15 @@ export default function ChordAtlas() {
             className="ca-search"
             onSubmit={(event) => {
               event.preventDefault();
-              const found = parseChord(query);
+              const selection = parseChordSelection(query);
+              const found = selection?.chord;
               if (found) {
                 chooseChord(found);
+                setRequestedBass(
+                  selection?.bass
+                    ? pitchClassNumber(selection.bass)
+                    : undefined,
+                );
                 setQuery("");
                 // Reveal the result and dismiss the phone keyboard without losing focus.
                 requestAnimationFrame(() =>
@@ -404,7 +416,10 @@ export default function ChordAtlas() {
         <div className="ca-chord-heading">
           <div>
             <h2 id={`${id}-explorer`} ref={explorerHeadingRef} tabIndex={-1}>
-              {chord.symbol} <span>{qualityInfo?.name}</span>
+              {fingering
+                ? voicingSymbol(chord, fingering.voicing)
+                : chord.symbol}{" "}
+              <span>{qualityInfo?.name}</span>
             </h2>
             <ChordTheoryHelp chord={chord} />
           </div>
