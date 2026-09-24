@@ -27,11 +27,14 @@ test("family filters persist and wrap on phone and desktop", async ({
   await page.goto("/music/cheat-sheet");
   await expect(page.locator("astro-island[ssr]")).toHaveCount(0);
   const filters = page.getByRole("group", { name: "Chord families" });
+  await expect(filters).not.toBeVisible();
+  await page.locator(".cs-options summary").click();
   await filters.getByRole("button", { name: "sus2", exact: true }).click();
   await expect(
     page.locator(".cs-chord h3").filter({ hasText: "Gsus2" }).first(),
   ).toBeVisible();
   await page.reload();
+  await page.locator(".cs-options summary").click();
   await expect(
     filters.getByRole("button", { name: "sus2", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
@@ -54,8 +57,11 @@ test("voicing controls, theory help and slash link work on mobile", async ({
   ).toHaveCount(0);
   const card = page.locator(".cs-chord").first();
   await expect(card.locator("h3")).toHaveText("G/D");
-  await card.getByLabel("Bass note for G", { exact: true }).selectOption("11");
+  await card.getByRole("button", { name: "B bass for G", exact: true }).click();
   await expect(card.locator("h3")).toHaveText("G/B");
+  await card.getByRole("button", { name: "B bass for G", exact: true }).click();
+  await expect(card.locator("h3")).toHaveText("G/D");
+  await card.getByRole("button", { name: "B bass for G", exact: true }).click();
   await card.getByRole("button", { name: "About major", exact: true }).click();
   await expect(card.getByRole("dialog")).toBeVisible();
   await page.keyboard.press("Escape");
@@ -67,4 +73,23 @@ test("voicing controls, theory help and slash link work on mobile", async ({
   ).toBe(true);
   await card.getByRole("link", { name: "G/B", exact: true }).click();
   await expect(page.locator(".ca-explorer h2").first()).toContainText("G/B");
+});
+
+test("compact sheet layout at phone and tablet widths", async ({ page }) => {
+  await page.goto("/music/cheat-sheet");
+  await expect(page.locator("astro-island[ssr]")).toHaveCount(0);
+  for (const width of [390, 661]) {
+    await page.setViewportSize({ width, height: 850 });
+    await expect(page.locator(".cs-family-filters")).not.toBeVisible();
+    const card = page.locator(".cs-chord").first();
+    const bounds = await card.boundingBox();
+    expect(bounds?.y).toBeLessThan(400);
+    await expect(card.locator("svg circle[r='2.5']")).toHaveCount(1);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({ path: `/tmp/chord-sheet-review-${width}.png` });
+  }
 });

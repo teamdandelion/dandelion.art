@@ -8,6 +8,17 @@
   gap: 6px;
   margin-bottom: 12px;
 }
+.cs-options {
+  margin: -4px 0 8px;
+}
+.cs-options summary {
+  width: fit-content;
+  min-height: 44px;
+  align-content: center;
+  cursor: pointer;
+  color: var(--ca-muted);
+  font-size: 13px;
+}
 .cs-family-filters > div {
   display: flex;
   border: 1px solid var(--ca-line);
@@ -47,14 +58,29 @@
   font-size: 11px;
   color: var(--ca-muted);
 }
-.cs-chord select {
-  width: 100%;
+.cs-bass-notes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 4px;
+}
+.cs-bass-notes button {
+  min-width: 32px;
   min-height: 44px;
   font-size: 14px;
-  background: var(--ca-paper);
+  background: transparent;
   color: var(--ca-ink);
-  border: 1px solid var(--ca-line);
+  border: 0;
   border-radius: 6px;
+}
+.cs-bass-notes button[aria-pressed="true"] {
+  background: var(--ca-accent-soft);
+  color: var(--ca-accent);
+}
+.cs-bass-notes button:disabled {
+  opacity: 0.4;
 }
 .cs-intro h1 {
   font:
@@ -151,6 +177,15 @@
   background: var(--ca-paper);
   color: var(--ca-accent);
   font-size: 18px;
+}
+.chord-sheet .cs-help-button {
+  width: 32px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ca-muted);
+  font-size: 14px;
 }
 .cs-paired {
   --cs-column-count: 2;
@@ -320,7 +355,7 @@
   min-width: 0;
   border: 1px solid transparent;
   border-radius: 8px;
-  padding: 6px 0;
+  padding: 6px 10px;
   background: var(--ca-paper);
   text-align: center;
   text-decoration: none;
@@ -431,6 +466,7 @@
   .cs-jump,
   .cs-nav,
   .cs-controls,
+  .cs-options,
   .cs-help-button,
   .cs-modal,
   .cs-atlas-link {

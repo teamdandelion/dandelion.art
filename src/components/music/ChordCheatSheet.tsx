@@ -103,25 +103,27 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
               →
             </button>
           </div>
-          <select
+          <fieldset
+            className="cs-bass-notes"
             aria-label={`Bass note for ${chord.symbol}`}
-            value={bass}
-            onChange={(e) => {
-              setBass(e.target.value);
-              setIndex(0);
-            }}
           >
-            <option value="any">Any bass</option>
             {chord.tones.map((t) => (
-              <option
+              <button
+                type="button"
                 key={t.degree}
-                value={pitchClassNumber(t.note)}
+                aria-label={`${formatNote(t.note)} bass for ${chord.symbol}`}
+                aria-pressed={bass === String(pitchClassNumber(t.note))}
                 disabled={!availableBass.has(pitchClassNumber(t.note))}
+                onClick={() => {
+                  const next = String(pitchClassNumber(t.note));
+                  setBass(bass === next ? "any" : next);
+                  setIndex(0);
+                }}
               >
-                {formatNote(t.note)} bass
-              </option>
+                {formatNote(t.note)}
+              </button>
             ))}
-          </select>
+          </fieldset>
           {fingering.source === "generated" && (
             <small className="cs-provenance">
               Generated · fingers unassigned
@@ -234,28 +236,33 @@ export default function ChordCheatSheet() {
           </button>
         </fieldset>
       </div>
-      <fieldset className="cs-family-filters" aria-label="Chord families">
-        {PRACTICE_GROUPS.map((group) => (
-          <div key={group.id}>
-            <button
-              type="button"
-              aria-pressed={groups.includes(group.id)}
-              onClick={() =>
-                setGroups((current) =>
-                  current.includes(group.id)
-                    ? current.length > 1
-                      ? current.filter((g) => g !== group.id)
-                      : current
-                    : [...current, group.id],
-                )
-              }
-            >
-              {group.label}
-            </button>
-            <ChordTheoryHelp chord={makeChord(tonic, groupExample(group.id))} />
-          </div>
-        ))}
-      </fieldset>
+      <details className="cs-options">
+        <summary>Options</summary>
+        <fieldset className="cs-family-filters" aria-label="Chord families">
+          {PRACTICE_GROUPS.map((group) => (
+            <div key={group.id}>
+              <button
+                type="button"
+                aria-pressed={groups.includes(group.id)}
+                onClick={() =>
+                  setGroups((current) =>
+                    current.includes(group.id)
+                      ? current.length > 1
+                        ? current.filter((g) => g !== group.id)
+                        : current
+                      : [...current, group.id],
+                  )
+                }
+              >
+                {group.label}
+              </button>
+              <ChordTheoryHelp
+                chord={makeChord(tonic, groupExample(group.id))}
+              />
+            </div>
+          ))}
+        </fieldset>
+      </details>
       <output className="cs-status" aria-live="polite">
         {view === "key"
           ? `${keyName}: ${rows.reduce((n, row) => n + row.entries.length, 0)} chords.`

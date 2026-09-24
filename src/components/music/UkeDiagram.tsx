@@ -29,7 +29,7 @@ export default function UkeDiagram({
   const start = fingering.startFret;
   const top = reference ? 28 : 44;
   const openY = reference ? 12 : 25;
-  const left = reference ? 19 : 43;
+  const left = reference ? 34 : 43;
   const spacing = compact || reference ? 34 : 44;
   const fretHeight = 34;
   const rows = Math.max(
@@ -67,14 +67,36 @@ export default function UkeDiagram({
       ))}
       {(start > 1 || reference) && (
         <text
-          x={reference ? 7 : 23}
+          x={left + spacing * (instrument.courses.length - 1) + 16}
           y={top + fretHeight / 2 + 4}
-          textAnchor="end"
+          textAnchor="start"
           className="ca-fret-number"
         >
           {start}
         </text>
       )}
+      {Array.from({ length: rows }, (_, i) => start + i).map((fret) => {
+        const octaveFret = fret % 12;
+        const marked = [
+          3,
+          5,
+          7,
+          instrument.id === "guitar-eadgbe" ? 9 : 10,
+        ].includes(octaveFret);
+        if (!marked && octaveFret !== 0) return null;
+        return (
+          <g key={`marker-${fret}`} fill="var(--ca-muted)">
+            {(octaveFret === 0 ? [-4, 4] : [0]).map((offset) => (
+              <circle
+                key={offset}
+                cx={left - 16}
+                cy={top + (fret - start + 0.5) * fretHeight + offset}
+                r={2.5}
+              />
+            ))}
+          </g>
+        );
+      })}
       {instrument.courses.map((course, index) => (
         <line
           key={course.number}
