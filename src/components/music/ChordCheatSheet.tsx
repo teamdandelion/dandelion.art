@@ -66,7 +66,35 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
         <a href={href}>
           <h3>{chord.symbol}</h3>
         </a>
-        <ChordTheoryHelp chord={chord} />
+        <fieldset
+          className="cs-bass-notes"
+          aria-label={`Bass note for ${chord.symbol}`}
+        >
+          {chord.tones.map((t) => (
+            <button
+              type="button"
+              key={t.degree}
+              className={
+                fingering &&
+                bass === "any" &&
+                pitchClassNumber(t.note) ===
+                  pitchClassNumber(bassPitch(fingering.voicing).note)
+                  ? "cs-root-hint"
+                  : undefined
+              }
+              aria-label={`${formatNote(t.note)} bass for ${chord.symbol}`}
+              aria-pressed={bass === String(pitchClassNumber(t.note))}
+              disabled={!availableBass.has(pitchClassNumber(t.note))}
+              onClick={() => {
+                const next = String(pitchClassNumber(t.note));
+                setBass(bass === next ? "any" : next);
+                setIndex(0);
+              }}
+            >
+              {formatNote(t.note)}
+            </button>
+          ))}
+        </fieldset>
       </div>
       {fingering ? (
         <>
@@ -102,34 +130,6 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
                 →
               </button>
             </div>
-            <fieldset
-              className="cs-bass-notes"
-              aria-label={`Bass note for ${chord.symbol}`}
-            >
-              {chord.tones.map((t) => (
-                <button
-                  type="button"
-                  key={t.degree}
-                  className={
-                    bass === "any" &&
-                    pitchClassNumber(t.note) ===
-                      pitchClassNumber(bassPitch(fingering.voicing).note)
-                      ? "cs-root-hint"
-                      : undefined
-                  }
-                  aria-label={`${formatNote(t.note)} bass for ${chord.symbol}`}
-                  aria-pressed={bass === String(pitchClassNumber(t.note))}
-                  disabled={!availableBass.has(pitchClassNumber(t.note))}
-                  onClick={() => {
-                    const next = String(pitchClassNumber(t.note));
-                    setBass(bass === next ? "any" : next);
-                    setIndex(0);
-                  }}
-                >
-                  {formatNote(t.note)}
-                </button>
-              ))}
-            </fieldset>
           </div>
         </>
       ) : (

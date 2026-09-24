@@ -146,7 +146,7 @@ test("family filters persist and wrap on phone and desktop", async ({
   }
 });
 
-test("voicing controls, theory help and slash link work on mobile", async ({
+test("heading bass controls and slash link work on mobile", async ({
   page,
 }) => {
   await page.goto("/music/cheat-sheet");
@@ -168,10 +168,10 @@ test("voicing controls, theory help and slash link work on mobile", async ({
     card.getByRole("button", { name: "B bass for G", exact: true }),
   ).toHaveAttribute("aria-pressed", "false");
   await card.getByRole("button", { name: "B bass for G", exact: true }).click();
-  await card.getByRole("button", { name: "About major", exact: true }).click();
-  await expect(card.getByRole("dialog")).toBeVisible();
-  await page.keyboard.press("Escape");
-  await expect(card.getByRole("dialog")).not.toBeVisible();
+  await expect(card.locator(".cs-card-heading .cs-bass-notes")).toBeVisible();
+  await expect(
+    card.getByRole("button", { name: "About major", exact: true }),
+  ).toHaveCount(0);
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,

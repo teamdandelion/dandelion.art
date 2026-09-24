@@ -51,6 +51,7 @@
 }
 .cs-card-heading {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 4px;
@@ -96,22 +97,21 @@
   color: var(--ca-muted);
 }
 .cs-bass-notes {
-  grid-column: 2;
-  grid-row: 2;
   min-width: 0;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  gap: 5px;
+  justify-content: flex-end;
+  gap: 3px;
   margin: 0;
+  margin-left: auto;
 }
 .cs-bass-notes button {
-  width: 40px;
-  height: 40px;
-  flex: 0 0 40px;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
   padding: 0;
-  font-size: 16px;
+  font-size: 14px;
   background: var(--ca-paper);
   color: var(--ca-ink);
   border: 1px solid var(--ca-line);
