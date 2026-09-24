@@ -1,3 +1,19 @@
+import {
+  CHORD_QUALITIES,
+  type ChordQuality,
+  type Interval,
+  QUALITY_ALIASES,
+} from "./catalog.ts";
+
+export {
+  CHORD_QUALITIES,
+  type ChordFormula,
+  type ChordGroup,
+  type ChordQuality,
+  chordFormula,
+  type Interval,
+} from "./catalog.ts";
+
 import { GUITAR_SHAPES } from "./data/guitar-shapes.ts";
 import { LIBRARY_REVISION, UKULELE_SHAPES } from "./data/ukulele-shapes.ts";
 
@@ -5,29 +21,6 @@ import { LIBRARY_REVISION, UKULELE_SHAPES } from "./data/ukulele-shapes.ts";
 export type Letter = "C" | "D" | "E" | "F" | "G" | "A" | "B";
 export type PitchClass = { step: Letter; alter: number };
 export type Pitch = { note: PitchClass; octave: number };
-export type Interval = { degree: number; semitones: number; label: string };
-export type ChordQuality =
-  | "major"
-  | "minor"
-  | "dim"
-  | "aug"
-  | "sus2"
-  | "sus4"
-  | "7"
-  | "maj7"
-  | "m7"
-  | "dim7"
-  | "m7b5"
-  | "6"
-  | "m6"
-  | "add9";
-export type ChordFormula = {
-  id: ChordQuality;
-  name: string;
-  suffix: string;
-  description: string;
-  intervals: Interval[];
-};
 export type Chord = {
   id: string;
   root: PitchClass;
@@ -133,124 +126,6 @@ export const KEY_OPTIONS = [
   "Db",
 ];
 
-const interval = (
-  degree: number,
-  semitones: number,
-  label: string,
-): Interval => ({ degree, semitones, label });
-const R = interval(1, 0, "1");
-const m3 = interval(3, 3, "♭3");
-const M3 = interval(3, 4, "3");
-const P5 = interval(5, 7, "5");
-const d5 = interval(5, 6, "♭5");
-const m7 = interval(7, 10, "♭7");
-const M6 = interval(6, 9, "6");
-
-export const CHORD_QUALITIES: ChordFormula[] = [
-  {
-    id: "major",
-    name: "Major",
-    suffix: "",
-    description: "Root, major third, perfect fifth.",
-    intervals: [R, M3, P5],
-  },
-  {
-    id: "minor",
-    name: "Minor",
-    suffix: "m",
-    description: "Root, minor third, perfect fifth.",
-    intervals: [R, m3, P5],
-  },
-  {
-    id: "7",
-    name: "Dominant seventh",
-    suffix: "7",
-    description:
-      "A major triad with a minor seventh. Often resolves down a fifth.",
-    intervals: [R, M3, P5, m7],
-  },
-  {
-    id: "maj7",
-    name: "Major seventh",
-    suffix: "maj7",
-    description:
-      "A major triad with a major seventh, one semitone below the root.",
-    intervals: [R, M3, P5, interval(7, 11, "7")],
-  },
-  {
-    id: "m7",
-    name: "Minor seventh",
-    suffix: "m7",
-    description: "A minor triad with a minor seventh.",
-    intervals: [R, m3, P5, m7],
-  },
-  {
-    id: "6",
-    name: "Major sixth",
-    suffix: "6",
-    description: "A major triad with an added major sixth. No seventh implied.",
-    intervals: [R, M3, P5, M6],
-  },
-  {
-    id: "m6",
-    name: "Minor sixth",
-    suffix: "m6",
-    description: "A minor triad with a major sixth—not a lowered sixth.",
-    intervals: [R, m3, P5, M6],
-  },
-  {
-    id: "sus2",
-    name: "Suspended second",
-    suffix: "sus2",
-    description: "The second replaces the third; neither major nor minor.",
-    intervals: [R, interval(2, 2, "2"), P5],
-  },
-  {
-    id: "sus4",
-    name: "Suspended fourth",
-    suffix: "sus4",
-    description: "The fourth replaces the third; neither major nor minor.",
-    intervals: [R, interval(4, 5, "4"), P5],
-  },
-  {
-    id: "add9",
-    name: "Added ninth",
-    suffix: "add9",
-    description:
-      "A major triad with an added ninth. Unlike a 9 chord, there is no seventh.",
-    intervals: [R, M3, P5, interval(9, 14, "9")],
-  },
-  {
-    id: "dim",
-    name: "Diminished",
-    suffix: "dim",
-    description: "A minor third and a diminished fifth above the root.",
-    intervals: [R, m3, d5],
-  },
-  {
-    id: "aug",
-    name: "Augmented",
-    suffix: "aug",
-    description: "A major triad with a raised fifth.",
-    intervals: [R, M3, interval(5, 8, "♯5")],
-  },
-  {
-    id: "dim7",
-    name: "Diminished seventh",
-    suffix: "dim7",
-    description:
-      "A diminished triad plus a diminished seventh, spelled as ♭♭7.",
-    intervals: [R, m3, d5, interval(7, 9, "♭♭7")],
-  },
-  {
-    id: "m7b5",
-    name: "Half-diminished seventh",
-    suffix: "m7♭5",
-    description: "A diminished triad with a minor seventh; also written ø7.",
-    intervals: [R, m3, d5, m7],
-  },
-];
-
 export function parseNote(value: string): PitchClass {
   const match = /^([A-Ga-g])([#b]{0,2})$/.exec(
     value.trim().replaceAll("♯", "#").replaceAll("♭", "b"),
@@ -317,42 +192,6 @@ export function makeChord(
     })),
   };
 }
-
-const QUALITY_ALIASES: Record<string, ChordQuality> = {
-  "": "major",
-  maj: "major",
-  major: "major",
-  M: "major",
-  m: "minor",
-  min: "minor",
-  minor: "minor",
-  "-": "minor",
-  "7": "7",
-  dom7: "7",
-  maj7: "maj7",
-  M7: "maj7",
-  Δ7: "maj7",
-  m7: "m7",
-  min7: "m7",
-  "-7": "m7",
-  "6": "6",
-  maj6: "6",
-  m6: "m6",
-  min6: "m6",
-  sus2: "sus2",
-  sus4: "sus4",
-  sus: "sus4",
-  add9: "add9",
-  dim: "dim",
-  "°": "dim",
-  aug: "aug",
-  "+": "aug",
-  dim7: "dim7",
-  "°7": "dim7",
-  m7b5: "m7b5",
-  ø: "m7b5",
-  ø7: "m7b5",
-};
 
 export function parseChord(query: string): Chord | null {
   const value = query
@@ -698,7 +537,7 @@ export function findFingerings(
 
 export function keyScale(key: Key): PitchClass[] {
   return (key.mode === "major" ? MAJOR : MINOR).map((semitones, index) =>
-    transpose(key.tonic, interval(index + 1, semitones, "")),
+    transpose(key.tonic, { degree: index + 1, semitones, label: "" }),
   );
 }
 
