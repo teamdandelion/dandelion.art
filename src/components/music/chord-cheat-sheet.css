@@ -2,6 +2,28 @@
   max-width: 760px;
   margin-top: -16px;
 }
+.cs-family-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.cs-family-filters > div {
+  display: flex;
+  border: 1px solid var(--ca-line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.cs-family-filters button {
+  min-height: 44px;
+  padding: 6px 10px;
+  background: transparent;
+  color: var(--ca-ink);
+  border: 0;
+}
+.cs-family-filters button[aria-pressed="true"] {
+  background: var(--ca-accent-soft);
+}
 .cs-card-heading,
 .cs-voicing-controls {
   display: flex;
@@ -259,7 +281,7 @@
 .cs-columns,
 .cs-chords {
   display: grid;
-  grid-template-columns: repeat(var(--cs-column-count, 3), minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(145px, 100%), 1fr));
   gap: 8px;
 }
 .cs-columns {

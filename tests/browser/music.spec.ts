@@ -1,5 +1,29 @@
 import { expect, test } from "@playwright/test";
 
+test("family filters persist and wrap on phone and desktop", async ({
+  page,
+}) => {
+  await page.goto("/music/cheat-sheet");
+  await expect(page.locator("astro-island[ssr]")).toHaveCount(0);
+  const filters = page.getByRole("group", { name: "Chord families" });
+  await filters.getByRole("button", { name: "sus2", exact: true }).click();
+  await expect(
+    page.locator(".cs-chord h3").filter({ hasText: "Gsus2" }).first(),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    filters.getByRole("button", { name: "sus2", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  for (const width of [390, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  }
+});
+
 test("voicing controls, theory help and slash link work on mobile", async ({
   page,
 }) => {
