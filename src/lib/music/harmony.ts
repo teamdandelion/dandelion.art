@@ -1,5 +1,6 @@
 import {
   type Chord,
+  chordFormula,
   formatNote,
   type Key,
   keyChords,
@@ -23,10 +24,7 @@ export type HarmonicRelation = {
 };
 
 export function chordFamily(chord: Chord) {
-  if (chord.quality === "7") return "dominant";
-  if (["dim", "dim7", "m7b5"].includes(chord.quality)) return "diminished";
-  if (["minor", "m7", "m6"].includes(chord.quality)) return "minor";
-  return "major";
+  return chordFormula(chord.quality).family;
 }
 
 /** Structural similarity and directional harmonic function are separate edges. */
