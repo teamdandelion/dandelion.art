@@ -29,34 +29,32 @@ const artworks = ids.map((id) => {
 ---
 
 <div class:list={["qql-gallery", `qql-gallery--${columns}`]}>
-  {
-    artworks.map(({ id, image }) => (
-      <figure>
-        <button
-          type="button"
-          class="qql-frame"
-          data-qql-lightbox-src={image.src}
-          data-qql-lightbox-zoom-src={`/art/qql-zoom/${id}.webp`}
-          data-qql-lightbox-alt={`Generative artwork QQL #${id}`}
-          data-qql-lightbox-title={`QQL #${id}`}
-          aria-label={`Expand QQL #${id}`}
-        >
-          <Picture
-            src={image}
-            alt={`Generative artwork QQL #${id}`}
-            formats={["avif"]}
-            fallbackFormat="webp"
-            widths={[480, 960, 1600]}
-            sizes={sizes}
-            loading={prioritize ? "eager" : "lazy"}
-            fetchpriority={prioritize ? "high" : "auto"}
-            decoding="async"
-          />
-        </button>
-        <figcaption>QQL #{id}</figcaption>
-      </figure>
-    ))
-  }
+  {artworks.map(({ id, image }) => (
+    <figure>
+      <button
+        type="button"
+        class="qql-frame"
+        data-qql-lightbox-src={image.src}
+        data-qql-lightbox-zoom-src={`/art/qql-zoom/${id}.webp`}
+        data-qql-lightbox-alt={`Generative artwork QQL #${id}`}
+        data-qql-lightbox-title={`QQL #${id}`}
+        aria-label={`Expand QQL #${id}`}
+      >
+        <Picture
+          src={image}
+          alt={`Generative artwork QQL #${id}`}
+          formats={["avif"]}
+          fallbackFormat="webp"
+          widths={[480, 960, 1600]}
+          sizes={sizes}
+          loading={prioritize ? "eager" : "lazy"}
+          fetchpriority={prioritize ? "high" : "auto"}
+          decoding="async"
+        />
+      </button>
+      <figcaption>QQL #{id}</figcaption>
+    </figure>
+  ))}
 </div>
 
 <style>

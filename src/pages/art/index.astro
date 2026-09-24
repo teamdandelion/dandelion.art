@@ -4,12 +4,14 @@ import LayoutDefault from "../../layouts/LayoutDefault.astro";
 const projects = [
   {
     title: "Polysome",
-    description: "An interactive generative artwork built from flowing fields of interacting motes.",
+    description:
+      "An interactive generative artwork built from flowing fields of interacting motes.",
     href: "/art/polysome",
   },
   {
     title: "QQL",
-    description: "A personal selection from the collaborative generative art project I created with Tyler Hobbs.",
+    description:
+      "A personal selection from the collaborative generative art project I created with Tyler Hobbs.",
     href: "/art/qql",
   },
 ];
@@ -23,15 +25,13 @@ const projects = [
     <h1>Art</h1>
 
     <div class="projects">
-      {
-        projects.map((project) => (
-          <a class="project" href={project.href}>
-            <h2>{project.title}</h2>
-            <p>{project.description}</p>
-            <span aria-hidden="true">View project →</span>
-          </a>
-        ))
-      }
+      {projects.map((project) => (
+        <a class="project" href={project.href}>
+          <h2>{project.title}</h2>
+          <p>{project.description}</p>
+          <span aria-hidden="true">View project →</span>
+        </a>
+      ))}
     </div>
   </article>
 </LayoutDefault>
