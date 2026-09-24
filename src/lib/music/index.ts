@@ -61,7 +61,8 @@ export type Fingering = {
   }[];
   voicing: Voicing;
   startFret: number;
-  source: "library" | "generated";
+  source: "library" | "transposed" | "generated";
+  transposition?: { sourceId: string; semitones: number };
   library?: { chord: string; position: number; revision: string };
   score: number;
 };
@@ -411,7 +412,7 @@ export function findFingerings(
   chord: Chord,
   instrument: FrettedInstrument = BARITONE,
 ): Fingering[] {
-  const cacheKey = `${instrument.id}/${chord.id}`;
+  const cacheKey = `${JSON.stringify(instrument)}/${chord.id}`;
   const cached = fingeringCache.get(cacheKey);
   if (cached) return cached;
   const isBaritone =
