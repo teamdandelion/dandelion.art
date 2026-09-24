@@ -65,16 +65,18 @@ export default function UkeDiagram({
           className={fret === 0 && start === 1 ? "ca-nut" : "ca-fret"}
         />
       ))}
-      {(start > 1 || reference) && (
-        <text
-          x={left + spacing * (instrument.courses.length - 1) + 16}
-          y={top + fretHeight / 2 + 4}
-          textAnchor="start"
-          className="ca-fret-number"
-        >
-          {start}
-        </text>
-      )}
+      {(start > 1 || reference) &&
+        Array.from({ length: reference ? rows : 1 }, (_, i) => (
+          <text
+            key={`number-${start + i}`}
+            x={left + spacing * (instrument.courses.length - 1) + 16}
+            y={top + (i + 0.5) * fretHeight + 4}
+            textAnchor="start"
+            className="ca-fret-number"
+          >
+            {start + i}
+          </text>
+        ))}
       {Array.from({ length: rows }, (_, i) => start + i).map((fret) => {
         const octaveFret = fret % 12;
         const marked = [
@@ -193,11 +195,24 @@ export default function UkeDiagram({
               textAnchor="middle"
               className="ca-string-name"
             >
-              {reference
-                ? voice
-                  ? formatNote(voice.pitch.note)
-                  : "—"
-                : stringNames[index]}
+              {reference ? (
+                voice ? (
+                  <>
+                    {formatNote(voice.pitch.note)}
+                    <tspan
+                      className="cs-note-octave"
+                      baselineShift="sub"
+                      fontSize="0.7em"
+                    >
+                      {voice.pitch.octave}
+                    </tspan>
+                  </>
+                ) : (
+                  "—"
+                )
+              ) : (
+                stringNames[index]
+              )}
             </text>
             {!compact && !reference && (
               <text

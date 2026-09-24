@@ -77,53 +77,57 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
               reference
             />
           </a>
-          <span className="cs-frets">
-            {fingering.frets.map((f) => f ?? "×").join(" · ")}
-          </span>
-          <div className="cs-voicing-controls">
-            <button
-              type="button"
-              aria-label={`Previous ${chord.symbol} voicing`}
-              disabled={filtered.length < 2}
-              onClick={() =>
-                setIndex((index + filtered.length - 1) % filtered.length)
-              }
-            >
-              ←
-            </button>
-            <span aria-live="polite">
-              {(index % filtered.length) + 1}/{filtered.length}
-            </span>
-            <button
-              type="button"
-              aria-label={`Next ${chord.symbol} voicing`}
-              disabled={filtered.length < 2}
-              onClick={() => setIndex((index + 1) % filtered.length)}
-            >
-              →
-            </button>
-          </div>
-          <fieldset
-            className="cs-bass-notes"
-            aria-label={`Bass note for ${chord.symbol}`}
-          >
-            {chord.tones.map((t) => (
+          <div className="cs-card-controls">
+            <div className="cs-voicing-controls">
               <button
                 type="button"
-                key={t.degree}
-                aria-label={`${formatNote(t.note)} bass for ${chord.symbol}`}
-                aria-pressed={bass === String(pitchClassNumber(t.note))}
-                disabled={!availableBass.has(pitchClassNumber(t.note))}
-                onClick={() => {
-                  const next = String(pitchClassNumber(t.note));
-                  setBass(bass === next ? "any" : next);
-                  setIndex(0);
-                }}
+                aria-label={`Previous ${chord.symbol} voicing`}
+                disabled={filtered.length < 2}
+                onClick={() =>
+                  setIndex((index + filtered.length - 1) % filtered.length)
+                }
               >
-                {formatNote(t.note)}
+                ←
               </button>
-            ))}
-          </fieldset>
+              <span aria-live="polite">
+                {(index % filtered.length) + 1}/{filtered.length}
+              </span>
+              <button
+                type="button"
+                aria-label={`Next ${chord.symbol} voicing`}
+                disabled={filtered.length < 2}
+                onClick={() => setIndex((index + 1) % filtered.length)}
+              >
+                →
+              </button>
+            </div>
+            <fieldset
+              className="cs-bass-notes"
+              aria-label={`Bass note for ${chord.symbol}`}
+            >
+              {chord.tones.map((t) => (
+                <button
+                  type="button"
+                  key={t.degree}
+                  className={
+                    bass === "any" && t.degree === 1
+                      ? "cs-root-hint"
+                      : undefined
+                  }
+                  aria-label={`${formatNote(t.note)} bass for ${chord.symbol}`}
+                  aria-pressed={bass === String(pitchClassNumber(t.note))}
+                  disabled={!availableBass.has(pitchClassNumber(t.note))}
+                  onClick={() => {
+                    const next = String(pitchClassNumber(t.note));
+                    setBass(bass === next ? "any" : next);
+                    setIndex(0);
+                  }}
+                >
+                  {formatNote(t.note)}
+                </button>
+              ))}
+            </fieldset>
+          </div>
         </>
       ) : (
         <span>No shape in this range</span>
