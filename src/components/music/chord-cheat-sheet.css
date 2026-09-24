@@ -2,6 +2,45 @@
   max-width: 760px;
   margin-top: -16px;
 }
+.cs-card-heading,
+.cs-voicing-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+.cs-card-heading a {
+  min-width: 0;
+}
+.cs-card-heading .cs-help-button {
+  width: 32px;
+  min-width: 32px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+}
+.cs-voicing-controls button {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 6px;
+  border: 1px solid var(--ca-line);
+  background: var(--ca-paper);
+  color: var(--ca-accent);
+}
+.cs-voicing-controls span,
+.cs-provenance {
+  font-size: 11px;
+  color: var(--ca-muted);
+}
+.cs-chord select {
+  width: 100%;
+  min-height: 44px;
+  font-size: 14px;
+  background: var(--ca-paper);
+  color: var(--ca-ink);
+  border: 1px solid var(--ca-line);
+  border-radius: 6px;
+}
 .cs-intro h1 {
   font:
     400 clamp(1.65rem, 4vw, 2.25rem) / 1.15 Georgia,

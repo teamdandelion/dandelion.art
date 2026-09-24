@@ -1,10 +1,13 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
+  bassPitch,
   CHORD_QUALITIES,
   type ChordQuality,
   formatNote,
   parseNote,
+  pitchClassNumber,
 } from "../../lib/music";
+import { voicingSymbol } from "../../lib/music/analysis";
 import {
   allChordRows,
   CHEAT_SHEET_COLUMNS,
@@ -12,6 +15,8 @@ import {
   ROOT_ALIASES,
   type SheetEntry,
 } from "../../lib/music/cheat-sheet";
+import { searchVoicings } from "../../lib/music/voicing-search";
+import ChordTheoryHelp from "./ChordTheoryHelp";
 import { useMusicPreferences } from "./MusicSettings";
 import UkeDiagram from "./UkeDiagram";
 import "./chord-atlas.css";
@@ -20,31 +25,105 @@ import "./chord-cheat-sheet.css";
 type Help = "practice" | "nearby";
 
 function ChordCard({ entry }: { entry: SheetEntry }) {
-  const { chord, fingering, href, instrument } = entry;
-  if (!fingering)
-    return (
-      <a className="cs-chord" href={href}>
-        <h3>{chord.symbol}</h3>
-        <span>No shape in this range</span>
-      </a>
-    );
   return (
-    <a
-      className="cs-chord"
-      href={href}
-      aria-label={`${chord.name} on ${instrument.name}: frets ${fingering.frets.map((fret) => (fret === null ? "muted" : fret === 0 ? "open" : fret)).join(", ")}. Fingers ${fingering.fingers.map((finger) => finger ?? "none").join(", ")}.${fingering.barres.map((barre) => ` Barre finger ${barre.finger} at fret ${barre.fret}, strings ${barre.fromCourse} to ${barre.toCourse}.`).join("")} Open in chord atlas.`}
-    >
-      <h3>{chord.symbol}</h3>
-      <UkeDiagram
-        chord={chord}
-        fingering={fingering}
-        instrument={instrument}
-        reference
-      />
-      <span className="cs-frets" aria-hidden="true">
-        {fingering.frets.map((fret) => fret ?? "×").join(" · ")}
-      </span>
-    </a>
+    <VoicingCard key={entry.chord.id + entry.instrument.id} entry={entry} />
+  );
+}
+
+function VoicingCard({ entry }: { entry: SheetEntry }) {
+  const { chord, instrument } = entry;
+  const shapes = useMemo(
+    () => searchVoicings(chord, instrument),
+    [chord, instrument],
+  );
+  const [index, setIndex] = useState(0);
+  const [bass, setBass] = useState("any");
+  const filtered = shapes.filter(
+    (s) =>
+      bass === "any" ||
+      pitchClassNumber(bassPitch(s.voicing).note) === Number(bass),
+  );
+  const fingering = filtered[index % Math.max(1, filtered.length)];
+  const symbol = fingering
+    ? voicingSymbol(chord, fingering.voicing)
+    : chord.symbol;
+  const href = `/music/chords?chord=${encodeURIComponent(symbol)}`;
+  const availableBass = new Set(
+    shapes.map((s) => pitchClassNumber(bassPitch(s.voicing).note)),
+  );
+  return (
+    <div className="cs-chord">
+      <div className="cs-card-heading">
+        <a href={href}>
+          <h3>{symbol}</h3>
+        </a>
+        <ChordTheoryHelp chord={chord} />
+      </div>
+      {fingering ? (
+        <>
+          <a href={href} aria-label={`Open ${symbol} in chord atlas`}>
+            <UkeDiagram
+              chord={chord}
+              fingering={fingering}
+              instrument={instrument}
+              reference
+            />
+          </a>
+          <span className="cs-frets">
+            {fingering.frets.map((f) => f ?? "×").join(" · ")}
+          </span>
+          <div className="cs-voicing-controls">
+            <button
+              type="button"
+              aria-label={`Previous ${chord.symbol} voicing`}
+              disabled={filtered.length < 2}
+              onClick={() =>
+                setIndex((index + filtered.length - 1) % filtered.length)
+              }
+            >
+              ←
+            </button>
+            <span aria-live="polite">
+              {(index % filtered.length) + 1}/{filtered.length}
+            </span>
+            <button
+              type="button"
+              aria-label={`Next ${chord.symbol} voicing`}
+              disabled={filtered.length < 2}
+              onClick={() => setIndex((index + 1) % filtered.length)}
+            >
+              →
+            </button>
+          </div>
+          <select
+            aria-label={`Bass note for ${chord.symbol}`}
+            value={bass}
+            onChange={(e) => {
+              setBass(e.target.value);
+              setIndex(0);
+            }}
+          >
+            <option value="any">Any bass</option>
+            {chord.tones.map((t) => (
+              <option
+                key={t.degree}
+                value={pitchClassNumber(t.note)}
+                disabled={!availableBass.has(pitchClassNumber(t.note))}
+              >
+                {formatNote(t.note)} bass
+              </option>
+            ))}
+          </select>
+          {fingering.source === "generated" && (
+            <small className="cs-provenance">
+              Generated · fingers unassigned
+            </small>
+          )}
+        </>
+      ) : (
+        <span>No shape in this range</span>
+      )}
+    </div>
   );
 }
 
