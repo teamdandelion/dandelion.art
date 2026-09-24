@@ -47,7 +47,9 @@ const description =
       const height = root.clientHeight;
       const xDim = width >= height ? 1000 : (width / height) * 1000;
       const yDim = width >= height ? (height / width) * 1000 : 1000;
-      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      );
 
       const instance = new Instance(randomSeed(), xDim, yDim, {
         maxFps: 30,

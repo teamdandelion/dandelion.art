@@ -10,38 +10,108 @@ import LayoutDefault from "../../layouts/LayoutDefault.astro";
   <article class="music-index">
     <h1>Music</h1>
     <a class="music-app" href="/music/cheat-sheet">
-      <div class="app-mark" aria-hidden="true">C<span> Cm C7</span></div>
+      <div class="app-mark" aria-hidden="true">
+        C<span> Cm C7</span>
+      </div>
       <div>
         <h2>Chord cheat sheet</h2>
         <p>Chords by key, with a full chromatic reference.</p>
-        <span class="open">Open the sheet <span aria-hidden="true">↗</span></span>
+        <span class="open">
+          Open the sheet <span aria-hidden="true">↗</span>
+        </span>
       </div>
     </a>
     <a class="music-app" href="/music/chords">
-      <div class="app-mark" aria-hidden="true">C<span> E G</span></div>
+      <div class="app-mark" aria-hidden="true">
+        C<span> E G</span>
+      </div>
       <div>
         <h2>Chord atlas</h2>
         <p>Fingerings, piano voicings, and chord progressions.</p>
-        <span class="open">Open the atlas <span aria-hidden="true">↗</span></span>
+        <span class="open">
+          Open the atlas <span aria-hidden="true">↗</span>
+        </span>
       </div>
     </a>
     <a class="music-app" href="/music/fretboard">
-      <div class="app-mark" aria-hidden="true">♯<span> ♭</span></div>
-      <div><h2>Fretboard</h2><p>Explore notes and identify chords from a shape.</p><span class="open">Open the fretboard ↗</span></div>
+      <div class="app-mark" aria-hidden="true">
+        ♯<span> ♭</span>
+      </div>
+      <div>
+        <h2>Fretboard</h2>
+        <p>Explore notes and identify chords from a shape.</p>
+        <span class="open">Open the fretboard ↗</span>
+      </div>
     </a>
   </article>
 </LayoutDefault>
 
 <style>
-  .music-index { max-width: 52rem; margin: 3rem auto; }
-  h1 { margin: 0.6rem 0; font-family: Georgia, serif; font-size: clamp(3rem, 8vw, 5rem); font-weight: 400; line-height: 1.1; }
-  .music-app { display: grid; grid-template-columns: 7rem 1fr; gap: 2rem; margin: 2.5rem 0; padding: 2rem; border: 1px solid color-mix(in oklch, currentColor 20%, transparent); border-radius: 1rem; background: color-mix(in oklch, currentColor 3%, transparent); }
-  .music-app:hover { border-color: currentColor; }
-  .music-app:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
-  .app-mark { align-self: center; font-family: Georgia, serif; font-size: 4rem; }
-  .app-mark span { font-size: 1.4rem; opacity: 0.5; }
-  h2 { margin: 0.5rem 0; font-family: Georgia, serif; font-size: 2rem; font-weight: 400; }
-  .music-app p { max-width: 30rem; line-height: 1.6; opacity: 0.75; }
-  .open { display: inline-block; margin-top: 1.5rem; text-decoration: underline; text-underline-offset: 0.25em; }
-  @media (max-width: 560px) { .music-index { margin-top: 1.5rem; } .music-app { grid-template-columns: 1fr; gap: 0.8rem; padding: 1.5rem; } .app-mark { font-size: 3rem; } }
+  .music-index {
+    max-width: 52rem;
+    margin: 3rem auto;
+  }
+  h1 {
+    margin: 0.6rem 0;
+    font-family: Georgia, serif;
+    font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: 400;
+    line-height: 1.1;
+  }
+  .music-app {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: 2rem;
+    margin: 2.5rem 0;
+    padding: 2rem;
+    border: 1px solid color-mix(in oklch, currentColor 20%, transparent);
+    border-radius: 1rem;
+    background: color-mix(in oklch, currentColor 3%, transparent);
+  }
+  .music-app:hover {
+    border-color: currentColor;
+  }
+  .music-app:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 5px;
+  }
+  .app-mark {
+    align-self: center;
+    font-family: Georgia, serif;
+    font-size: 4rem;
+  }
+  .app-mark span {
+    font-size: 1.4rem;
+    opacity: 0.5;
+  }
+  h2 {
+    margin: 0.5rem 0;
+    font-family: Georgia, serif;
+    font-size: 2rem;
+    font-weight: 400;
+  }
+  .music-app p {
+    max-width: 30rem;
+    line-height: 1.6;
+    opacity: 0.75;
+  }
+  .open {
+    display: inline-block;
+    margin-top: 1.5rem;
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+  @media (max-width: 560px) {
+    .music-index {
+      margin-top: 1.5rem;
+    }
+    .music-app {
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+      padding: 1.5rem;
+    }
+    .app-mark {
+      font-size: 3rem;
+    }
+  }
 </style>

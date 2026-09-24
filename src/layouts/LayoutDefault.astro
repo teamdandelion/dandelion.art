@@ -29,24 +29,23 @@ const isMusic = pathname === "/music" || pathname.startsWith("/music/");
 <html lang="en" data-palette={DEFAULT_PALETTE} data-theme="light">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" href={logoUrl} />
-    {
-      Astro.url.pathname === "/" && (
-        <link rel="preload" as="image" href="/art/qql-276.png" />
-      )
-    }
+    {Astro.url.pathname === "/" && (
+      <link rel="preload" as="image" href="/art/qql-276.png" />
+    )}
     <title>{title}</title>
     <PaletteHead />
   </head>
   <body>
     <div class="min-h-screen bg-base-100" data-page-content>
       <header data-site-header class="border-b border-base-300 bg-base-200">
-        <div
-          class="max-w-5xl mx-auto px-5 py-2 flex items-center justify-between"
-        >
+        <div class="max-w-5xl mx-auto px-5 py-2 flex items-center justify-between">
           <a href="/" class="flex items-center">
             <img
               src={logoUrl}
@@ -58,7 +57,10 @@ const isMusic = pathname === "/music" || pathname.startsWith("/music/");
           </a>
           <div class="flex items-center gap-6">
             <nav class="flex items-center gap-6">
-              <a href="/" aria-current={Astro.url.pathname === "/" ? "page" : undefined}>
+              <a
+                href="/"
+                aria-current={Astro.url.pathname === "/" ? "page" : undefined}
+              >
                 Home
               </a>
               <a
@@ -72,8 +74,24 @@ const isMusic = pathname === "/music" || pathname.startsWith("/music/");
               >
                 Art
               </a>
-              <a href="/music" class="music-link" aria-label="Music" title="Music" aria-current={isMusic ? "page" : undefined}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <a
+                href="/music"
+                class="music-link"
+                aria-label="Music"
+                title="Music"
+                aria-current={isMusic ? "page" : undefined}
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
                   <path d="M9 18V5l12-2v13M9 9l12-2" />
                   <ellipse cx="6" cy="18" rx="3" ry="3" />
                   <ellipse cx="18" cy="16" rx="3" ry="3" />
@@ -84,7 +102,9 @@ const isMusic = pathname === "/music" || pathname.startsWith("/music/");
           </div>
         </div>
       </header>
-      <main class:list={["max-w-5xl mx-auto px-5 py-8", { "music-page": isMusic }]}>
+      <main
+        class:list={["max-w-5xl mx-auto px-5 py-8", { "music-page": isMusic }]}
+      >
         <slot />
       </main>
     </div>
@@ -95,6 +115,15 @@ const isMusic = pathname === "/music" || pathname.startsWith("/music/");
 </html>
 
 <style>
-  .music-link { display:grid; place-items:center; min-width:44px; min-height:44px; }
-  .music-link:focus-visible { outline:2px solid var(--site-accent); outline-offset:2px; border-radius:6px; }
+  .music-link {
+    display: grid;
+    place-items: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .music-link:focus-visible {
+    outline: 2px solid var(--site-accent);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
 </style>

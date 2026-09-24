@@ -40,7 +40,9 @@
   const title = lightbox
     ? lightbox.querySelector<HTMLElement>("[data-qql-lightbox-title]")
     : null;
-  const pageContent = document.querySelector<HTMLElement>("[data-page-content]");
+  const pageContent = document.querySelector<HTMLElement>(
+    "[data-page-content]",
+  );
   const stage = lightbox
     ? lightbox.querySelector<HTMLElement>("[data-qql-lightbox-stage]")
     : null;
@@ -74,7 +76,12 @@
     let activePointerType = "";
     let frameRequest = 0;
     let latestPointer: { clientX: number; clientY: number } | null = null;
-    let imageBounds: { left: number; top: number; width: number; height: number } | null = null;
+    let imageBounds: {
+      left: number;
+      top: number;
+      width: number;
+      height: number;
+    } | null = null;
     let lensSize = 0;
     const root = document.documentElement;
 
@@ -82,7 +89,9 @@
       root.dataset.qqlInputModality = "pointer";
     };
 
-    document.addEventListener("pointerdown", markPointerInput, { capture: true });
+    document.addEventListener("pointerdown", markPointerInput, {
+      capture: true,
+    });
     document.addEventListener("touchstart", markPointerInput, {
       capture: true,
       passive: true,
@@ -114,7 +123,10 @@
       const radius = lensSize / 2;
       const rawX = latestPointer.clientX - imageBounds.left;
       const rawY = latestPointer.clientY - imageBounds.top;
-      const displayX = Math.min(imageBounds.width - radius, Math.max(radius, rawX));
+      const displayX = Math.min(
+        imageBounds.width - radius,
+        Math.max(radius, rawX),
+      );
       const offset = activePointerType === "mouse" ? 0 : touchOffset;
       const minDisplayY = Math.max(0, radius + 8 - imageBounds.top);
       const displayY = Math.min(
@@ -299,8 +311,10 @@
     z-index: 100;
     inset: 0;
     margin: 0;
-    padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right))
-      max(0.75rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
+    padding: max(0.75rem, env(safe-area-inset-top))
+      max(0.75rem, env(safe-area-inset-right))
+      max(0.75rem, env(safe-area-inset-bottom))
+      max(0.75rem, env(safe-area-inset-left));
     overflow: hidden;
     background: rgb(3 1 18);
   }
@@ -342,7 +356,9 @@
     max-width: 100%;
     height: auto;
     max-height: calc(
-      100dvh - max(1.5rem, env(safe-area-inset-top) + env(safe-area-inset-bottom)) - 2.4rem
+      100dvh -
+        max(1.5rem, env(safe-area-inset-top) + env(safe-area-inset-bottom)) -
+        2.4rem
     );
     object-fit: contain;
     pointer-events: none;
