@@ -8,8 +8,25 @@ import {
 } from "../src/lib/music/index.ts";
 import {
   movableFingerings,
+  searchVoicings,
   transposeShape,
 } from "../src/lib/music/voicing-search.ts";
+
+test("bass-targeted search fills G/B and cache values cannot be corrupted", () => {
+  const chord = makeChord("G", "major");
+  const shapes = searchVoicings(chord, BARITONE, { bass: 11 });
+  assert.ok(shapes.length);
+  for (const s of shapes)
+    assert.equal(
+      Math.min(...s.voicing.voices.map((v) => midi(v.pitch))) % 12,
+      11,
+    );
+  shapes[0].frets[0] = 99;
+  assert.notEqual(
+    searchVoicings(chord, BARITONE, { bass: 11 })[0].frets[0],
+    99,
+  );
+});
 
 test("movable search preserves canonical order and deduplicates physical positions", () => {
   const chord = makeChord("G", "major");

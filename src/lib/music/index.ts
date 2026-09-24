@@ -4,6 +4,7 @@ import {
   type Interval,
   QUALITY_ALIASES,
 } from "./catalog.ts";
+import { generateFingerings } from "./generation.ts";
 
 export {
   CHORD_QUALITIES,
@@ -491,46 +492,7 @@ export function findFingerings(
     fingeringCache.set(cacheKey, result);
     return result;
   }
-  const allowed = new Set(
-    chord.tones.map((tone) => pitchClassNumber(tone.note)),
-  );
-  const choices = instrument.courses.map((course, index) => {
-    const frets: (number | null)[] = [];
-    for (let fret = 0; fret <= 12; fret++)
-      if (
-        course.strings.every((string) =>
-          allowed.has(mod(midi(string.open) + fret, 12)),
-        )
-      )
-        frets.push(fret);
-    // Only mute the lowest string; inner mutes make strumming harder to interpret.
-    if (index === 0) frets.push(null);
-    return frets;
-  });
-  const candidates: Fingering[] = [];
-  const visit = (frets: (number | null)[]) => {
-    if (frets.length < instrument.courses.length) {
-      for (const fret of choices[frets.length]) visit([...frets, fret]);
-      return;
-    }
-    const stopped = frets.filter(
-      (fret): fret is number => fret !== null && fret > 0,
-    );
-    const min = stopped.length ? Math.min(...stopped) : 0;
-    const max = stopped.length ? Math.max(...stopped) : 0;
-    if (max - min > 3) return;
-    const shape = realizeFingering(chord, frets, instrument);
-    if (voicingCoverage(shape.voicing, chord).omitted.length) return;
-    shape.score =
-      max * 2 +
-      (max - min) * 3 +
-      stopped.length +
-      (frets.includes(null) ? 8 : 0);
-    candidates.push(shape);
-  };
-  visit([]);
-  candidates.sort((a, b) => a.score - b.score || a.id.localeCompare(b.id));
-  const result = candidates.slice(0, 12);
+  const result = generateFingerings(chord, instrument, 12).slice(0, 12);
   fingeringCache.set(cacheKey, result);
   return result;
 }
