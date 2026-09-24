@@ -489,8 +489,11 @@ export function findFingerings(
       });
       return shape;
     });
-    fingeringCache.set(cacheKey, result);
-    return result;
+    const available = result.length
+      ? result
+      : generateFingerings(chord, instrument, 12).slice(0, 12);
+    fingeringCache.set(cacheKey, available);
+    return available;
   }
   const result = generateFingerings(chord, instrument, 12).slice(0, 12);
   fingeringCache.set(cacheKey, result);

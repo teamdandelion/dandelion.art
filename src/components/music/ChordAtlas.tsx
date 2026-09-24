@@ -22,6 +22,7 @@ import {
   ROOT_OPTIONS,
   type Voicing,
 } from "../../lib/music";
+import ChordTheoryHelp from "./ChordTheoryHelp";
 import "./chord-atlas.css";
 import { useMusicPreferences } from "./MusicSettings";
 import ProgressionExplorer from "./ProgressionExplorer";
@@ -405,7 +406,7 @@ export default function ChordAtlas() {
             <h2 id={`${id}-explorer`} ref={explorerHeadingRef} tabIndex={-1}>
               {chord.symbol} <span>{qualityInfo?.name}</span>
             </h2>
-            <p className="ca-help">{qualityInfo?.description}</p>
+            <ChordTheoryHelp chord={chord} />
           </div>
           <fieldset
             className="ca-tones"

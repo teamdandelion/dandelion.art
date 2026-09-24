@@ -21,6 +21,13 @@ type Help = "practice" | "nearby";
 
 function ChordCard({ entry }: { entry: SheetEntry }) {
   const { chord, fingering, href, instrument } = entry;
+  if (!fingering)
+    return (
+      <a className="cs-chord" href={href}>
+        <h3>{chord.symbol}</h3>
+        <span>No shape in this range</span>
+      </a>
+    );
   return (
     <a
       className="cs-chord"
