@@ -124,11 +124,6 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
               </button>
             ))}
           </fieldset>
-          {fingering.source === "generated" && (
-            <small className="cs-provenance">
-              Generated · fingers unassigned
-            </small>
-          )}
         </>
       ) : (
         <span>No shape in this range</span>
