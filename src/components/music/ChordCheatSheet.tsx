@@ -4,6 +4,7 @@ import {
   type ChordGroup,
   chordFormula,
   formatNote,
+  INSTRUMENTS,
   makeChord,
   parseNote,
   pitchClassNumber,
@@ -63,7 +64,7 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
     <div className="cs-chord">
       <div className="cs-card-heading">
         <a href={href}>
-          <h3>{symbol}</h3>
+          <h3>{chord.symbol}</h3>
         </a>
         <ChordTheoryHelp chord={chord} />
       </div>
@@ -110,7 +111,9 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
                   type="button"
                   key={t.degree}
                   className={
-                    bass === "any" && t.degree === 1
+                    bass === "any" &&
+                    pitchClassNumber(t.note) ===
+                      pitchClassNumber(bassPitch(fingering.voicing).note)
                       ? "cs-root-hint"
                       : undefined
                   }
@@ -138,7 +141,7 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
 
 export default function ChordCheatSheet() {
   const id = useId();
-  const { tonic, mode, instrument } = useMusicPreferences();
+  const { tonic, mode, instrument, update } = useMusicPreferences();
   const [view, setView] = useState<"key" | "all">("key");
   const [groups, setGroups] = useState<ChordGroup[]>(DEFAULT_GROUPS);
   const [groupsLoaded, setGroupsLoaded] = useState(false);
@@ -213,7 +216,20 @@ export default function ChordCheatSheet() {
             Chord atlas ↗
           </a>
         </nav>
-        <h1>{instrument.name} cheat sheet</h1>
+        <h1 className="cs-title">
+          <select
+            aria-label="Instrument"
+            value={instrument.id}
+            onChange={(event) => update({ instrumentId: event.target.value })}
+          >
+            {INSTRUMENTS.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.id === "baritone-dgbe" ? "Baritone uke" : item.name}
+              </option>
+            ))}
+          </select>{" "}
+          Cheat Sheet
+        </h1>
       </header>
       <div
         className={`cs-controls${view === "all" ? " cs-controls--all" : ""}`}

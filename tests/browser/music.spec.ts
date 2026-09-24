@@ -1,5 +1,33 @@
 import { expect, test } from "@playwright/test";
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    if (!localStorage.getItem("music.preferences.v1"))
+      localStorage.setItem(
+        "music.preferences.v1",
+        JSON.stringify({
+          instrumentId: "baritone-dgbe",
+          tonic: "G",
+          mode: "major",
+        }),
+      );
+  });
+});
+
+test("new visitors get guitar and heading selection persists", async ({
+  browser,
+}) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto("/music/cheat-sheet");
+  await expect(page.locator("astro-island[ssr]")).toHaveCount(0);
+  await expect(page.locator(".cs-title select")).toHaveValue("guitar-eadgbe");
+  await page.locator(".cs-title select").selectOption("baritone-dgbe");
+  await page.reload();
+  await expect(page.locator(".cs-title select")).toHaveValue("baritone-dgbe");
+  await context.close();
+});
+
 test("fretboard chord link preserves the exact open and muted positions", async ({
   page,
 }) => {
@@ -90,11 +118,15 @@ test("voicing controls, theory help and slash link work on mobile", async ({
     page.locator('astro-island[component-export="default"][ssr]'),
   ).toHaveCount(0);
   const card = page.locator(".cs-chord").first();
-  await expect(card.locator("h3")).toHaveText("G/D");
+  await expect(card.locator("h3")).toHaveText("G");
   await card.getByRole("button", { name: "B bass for G", exact: true }).click();
-  await expect(card.locator("h3")).toHaveText("G/B");
+  await expect(
+    card.getByRole("button", { name: "B bass for G", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
   await card.getByRole("button", { name: "B bass for G", exact: true }).click();
-  await expect(card.locator("h3")).toHaveText("G/D");
+  await expect(
+    card.getByRole("button", { name: "B bass for G", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
   await card.getByRole("button", { name: "B bass for G", exact: true }).click();
   await card.getByRole("button", { name: "About major", exact: true }).click();
   await expect(card.getByRole("dialog")).toBeVisible();
@@ -105,7 +137,7 @@ test("voicing controls, theory help and slash link work on mobile", async ({
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
-  await card.getByRole("link", { name: "G/B", exact: true }).click();
+  await card.getByRole("link", { name: "G", exact: true }).click();
   await expect(page.locator(".ca-explorer h2").first()).toContainText("G/B");
 });
 
@@ -116,8 +148,10 @@ test("compact sheet layout at phone and tablet widths", async ({ page }) => {
     await page.setViewportSize({ width, height: 850 });
     await expect(page.locator(".cs-family-filters")).not.toBeVisible();
     const card = page.locator(".cs-chord").first();
-    const bounds = await card.boundingBox();
-    expect(bounds?.y).toBeLessThan(400);
+    await expect(card).toBeVisible();
+    await expect
+      .poll(async () => (await card.boundingBox())?.y ?? Infinity)
+      .toBeLessThan(400);
     await expect(card.locator("svg circle[r='2.5']")).toHaveCount(1);
     expect(
       await page.evaluate(

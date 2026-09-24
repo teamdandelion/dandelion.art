@@ -9,6 +9,7 @@ import {
 import {
   BARITONE,
   formatNote,
+  GUITAR,
   INSTRUMENTS,
   parseNote,
   pitchClassNumber,
@@ -59,7 +60,7 @@ export function useMusicPreferences() {
   return {
     ...preferences,
     instrument:
-      INSTRUMENTS.find((i) => i.id === preferences.instrumentId) ?? BARITONE,
+      INSTRUMENTS.find((i) => i.id === preferences.instrumentId) ?? GUITAR,
     update,
   };
 }

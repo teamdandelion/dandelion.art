@@ -1,4 +1,4 @@
-import { BARITONE, INSTRUMENTS, type Key } from "./index.ts";
+import { GUITAR, INSTRUMENTS, type Key } from "./index.ts";
 
 export const MUSIC_STORAGE_KEY = "music.preferences.v1";
 export const KEY_ROOTS = {
@@ -24,7 +24,7 @@ export type MusicPreferences = {
   mode: Key["mode"];
 };
 export const DEFAULT_PREFERENCES: MusicPreferences = {
-  instrumentId: BARITONE.id,
+  instrumentId: GUITAR.id,
   tonic: "G",
   mode: "major",
 };
@@ -36,7 +36,7 @@ export function parsePreferences(raw: string | null): MusicPreferences {
     return {
       instrumentId: INSTRUMENTS.some((i) => i.id === value?.instrumentId)
         ? value.instrumentId
-        : BARITONE.id,
+        : GUITAR.id,
       tonic: KEY_ROOTS[mode].includes(value?.tonic) ? value.tonic : "G",
       mode,
     };

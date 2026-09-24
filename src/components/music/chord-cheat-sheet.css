@@ -119,6 +119,25 @@
     serif;
   margin: 4px 0 12px;
 }
+.cs-intro .cs-title {
+  font-size: clamp(1.35rem, 3vw, 2.25rem);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cs-title select {
+  font: inherit;
+  font-size: 0.85em;
+  color: var(--ca-ink);
+  background: var(--ca-paper);
+  border: 1px solid var(--ca-line);
+  border-radius: 6px;
+  padding: 6px 8px;
+  min-height: 44px;
+  max-width: 100%;
+  cursor: pointer;
+}
 .cs-nav {
   display: flex;
   justify-content: space-between;
@@ -405,9 +424,10 @@
   color: var(--ca-ink);
 }
 .cs-chord .ca-uke-diagram {
-  background: var(--ca-accent-soft);
+  background: var(--ca-paper);
+  padding: 12px;
   border-radius: 6px;
-  width: 140px;
+  width: 172px;
   max-width: 100%;
   margin: 0 auto;
 }
