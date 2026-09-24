@@ -1,20 +1,28 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   bassPitch,
-  CHORD_QUALITIES,
-  type ChordQuality,
+  type ChordGroup,
+  chordFormula,
   formatNote,
+  makeChord,
   parseNote,
   pitchClassNumber,
 } from "../../lib/music";
 import { voicingSymbol } from "../../lib/music/analysis";
 import {
-  allChordRows,
-  CHEAT_SHEET_COLUMNS,
   practiceSheet,
   ROOT_ALIASES,
   type SheetEntry,
 } from "../../lib/music/cheat-sheet";
+import {
+  DEFAULT_GROUPS,
+  dictionaryRows,
+  GROUP_STORAGE_KEY,
+  groupExample,
+  PRACTICE_GROUPS,
+  parseGroups,
+  practiceRows,
+} from "../../lib/music/practice";
 import { searchVoicings } from "../../lib/music/voicing-search";
 import ChordTheoryHelp from "./ChordTheoryHelp";
 import { useMusicPreferences } from "./MusicSettings";
@@ -131,7 +139,25 @@ export default function ChordCheatSheet() {
   const id = useId();
   const { tonic, mode, instrument } = useMusicPreferences();
   const [view, setView] = useState<"key" | "all">("key");
-  const [quality, setQuality] = useState<ChordQuality | "common">("common");
+  const [groups, setGroups] = useState<ChordGroup[]>(DEFAULT_GROUPS);
+  const [groupsLoaded, setGroupsLoaded] = useState(false);
+  useEffect(() => {
+    try {
+      setGroups(parseGroups(localStorage.getItem(GROUP_STORAGE_KEY)));
+    } catch {}
+    setGroupsLoaded(true);
+  }, []);
+  useEffect(() => {
+    if (groupsLoaded) {
+      try {
+        localStorage.setItem(GROUP_STORAGE_KEY, JSON.stringify(groups));
+      } catch {}
+    }
+  }, [groups, groupsLoaded]);
+  const rows = useMemo(
+    () => practiceRows({ tonic: parseNote(tonic), mode }, instrument, groups),
+    [tonic, mode, instrument, groups],
+  );
   const [help, setHelp] = useState<Help | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const helpOpenerRef = useRef<HTMLButtonElement>(null);
@@ -140,8 +166,8 @@ export default function ChordCheatSheet() {
     [tonic, instrument, mode],
   );
   const dictionary = useMemo(
-    () => allChordRows(quality, instrument),
-    [quality, instrument],
+    () => dictionaryRows(instrument, groups),
+    [groups, instrument],
   );
   const keyName = `${formatNote(parseNote(tonic))} ${mode === "major" ? "major" : "minor"}`;
   useEffect(() => {
@@ -207,50 +233,44 @@ export default function ChordCheatSheet() {
             All chords
           </button>
         </fieldset>
-        <div className="cs-selector">
-          {view === "all" && (
-            <>
-              <label className="cs-status" htmlFor={`${id}-quality`}>
-                Chords
-              </label>
-              <select
-                id={`${id}-quality`}
-                value={quality}
-                onChange={(e) =>
-                  setQuality(e.target.value as ChordQuality | "common")
-                }
-              >
-                <option value="common">Major · minor · 7</option>
-                {CHORD_QUALITIES.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-            </>
-          )}
-        </div>
       </div>
+      <fieldset className="cs-family-filters" aria-label="Chord families">
+        {PRACTICE_GROUPS.map((group) => (
+          <div key={group.id}>
+            <button
+              type="button"
+              aria-pressed={groups.includes(group.id)}
+              onClick={() =>
+                setGroups((current) =>
+                  current.includes(group.id)
+                    ? current.length > 1
+                      ? current.filter((g) => g !== group.id)
+                      : current
+                    : [...current, group.id],
+                )
+              }
+            >
+              {group.label}
+            </button>
+            <ChordTheoryHelp chord={makeChord(tonic, groupExample(group.id))} />
+          </div>
+        ))}
+      </fieldset>
       <output className="cs-status" aria-live="polite">
         {view === "key"
-          ? `${keyName}: 7 chord pairs and ${practice.nearby.length} outside-key chords.`
+          ? `${keyName}: ${rows.reduce((n, row) => n + row.entries.length, 0)} chords.`
           : `${dictionary.length * dictionary[0].entries.length} chords across all 12 roots.`}
       </output>
       {view === "key" ? (
         <>
           <h2 className="cs-status">In {keyName}</h2>
           <div className="cs-paired">
-            <div className="cs-key-header">
-              <div className="cs-columns" aria-hidden="true">
-                <span>Triad</span>
-                <span>Seventh</span>
-                <span className="cs-repeated-column">Triad</span>
-                <span className="cs-repeated-column">Seventh</span>
-              </div>
+            <div className="cs-section-heading">
+              <h2>{keyName}</h2>
               {helpButton("practice", "How to practice chords in a key")}
             </div>
             <div className="cs-degree-grid">
-              {practice.rows.map((row) => (
+              {rows.map((row) => (
                 <section
                   key={row.degree}
                   className="cs-row"
@@ -287,7 +307,13 @@ export default function ChordCheatSheet() {
                 <h3>{title}</h3>
                 <div className="cs-nearby-grid">
                   {practice.nearby
-                    .filter((entry) => entry.kind === kind)
+                    .filter(
+                      (entry) =>
+                        entry.kind === kind &&
+                        groups.includes(
+                          chordFormula(entry.chord.quality).group,
+                        ),
+                    )
                     .map((entry) => (
                       <div key={entry.chord.id} className="cs-related">
                         <p className="cs-roman">{entry.roman}</p>
@@ -309,42 +335,20 @@ export default function ChordCheatSheet() {
               </a>
             ))}
           </nav>
-          {quality === "common" ? (
-            <>
-              <div className="cs-columns" aria-hidden="true">
-                {CHEAT_SHEET_COLUMNS.map((column) => (
-                  <span key={column.quality}>{column.label}</span>
+          {dictionary.map(({ root, entries }) => (
+            <section
+              key={root}
+              className="cs-row"
+              aria-labelledby={`root-${root}`}
+            >
+              <h2 id={`root-${root}`}>{ROOT_ALIASES[root] ?? root}</h2>
+              <div className="cs-chords">
+                {entries.map((entry) => (
+                  <ChordCard key={entry.chord.id} entry={entry} />
                 ))}
               </div>
-              {dictionary.map(({ root, entries }) => (
-                <section
-                  key={root}
-                  className="cs-row"
-                  aria-labelledby={`root-${root}`}
-                >
-                  <h2 id={`root-${root}`}>{ROOT_ALIASES[root] ?? root}</h2>
-                  <div className="cs-chords">
-                    {entries.map((entry) => (
-                      <ChordCard key={entry.chord.id} entry={entry} />
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </>
-          ) : (
-            <div className="cs-single-grid">
-              {dictionary.map(({ root, entries }) => (
-                <section
-                  key={root}
-                  className="cs-single"
-                  aria-labelledby={`root-${root}`}
-                >
-                  <h2 id={`root-${root}`}>{ROOT_ALIASES[root] ?? root}</h2>
-                  <ChordCard entry={entries[0]} />
-                </section>
-              ))}
-            </div>
-          )}
+            </section>
+          ))}
         </>
       )}
       <footer className="ca-attribution">
