@@ -1,14 +1,35 @@
 .fretboard-explorer {
   max-width: 860px;
 }
-.fb-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 12px 0;
+.fb-help {
+  float: right;
 }
-.fb-toolbar .cs-help-button {
-  margin-left: auto;
+.fb-help .cs-help-button {
+  border: 0;
+  background: transparent;
+  font-size: 14px;
+}
+.fb-reset-controls {
+  display: flex;
+  gap: 4px;
+  padding-left: 58px;
+  position: sticky;
+  left: 0;
+  width: fit-content;
+}
+.fb-reset-controls button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 2px;
+  border: 1px solid var(--ca-line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ca-muted);
+  font-size: 12px;
+}
+.fb-matches small {
+  font-size: 13px;
+  color: var(--ca-muted);
 }
 .fb-results {
   min-height: 94px;
@@ -104,8 +125,14 @@
   border-left: 3px solid var(--site-muted);
 }
 .fb-note.fb-in-key .fb-note-name {
-  background: color-mix(in srgb, var(--site-secondaryFill) 18%, var(--ca-paper));
-  color: var(--ca-ink);
+  background: color-mix(in srgb, var(--site-muted) 12%, var(--ca-paper));
+  color: var(--site-muted);
+}
+.fb-preview {
+  display: block;
+  min-height: 1.5em;
+  font-size: 13px;
+  color: var(--ca-muted);
 }
 .fb-note.fb-in-chord .fb-note-name {
   background: var(--site-secondaryFill);
@@ -145,6 +172,10 @@
   background: var(--ca-muted);
 }
 @media (max-width: 640px) {
+  .fb-reset-controls {
+    padding: 6px 24px;
+    gap: 8px;
+  }
   .fb-scroll {
     overflow: visible;
     padding-bottom: 6px;

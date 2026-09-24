@@ -20,6 +20,8 @@ import {
   fretboardPitches,
   identifyChords,
   pitchAt,
+  predictFretboard,
+  recognitionLabel,
 } from "../../lib/music/fretboard";
 import { useMusicPreferences } from "./MusicSettings";
 import "./chord-atlas.css";
@@ -53,11 +55,15 @@ function Board({
     };
   }, [helpOpen]);
   const pitches = fretboardPitches(instrument, frets);
-  const soundingNotes = new Set(pitches.map((pitch) => pitch % 12));
+  const predictions = useMemo(
+    () => predictFretboard(instrument, frets, tonalKey),
+    [instrument, frets, tonalKey],
+  );
+  const [preview, setPreview] = useState("");
   const noteList = [...new Set(pitches)]
     .map((p) => formatPitch(pitchAt(p, tonalKey)))
     .join(" · ");
-  const matches = identifyChords(pitches, tonalKey);
+  const matches = identifyChords(pitches, tonalKey, true);
   const scale = new Set(keyScale(tonalKey).map(pitchClassNumber));
   const positions = [null, ...Array.from({ length: 13 }, (_, i) => i)];
   const select = (index: number, fret: number | null) =>
@@ -66,21 +72,7 @@ function Board({
     );
   return (
     <>
-      <div className="fb-toolbar">
-        <button
-          className="ca-button"
-          type="button"
-          onClick={() => setFrets(instrument.courses.map(() => 0))}
-        >
-          Open strings
-        </button>
-        <button
-          className="ca-button"
-          type="button"
-          onClick={() => setFrets(instrument.courses.map(() => null))}
-        >
-          Mute all
-        </button>
+      <div className="fb-help">
         <button
           className="cs-help-button"
           ref={opener}
@@ -99,23 +91,29 @@ function Board({
       >
         {matches.length ? (
           <div className="fb-matches">
-            {matches.map(({ chord, bass }) => (
+            {matches.map(({ chord, bass, coverage }) => (
               <a
                 key={chord.id}
-                href={`/music/chords?chord=${encodeURIComponent(chord.symbol)}`}
+                href={`/music/chords?${new URLSearchParams({ chord: `${chord.symbol}/${bass}`, instrument: instrument.id, frets: frets.map((fret) => fret ?? "x").join(",") })}`}
               >
                 <strong>{chord.symbol}</strong>
                 {pitchClassNumber(chord.root) !==
                   pitchClassNumber(parseNote(bass)) && <span> / {bass}</span>}
+                {coverage?.kind === "omitted" && (
+                  <small> (fifth omitted)</small>
+                )}
               </a>
             ))}
           </div>
         ) : (
           <strong>
-            {pitches.length ? "No exact chord match" : "All strings muted"}
+            {pitches.length ? "No chord match" : "All strings muted"}
           </strong>
         )}
         <p>{noteList || "—"}</p>
+        <output className="fb-preview" aria-live="polite">
+          {preview || "\u00a0"}
+        </output>
       </section>
       <section className="fb-scroll" aria-label="Fretboard">
         <div
@@ -167,7 +165,26 @@ function Board({
                     <button
                       key={fret ?? "mute"}
                       type="button"
-                      className={`fb-note${pitch !== null && scale.has(pitch % 12) ? " fb-in-key" : ""}${pitch !== null && soundingNotes.has(pitch % 12) ? " fb-in-chord" : ""}`}
+                      className={`fb-note${pitch !== null && scale.has(pitch % 12) ? " fb-in-key" : ""}${predictions[index][i].matches.length ? " fb-in-chord" : ""}`}
+                      title={predictions[index][i].matches
+                        .map(recognitionLabel)
+                        .join(" · ")}
+                      onMouseEnter={() =>
+                        setPreview(
+                          predictions[index][i].matches
+                            .map(recognitionLabel)
+                            .join(" · "),
+                        )
+                      }
+                      onMouseLeave={() => setPreview("")}
+                      onFocus={() =>
+                        setPreview(
+                          predictions[index][i].matches
+                            .map(recognitionLabel)
+                            .join(" · "),
+                        )
+                      }
+                      onBlur={() => setPreview("")}
                       aria-pressed={frets[index] === fret}
                       tabIndex={frets[index] === fret ? 0 : -1}
                       aria-label={`String ${course.number}, ${fret === null ? "mute" : fret === 0 ? `open ${label}` : `fret ${fret}, ${label}`}`}
@@ -224,6 +241,22 @@ function Board({
             ))}
           </div>
         </div>
+        <div className="fb-reset-controls">
+          <button
+            type="button"
+            aria-label="Mute all strings"
+            onClick={() => setFrets(instrument.courses.map(() => null))}
+          >
+            × all
+          </button>
+          <button
+            type="button"
+            aria-label="Open all strings"
+            onClick={() => setFrets(instrument.courses.map(() => 0))}
+          >
+            ○ all
+          </button>
+        </div>
       </section>
       <dialog
         ref={help}
@@ -266,30 +299,15 @@ function Board({
               ×
             </button>
           </header>
+          <p>Tap a note to change one string. × mutes it; ○ plays it open.</p>
+          <ul>
+            <li>Purple: selected notes.</li>
+            <li>Blue: a one-string change that forms a recognized chord.</li>
+            <li>Muted color: other notes in your key.</li>
+          </ul>
           <p>
-            On phones, strings run vertically, with string 1 on the right. On
-            wider screens, they run horizontally, with string 1 at the top.
-            Scroll down on a phone or sideways on a laptop for higher frets. Tap
-            one fret per string; unmarked strings stay open. Use × to mute a
-            string, or “Mute all” to build a shape from silence. Arrow keys move
-            along a string: up/down on phones, left/right on wider screens. Side
-            dots mark frets 3, 5, 7, 10, and 12; the double dot marks the
-            octave.
-          </p>
-          <p>
-            Purple marks selected frets; blue marks other positions with the
-            same pitch classes as your sounding notes. Faint blue marks other
-            notes in your selected key. Chord detection uses every sounding
-            string, including open strings, and matches pitch classes exactly
-            against the supported chord vocabulary. Slash names show a bass note
-            other than the root. A shape can have multiple valid names; its
-            musical context decides which is useful.
-          </p>
-          <p>
-            On baritone uke, leave D, G, and B open and fret string 1 at 3:
-            D–G–B–G is G/D, a G chord with D in the bass. “No exact chord match”
-            does not mean the notes are wrong; incomplete chords and other
-            extensions are not named yet.
+            G/B means G with B in the bass. “Fifth omitted” means that chord
+            tone isn’t being played.
           </p>
         </div>
       </dialog>

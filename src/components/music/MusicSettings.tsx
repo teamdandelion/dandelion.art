@@ -9,6 +9,7 @@ import {
 import {
   BARITONE,
   formatNote,
+  GUITAR,
   INSTRUMENTS,
   parseNote,
   pitchClassNumber,
@@ -41,6 +42,11 @@ function subscribe(listener: () => void) {
   };
 }
 export function useMusicPreferences() {
+  const ready = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
   const raw = useSyncExternalStore(subscribe, read, () => initial);
   const preferences = useMemo(() => parsePreferences(raw), [raw]);
   const update = (patch: Partial<MusicPreferences>) => {
@@ -57,9 +63,10 @@ export function useMusicPreferences() {
     window.dispatchEvent(new Event("music-preferences"));
   };
   return {
+    ready,
     ...preferences,
     instrument:
-      INSTRUMENTS.find((i) => i.id === preferences.instrumentId) ?? BARITONE,
+      INSTRUMENTS.find((i) => i.id === preferences.instrumentId) ?? GUITAR,
     update,
   };
 }

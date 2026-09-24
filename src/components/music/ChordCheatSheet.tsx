@@ -4,6 +4,7 @@ import {
   type ChordGroup,
   chordFormula,
   formatNote,
+  INSTRUMENTS,
   makeChord,
   parseNote,
   pitchClassNumber,
@@ -23,6 +24,7 @@ import {
   parseGroups,
   practiceRows,
 } from "../../lib/music/practice";
+import { KEY_ROOTS } from "../../lib/music/preferences";
 import { searchVoicings } from "../../lib/music/voicing-search";
 import ChordTheoryHelp from "./ChordTheoryHelp";
 import { useMusicPreferences } from "./MusicSettings";
@@ -63,9 +65,37 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
     <div className="cs-chord">
       <div className="cs-card-heading">
         <a href={href}>
-          <h3>{symbol}</h3>
+          <h3>{chord.symbol}</h3>
         </a>
-        <ChordTheoryHelp chord={chord} />
+        <fieldset
+          className="cs-bass-notes"
+          aria-label={`Bass note for ${chord.symbol}`}
+        >
+          {chord.tones.map((t) => (
+            <button
+              type="button"
+              key={t.degree}
+              className={
+                fingering &&
+                bass === "any" &&
+                pitchClassNumber(t.note) ===
+                  pitchClassNumber(bassPitch(fingering.voicing).note)
+                  ? "cs-root-hint"
+                  : undefined
+              }
+              aria-label={`${formatNote(t.note)} bass for ${chord.symbol}`}
+              aria-pressed={bass === String(pitchClassNumber(t.note))}
+              disabled={!availableBass.has(pitchClassNumber(t.note))}
+              onClick={() => {
+                const next = String(pitchClassNumber(t.note));
+                setBass(bass === next ? "any" : next);
+                setIndex(0);
+              }}
+            >
+              {formatNote(t.note)}
+            </button>
+          ))}
+        </fieldset>
       </div>
       {fingering ? (
         <>
@@ -77,56 +107,31 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
               reference
             />
           </a>
-          <span className="cs-frets">
-            {fingering.frets.map((f) => f ?? "×").join(" · ")}
-          </span>
-          <div className="cs-voicing-controls">
-            <button
-              type="button"
-              aria-label={`Previous ${chord.symbol} voicing`}
-              disabled={filtered.length < 2}
-              onClick={() =>
-                setIndex((index + filtered.length - 1) % filtered.length)
-              }
-            >
-              ←
-            </button>
-            <span aria-live="polite">
-              {(index % filtered.length) + 1}/{filtered.length}
-            </span>
-            <button
-              type="button"
-              aria-label={`Next ${chord.symbol} voicing`}
-              disabled={filtered.length < 2}
-              onClick={() => setIndex((index + 1) % filtered.length)}
-            >
-              →
-            </button>
-          </div>
-          <select
-            aria-label={`Bass note for ${chord.symbol}`}
-            value={bass}
-            onChange={(e) => {
-              setBass(e.target.value);
-              setIndex(0);
-            }}
-          >
-            <option value="any">Any bass</option>
-            {chord.tones.map((t) => (
-              <option
-                key={t.degree}
-                value={pitchClassNumber(t.note)}
-                disabled={!availableBass.has(pitchClassNumber(t.note))}
+          <div className="cs-card-controls">
+            <div className="cs-voicing-controls">
+              <button
+                type="button"
+                aria-label={`Previous ${chord.symbol} voicing`}
+                disabled={filtered.length < 2}
+                onClick={() =>
+                  setIndex((index + filtered.length - 1) % filtered.length)
+                }
               >
-                {formatNote(t.note)} bass
-              </option>
-            ))}
-          </select>
-          {fingering.source === "generated" && (
-            <small className="cs-provenance">
-              Generated · fingers unassigned
-            </small>
-          )}
+                ←
+              </button>
+              <span aria-live="polite">
+                {(index % filtered.length) + 1}/{filtered.length}
+              </span>
+              <button
+                type="button"
+                aria-label={`Next ${chord.symbol} voicing`}
+                disabled={filtered.length < 2}
+                onClick={() => setIndex((index + 1) % filtered.length)}
+              >
+                →
+              </button>
+            </div>
+          </div>
         </>
       ) : (
         <span>No shape in this range</span>
@@ -137,8 +142,9 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
 
 export default function ChordCheatSheet() {
   const id = useId();
-  const { tonic, mode, instrument } = useMusicPreferences();
+  const { tonic, mode, instrument, update, ready } = useMusicPreferences();
   const [view, setView] = useState<"key" | "all">("key");
+  const [optionsOpen, setOptionsOpen] = useState(false);
   const [groups, setGroups] = useState<ChordGroup[]>(DEFAULT_GROUPS);
   const [groupsLoaded, setGroupsLoaded] = useState(false);
   useEffect(() => {
@@ -203,6 +209,9 @@ export default function ChordCheatSheet() {
     <article
       className="chord-atlas chord-sheet"
       data-instrument={instrument.id}
+      data-preferences-ready={ready}
+      style={{ visibility: ready ? "visible" : "hidden" }}
+      inert={!ready}
     >
       <header className="cs-intro">
         <nav className="cs-nav" aria-label="Music tools">
@@ -212,50 +221,93 @@ export default function ChordCheatSheet() {
             Chord atlas ↗
           </a>
         </nav>
-        <h1>{instrument.name} cheat sheet</h1>
+        <div className="cs-heading-row">
+          <h1 className="cs-title">
+            <select
+              aria-label="Instrument"
+              value={instrument.id}
+              style={{
+                width: `${(instrument.id === "baritone-dgbe" ? "Baritone uke" : instrument.name).length + 3}ch`,
+              }}
+              onChange={(event) => update({ instrumentId: event.target.value })}
+            >
+              {INSTRUMENTS.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.id === "baritone-dgbe" ? "Baritone uke" : item.name}
+                </option>
+              ))}
+            </select>{" "}
+            {view === "key" && <span className="cs-title-join">in the</span>}
+            <select
+              aria-label="Key"
+              value={view === "all" ? "all" : `${mode}:${tonic}`}
+              onChange={(event) => {
+                const value = event.target.value;
+                if (value === "all") {
+                  setView("all");
+                  return;
+                }
+                const [nextMode, nextTonic] = value.split(":");
+                if (nextMode === "major" || nextMode === "natural-minor") {
+                  update({ mode: nextMode, tonic: nextTonic });
+                  setView("key");
+                }
+              }}
+            >
+              {(["major", "natural-minor"] as const).map((keyMode) => (
+                <optgroup
+                  key={keyMode}
+                  label={keyMode === "major" ? "Major keys" : "Minor keys"}
+                >
+                  {KEY_ROOTS[keyMode].map((keyRoot) => (
+                    <option key={keyRoot} value={`${keyMode}:${keyRoot}`}>
+                      key of {formatNote(parseNote(keyRoot))}
+                      {keyMode === "natural-minor" ? " minor" : ""}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+              <option value="all">All chords</option>
+            </select>
+          </h1>
+          <button
+            className="cs-settings-toggle"
+            type="button"
+            aria-label="Cheat sheet settings"
+            aria-expanded={optionsOpen}
+            aria-controls={`${id}-options`}
+            onClick={() => setOptionsOpen(!optionsOpen)}
+          >
+            <span aria-hidden="true">⚙</span>
+          </button>
+        </div>
       </header>
-      <div
-        className={`cs-controls${view === "all" ? " cs-controls--all" : ""}`}
-      >
-        <fieldset className="cs-view" aria-label="Sheet view">
-          <button
-            type="button"
-            aria-pressed={view === "key"}
-            onClick={() => setView("key")}
-          >
-            Key
-          </button>
-          <button
-            type="button"
-            aria-pressed={view === "all"}
-            onClick={() => setView("all")}
-          >
-            All chords
-          </button>
+      <div className="cs-options" id={`${id}-options`} hidden={!optionsOpen}>
+        <fieldset className="cs-family-filters" aria-label="Chord families">
+          {PRACTICE_GROUPS.map((group) => (
+            <div key={group.id}>
+              <button
+                type="button"
+                aria-pressed={groups.includes(group.id)}
+                onClick={() =>
+                  setGroups((current) =>
+                    current.includes(group.id)
+                      ? current.length > 1
+                        ? current.filter((g) => g !== group.id)
+                        : current
+                      : [...current, group.id],
+                  )
+                }
+              >
+                {group.label}
+              </button>
+              <ChordTheoryHelp
+                chord={makeChord(tonic, groupExample(group.id))}
+              />
+            </div>
+          ))}
         </fieldset>
       </div>
-      <fieldset className="cs-family-filters" aria-label="Chord families">
-        {PRACTICE_GROUPS.map((group) => (
-          <div key={group.id}>
-            <button
-              type="button"
-              aria-pressed={groups.includes(group.id)}
-              onClick={() =>
-                setGroups((current) =>
-                  current.includes(group.id)
-                    ? current.length > 1
-                      ? current.filter((g) => g !== group.id)
-                      : current
-                    : [...current, group.id],
-                )
-              }
-            >
-              {group.label}
-            </button>
-            <ChordTheoryHelp chord={makeChord(tonic, groupExample(group.id))} />
-          </div>
-        ))}
-      </fieldset>
       <output className="cs-status" aria-live="polite">
         {view === "key"
           ? `${keyName}: ${rows.reduce((n, row) => n + row.entries.length, 0)} chords.`
@@ -270,61 +322,75 @@ export default function ChordCheatSheet() {
               {helpButton("practice", "How to practice chords in a key")}
             </div>
             <div className="cs-degree-grid">
-              {rows.map((row) => (
-                <section
-                  key={row.degree}
-                  className="cs-row"
-                  aria-labelledby={`${id}-degree-${row.degree}`}
-                >
-                  <h2 id={`${id}-degree-${row.degree}`}>{row.roman}</h2>
-                  <div className="cs-chords">
-                    {row.entries.map((entry) => (
-                      <ChordCard key={entry.chord.id} entry={entry} />
-                    ))}
-                  </div>
-                </section>
-              ))}
+              {rows
+                .filter((row) => row.entries.length > 0)
+                .map((row) => (
+                  <section
+                    key={row.degree}
+                    className="cs-row"
+                    aria-labelledby={`${id}-degree-${row.degree}`}
+                  >
+                    <h2 id={`${id}-degree-${row.degree}`}>{row.roman}</h2>
+                    <div className="cs-chords">
+                      {row.entries.map((entry) => (
+                        <ChordCard key={entry.chord.id} entry={entry} />
+                      ))}
+                    </div>
+                  </section>
+                ))}
             </div>
           </div>
-          <section aria-labelledby={`${id}-nearby`}>
-            <div className="cs-section-heading cs-nearby-heading">
-              <h2 id={`${id}-nearby`}>Outside key</h2>
-              {helpButton("nearby", "About outside-key chords")}
-            </div>
-            {(
-              [
-                ["applied", "Dominants"],
-                ["ii-v", "ii–V approaches"],
-                ["borrowed", "Borrowed chords"],
-                ["diminished", "Diminished approaches"],
-              ] as const
-            ).map(([kind, title]) => (
-              <section
-                key={kind}
-                className="cs-nearby-family"
-                aria-label={title}
-              >
-                <h3>{title}</h3>
-                <div className="cs-nearby-grid">
-                  {practice.nearby
-                    .filter(
-                      (entry) =>
-                        entry.kind === kind &&
-                        groups.includes(
-                          chordFormula(entry.chord.quality).group,
-                        ),
-                    )
-                    .map((entry) => (
-                      <div key={entry.chord.id} className="cs-related">
-                        <p className="cs-roman">{entry.roman}</p>
-                        <ChordCard entry={entry} />
-                        <p className="cs-destination">{entry.move}</p>
-                      </div>
-                    ))}
-                </div>
-              </section>
-            ))}
-          </section>
+          {practice.nearby.some((entry) =>
+            groups.includes(chordFormula(entry.chord.quality).group),
+          ) && (
+            <section aria-labelledby={`${id}-nearby`}>
+              <div className="cs-section-heading cs-nearby-heading">
+                <h2 id={`${id}-nearby`}>Outside key</h2>
+                {helpButton("nearby", "About outside-key chords")}
+              </div>
+              {(
+                [
+                  ["applied", "Dominants"],
+                  ["ii-v", "ii–V approaches"],
+                  ["borrowed", "Borrowed chords"],
+                  ["diminished", "Diminished approaches"],
+                ] as const
+              )
+                .filter(([kind]) =>
+                  practice.nearby.some(
+                    (entry) =>
+                      entry.kind === kind &&
+                      groups.includes(chordFormula(entry.chord.quality).group),
+                  ),
+                )
+                .map(([kind, title]) => (
+                  <section
+                    key={kind}
+                    className="cs-nearby-family"
+                    aria-label={title}
+                  >
+                    <h3>{title}</h3>
+                    <div className="cs-nearby-grid">
+                      {practice.nearby
+                        .filter(
+                          (entry) =>
+                            entry.kind === kind &&
+                            groups.includes(
+                              chordFormula(entry.chord.quality).group,
+                            ),
+                        )
+                        .map((entry) => (
+                          <div key={entry.chord.id} className="cs-related">
+                            <p className="cs-roman">{entry.roman}</p>
+                            <ChordCard entry={entry} />
+                            <p className="cs-destination">{entry.move}</p>
+                          </div>
+                        ))}
+                    </div>
+                  </section>
+                ))}
+            </section>
+          )}
         </>
       ) : (
         <>

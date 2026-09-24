@@ -7,11 +7,44 @@ import {
 } from "../src/lib/music/analysis.ts";
 import {
   BARITONE,
+  CHORD_QUALITIES,
+  findFingerings,
+  INSTRUMENTS,
   makeChord,
   midi,
   realizeFingering,
   UKULELE,
 } from "../src/lib/music/index.ts";
+
+test("every offered fingering satisfies the shared recognition coverage policy", () => {
+  for (const instrument of INSTRUMENTS)
+    for (const formula of CHORD_QUALITIES)
+      for (const root of [
+        "C",
+        "Db",
+        "D",
+        "Eb",
+        "E",
+        "F",
+        "Gb",
+        "G",
+        "Ab",
+        "A",
+        "Bb",
+        "B",
+      ]) {
+        const chord = makeChord(root, formula.id);
+        for (const shape of findFingerings(chord, instrument))
+          assert.ok(
+            analyzeCoverage(
+              chord,
+              shape.voicing.voices.map((v) => midi(v.pitch)),
+            ),
+            shape.id,
+          );
+      }
+});
+
 import { realizePosition } from "../src/lib/music/positions.ts";
 
 test("physical and harmonic realizations sound exactly the same pitches", () => {

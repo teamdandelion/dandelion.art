@@ -1,199 +1,113 @@
 # Music model
 
-The chord tool uses a small TypeScript domain of value objects for twelve-tone equal
-temperament (12-TET). Theory, register, and instrument technique are separate so
-the same chord can support reference diagrams, listening, and future exploration.
-The initial implementation has no music-library dependency: its formulas and
-transformations are explicit and testable. Adapters to Tonal or other libraries
-can be added without making their object models the application's storage format.
+The domain is TypeScript with strict checking. It models spelled notes and concrete
+pitches separately from chords and physical instrument positions. The site uses
+twelve-tone equal temperament.
 
-## Four layers
+## Modules and boundaries
 
-1. **Spelled note:** `{ step, alter }` identifies a note without an octave. `step`
-   is a letter A–G; `alter` is an integer semitone alteration. C♯ and D♭ remain
-   distinct spellings even though they share a chromatic pitch class. A concrete
-   `Pitch` is `{ note: { step, alter }, octave }`; MIDI number is derived.
-2. **Chord:** a spelled root and a formula describe the intended harmony without
-   choosing a register or instrument. Formulas retain tone degrees and semitone
-   distances: a sixth is not silently renamed a diminished seventh. Chord tones,
-   labels, and chromatic pitch-class sets are derived from this intent.
-3. **Voicing:** voices give those chord tones concrete pitches. Each voice has a
-   stable ID and `toneDegree`. Repeated tones are preserved; E3 and E4 are two
-   voices, not one set member. The lowest sounding pitch determines the bass and
-   inversion, regardless of array or string order.
-4. **Instrument realization:** a baritone shape maps string/fret positions to
-   voices in its nested `Voicing`. Piano rendering consumes this same voicing,
-   making the keyboard an exact view of the uke's sound. A separately selected
-   piano inversion is a different voicing of the same chord.
+- `catalog.ts`: authoritative chord formulas, aliases, harmonic family, practice
+  group, teaching descriptions, and explicitly permitted omitted degrees.
+  `ChordQuality` is derived from this registry.
+- `index.ts`: public compatibility API, pitch arithmetic, instruments, chord
+  construction, concrete chord voicings, canonical library adapter, keys.
+- `positions.ts`: realizes arbitrary fret/mute positions on the instrument into
+  sounding MIDI pitches, without requiring a chord interpretation.
+- `analysis.ts`: shared chord-coverage policy, slash requests, actual-bass labels.
+- `generation.ts`: bounded candidate generation with unknown finger assignments.
+- `voicing-search.ts`: canonical, transposed, and generated alternatives; bass
+  filtering; deterministic deduplication; tuning-sensitive bounded search cache.
+- `fretboard.ts`: key-aware spelling, recognition and single-string predictions.
+- `harmony.ts`: explained chord relationships and ranked neighboring moves.
+- `cheat-sheet.ts` and `practice.ts`: reference and practice view construction.
+- `preferences.ts`: validated instrument/key preferences; practice family
+  preferences have their own versioned storage key in `practice.ts`.
 
-Fretted instruments contain **courses**, each containing one or more physical
-strings. A shape has one fret/mute per course, and the realization maps every
-physical string to its own voice. The six-string baritone preset has four courses:
-D3 / G3+G4 / B3 / E4+E4. Its `2010` C shape sounds E3, G3, G4, C4, E4, E4.
-The octave G remains a separate piano key; unison E strings share one key but
-remain two voices in the model. Neither doubling changes the inversion. Course
-numbers 4→1 describe shape positions; physical string IDs distinguish all six
-voices without assuming a particular within-course mounting order.
+A spelled note (C♯) is distinct from its chromatic pitch class (equal to D♭).
+A pitch adds an octave. A chord has a root and formula but no register. A voicing
+retains individual sounding voices and tone roles, including duplicated notes.
+An instrument position adds frets/mutes; optional finger numbers and barres
+describe technique. The raw position can exist even when no chord is recognized.
 
-The MVP keeps related values together as serializable objects. Consumers should
-treat returned values as read-only, including cached fingering candidates.
-A database, normalized
-ID references, or object storage is unnecessary now; those are optional storage
-choices later and do not change these distinctions.
+The lowest actual pitch determines bass, including on reentrant ukulele.
+G/B is a selection of G major with a requested B bass, not a different formula.
+Only chord-tone bass requests are currently supported. The formula 6/9 is parsed
+as a quality; a final slash followed by a note is a bass request.
 
-For the standard linear baritone tuning, strings 4→1 are D3–G3–B3–E4:
+Piano and audio use the same concrete voices as the instrument. A separately
+selected piano inversion is a different voicing, not a reinterpretation of the
+instrument diagram.
 
-```text
-Chord intent:        C major → C, E, G
-String:              4    3    2    1
-Open pitch:          D3   G3   B3   E4
-Fret:                2    0    1    0
-Voice pitch:         E3   G3   C4   E4
-Tone degree:         3    5    1    3
-Bass:                E3 → first inversion
-```
+## Vocabulary and provenance
 
-Thus the familiar `2010` shape is a C-major realization with E in the bass. Its
-piano view highlights E3, G3, C4, and E4. A root-position piano example such as
-C4–E4–G4 is related by chord identity, but is not the same voicing.
+The registry contains the original fourteen qualities plus minor add9, 7sus4,
+minor-major seventh, dominant/major/minor ninths, and 6/9. Every formula works on
+every spelled root; that does not guarantee a suitable physical shape.
 
-C6 and Am7 both contain C–E–G–A. Their roots and tone roles differ, so a pitch-class
-mask must never be the unique chord identity. Likewise, sounding equivalence,
-spelled equality, equal voicings, and equal fingerings are distinct comparisons.
+Canonical shapes come from the pinned MIT-licensed
+tombatossals/chords-db subset, revision
+`df06fa7b425cf5fd29485ff6591236b3557e3fac`. The imported fixture remains 168 chords
+per instrument library, independently of expansion of the formula registry.
+The library's default order stays intact.
 
-## Supported vocabulary and shapes
+For baritone DGBE, GCEA shapes are looked up a fourth higher and realized on the
+actual tuning. Upstream MIDI pitches and inversion labels are not reused.
 
-The initial fourteen qualities are major, minor, diminished, augmented, sus2,
-sus4, dominant seventh, major seventh, minor seventh, diminished seventh,
-half-diminished seventh, major sixth, minor sixth, and add9. Chord spelling follows
-the formula's degrees, including double accidentals where musically required.
+Movable alternatives pool fully fretted library shapes from all twelve roots.
+Every stopped fret and barre shifts equally. Mutes stay muted. Open-string shapes
+are not blindly shifted. Derived shapes retain their original source reference
+and transposition amount.
 
-The canonical baritone fingerings are a vendored subset of
-[tombatossals/chords-db](https://github.com/tombatossals/chords-db), pinned to
-`df06fa7b425cf5fd29485ff6591236b3557e3fac`: 672 positions covering 12 roots × 14
-qualities × 4 positions, preserving upstream order. The MIT notice ships at
-`public/licenses/chords-db.txt`. `scripts/import-ukulele-library.mjs` fetches that
-revision and prints the normalized TypeScript subset; format its output with Biome.
-The app makes no runtime requests to the library.
+Generated candidates allow leading/trailing mutes and a maximum stopped-fret span
+of three. Search is limited to six courses and frets 0–24. These constraints are a
+heuristic, not proof of comfortable fingering. Finger numbers remain unassigned.
+A bounded selection per bass prevents root-position candidates crowding out all
+inversions. The UI labels generated positions and handles unavailable shapes.
 
-The source is GCEA. For a DGBE chord, look up the source root a perfect fourth
-higher, reuse its physical shape and finger numbers, and realize it on the actual
-instrument. Do not reuse upstream MIDI pitches or inversion labels. This also
-preserves the six-string instrument's octave and unison partners. Enharmonic roots
-share a shape, but retain their requested spelling in the derived voicing.
+Recognition requires the root and defining tones. Only registry-declared fifth
+omissions are allowed, and exact matches rank first. Rootless jazz recognition and
+arbitrary incomplete subsets are not supported. C6 and Am7 can share a sounding
+pitch set while retaining distinct identities and interpretations.
 
-`Fingering` carries per-course finger numbers (1–4; null for open/muted or unknown)
-and explicit barres with fret, finger, and start/end course numbers. Upstream
-relative frets and barre frets are converted to absolute frets at import. Barre
-spans use the outermost courses stopped by the same finger at that fret; intervening
-courses may be stopped higher by another finger. A library source reference keeps
-the original chord, position number, and revision for corrections.
+## Practice and interaction
 
-Library positions are the default, not mixed with generated alternatives. They
-reach fret 14. Automated tests check every imported position's pitches, finger
-assignments, and barre spans on both instruments. User-reported fingering issues
-can be corrected individually without changing chord identity.
+Instrument and key preferences are global to /music. Chord-family filters default
+to triads and sevenths and persist separately. In-key cards must fit the selected
+major or natural-minor scale. A key-compatible chord is not automatically assigned
+a harmonic function. Outside-key practice families remain explicitly separate.
 
-Other tunings retain a generated fallback over frets 0–12, with no assigned finger
-numbers or barres. Every sounding note must belong to the requested chord, and all
-chord tones must be present. A muted string is distinct from an open string.
+Voicing arrows and bass selectors use the same expanded search as the atlas.
+Theory dialogs derive their examples and intervals from the formula registry.
+Teaching prose stays out of the normal compact view.
 
-Extended chords with omitted roots or fifths will eventually require explicit
-coverage policies. They should retain their intended chord and report omissions,
-rather than being automatically relabeled by a chord-detection heuristic.
+On the fretboard, primary means selected. Secondary means replacing this string's
+note with this position produces a recognized chord, leaving all other strings
+unchanged. Muted treatment means in-key without that prediction. Predictions use
+the same recognition policy as the displayed result, including explicitly labeled
+omitted fifths. Recognition is not a recommendation about musical quality.
 
-## Keys and relationships
+## Relationships and future paths
 
-A key context specifies a spelled tonic and major or **natural minor** mode.
-Natural minor is explicit: harmonic and melodic minor are not silently mixed into
-its chord palette. Stacking thirds from the scale produces seven degree nodes,
-selectable as triads or seventh chords. A chord's Roman numeral and degree belong
-to this context, not to its global identity.
+Shared-tone and relative relationships are undirected. Dominant and leading-tone
+resolutions are directed. Key membership remains separate. Practice-sheet grouping
+and progression-neighbor ranking are different presentations and currently retain
+their own selection policies.
 
-`keyContext` reports whether all sounding pitch classes fit the scale. This is
-separate from spelled membership: C♯ major fits D♭ major sonically, but the graph's
-spelled tonic chord is D♭ major. The app does not infer harmonic function from
-pitch-class compatibility alone.
+Future pathfinding must distinguish harmonic distance, concrete voice movement,
+and physical hand movement. One scalar cost should not silently conflate them.
+Automatic pathfinding is not part of this stack.
 
-The MVP graph uses typed, undirected **shared-tone** edges between chords in the
-selected key. An edge records the common tones that justify it. It describes
-similarity; it does not assert that one chord ought to follow another or rank a
-progression as musically better. Adjacent-chord links expose this same relation.
+## Verification
 
-The progression playground adds a separate `harmony.ts` layer. `chordRelations`
-returns explained, typed edges: shared tones and relative major/minor triads are
-undirected; dominant-seventh and leading-tone resolutions are directional. A pair
-can have both kinds of relationship. These are possible moves, not claims about
-how an actual piece must be analyzed. Key membership is reported separately.
+Run `npm run verify` for type checks, lint, formatting checks, model/palette tests
+and the production build. `npm run test:browser` builds and tests the production
+site at phone and desktop widths. Both run in CI.
 
-`harmonicMoves` selects up to six neighbors from the key's triads and sevenths,
-plus applied dominants and leading-tone diminished chords when chromatic choices
-are enabled. Explicit resolution destinations include major, minor, and major-sixth
-chords. The selection heuristic prioritizes resolutions and relative triads, then
-shared tones with a diversity pass; it is not a musical quality score. Turning off
-chromatic suggestions requires every destination's pitch classes to fit the scale,
-without changing an existing trail. Borrowed-chord and modulation analysis remain
-future work.
+Tests preserve imported fixtures while separately checking generated/derived
+coverage, actual bass, transposition, alias round-trips, arbitrary instrument
+realization, recognition ambiguity, key filtering, preference validation, and
+prediction/result agreement. Browser tests cover help dialogs, bass navigation,
+family persistence, responsive wrapping and predictive selection.
 
-The interactive trail stores chord identities, not fingerings. Up to sixteen steps
-play as root-position piano voicings, two beats per chord, scheduled on the Web
-Audio clock. The reference and progression players share audio focus; stop, edits,
-and unmount cancel pending as well as active notes. The prototype does not save
-trails across reloads or optimize voice leading. Inspecting a step selects it in
-the existing instrument reference; it does not move the trail's endpoint.
-
-Path search will need distinct objectives:
-
-- **Harmony:** key membership, transition vocabulary, and modulation policy.
-- **Voice leading:** movement of concrete voices between voicings.
-- **Instrument technique:** movement between physical realizations.
-
-The fewest harmonic steps, least pitch movement, and easiest hand movement need
-not produce the same path. Keep those costs separate and explain the chosen
-objective to the player. Pathfinding is not included in this MVP.
-
-For example, D6 is D–F♯–A–B, so it is outside a strictly C-major palette. Both
-C major and D6 fit G major. A future C-major-chord → D6 search must specify its
-key context or allow chromatic harmony/modulation; it must not quietly alter F♯
-or claim that D6 is diatonic to C major.
-
-## Boundaries and verification
-
-The initial instruments are standard linear baritone uke and a six-string variant
-with an octave G course and unison E course. Other tunings,
-microtones, custom rhythms, chord-symbol inference, and automatic path search are
-outside this scope. The domain leaves instrument mapping independent of harmony
-so these can be considered without rewriting chord identity.
-
-Useful invariants for tests:
-
-- Spelling and transposition preserve both letter distance and semitone distance.
-- Concrete pitches round-trip to MIDI, including accidentals crossing an octave.
-- Every sounding string maps to exactly one stable voice ID and the pitch computed
-  from its tuning plus fret; muted strings contribute no voice.
-- Realizations contain every requested chord tone and no foreign pitch classes.
-- Inversions use the actual lowest pitch, and piano rendering uses those same
-  pitches rather than reconstructing a root-position chord.
-- C6 and Am7 remain different chords with equal pitch-class sets.
-- Diatonic chord tones belong to the selected scale; graph edges name their actual
-  intersection and remain symmetric.
-
-`/music` is unlisted: it has no main-navigation entry and uses `noindex` metadata.
-That is discoverability guidance, not access control; anyone with the URL can
-visit, and the content is public.
-
-## Design references
-
-- [music21 Pitch](https://music21.org/music21docs/moduleReference/modulePitch.html)
-  distinguishes spelling from sounding pitch and treats octave as explicit data.
-- [MusicXML pitch](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/pitch/)
-  represents letter, alteration, and octave;
-  [harmony](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/harmony/)
-  distinguishes chord root/kind, bass, inversion, and analytical context.
-- [MusicXML frame-note](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/frame-note/)
-  separates string/fret positions from optional fingering and barre technique.
-- [Tonal chords](https://tonaljs.github.io/tonal/docs/groups/chords) and
-  [voicing](https://github.com/tonaljs/tonal/blob/main/packages/voicing/README.md)
-  provide examples of formula dictionaries and register-constrained realization.
-- [Ukulele Magazine's baritone lesson](https://ukulelemagazine.com/lessons/baritone-ukulele-lesson-drawing-inspiration-from-the-larger-sound-and-deeper-tuning)
-  distinguishes the standard linear D–G–B–E tuning from reentrant alternatives.
+The music routes use noindex metadata but are publicly accessible via the music
+navigation icon. Noindex is not access control.
