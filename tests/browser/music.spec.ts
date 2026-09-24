@@ -193,6 +193,7 @@ test("compact sheet layout at phone and tablet widths", async ({ page }) => {
     await expect(page.locator(".cs-family-filters")).not.toBeVisible();
     const card = page.locator(".cs-chord").first();
     await expect(card).toBeVisible();
+    expect((await card.boundingBox())?.width).toBeLessThanOrEqual(300);
     await expect
       .poll(async () => (await card.boundingBox())?.y ?? Infinity)
       .toBeLessThan(400);

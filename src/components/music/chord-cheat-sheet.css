@@ -88,7 +88,7 @@
   min-height: 44px;
   border-radius: 6px;
   border: 1px solid var(--ca-line);
-  background: var(--ca-accent-soft);
+  background: var(--ca-paper);
   color: var(--ca-accent);
 }
 .cs-voicing-controls span {
@@ -112,14 +112,14 @@
   flex: 0 0 40px;
   padding: 0;
   font-size: 16px;
-  background: var(--ca-accent-soft);
+  background: var(--ca-paper);
   color: var(--ca-ink);
   border: 1px solid var(--ca-line);
   border-radius: 50%;
 }
 .cs-bass-notes button[aria-pressed="true"] {
-  background: var(--site-secondaryFill);
-  color: var(--site-onSecondary);
+  background: var(--site-accentFill);
+  color: var(--site-onAccent);
 }
 .cs-bass-notes button.cs-root-hint {
   background: var(--site-secondaryFill);
@@ -386,7 +386,7 @@
 .cs-columns,
 .cs-chords {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(245px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 300px));
   gap: 8px;
 }
 .cs-columns {
@@ -423,6 +423,9 @@
 .cs-chord {
   display: block;
   min-width: 0;
+  width: 100%;
+  max-width: 300px;
+  justify-self: start;
   border: 1px solid var(--ca-line);
   border-radius: 8px;
   padding: 6px 10px;
@@ -500,7 +503,7 @@
 }
 @media (min-width: 700px) {
   .cs-degree-grid {
-    grid-template-columns: repeat(auto-fit, minmax(min(245px, 100%), 1fr));
+    grid-template-columns: minmax(0, 1fr);
   }
   .cs-key-header .cs-columns {
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -563,7 +566,7 @@
 @media (max-width: 560px) {
   [data-instrument="guitar-eadgbe"] .cs-chords,
   [data-instrument="guitar-eadgbe"] .cs-nearby-grid {
-    grid-template-columns: repeat(auto-fit, minmax(min(245px, 100%), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 300px));
   }
   [data-instrument="guitar-eadgbe"] > .cs-columns {
     display: none;
