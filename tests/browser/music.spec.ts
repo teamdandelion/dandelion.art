@@ -1,5 +1,47 @@
 import { expect, test } from "@playwright/test";
 
+test("Explore uses three desktop columns and two phone columns", async ({
+  page,
+}) => {
+  await page.goto("/music/chords?theme=dark");
+  for (const instrument of ["guitar-eadgbe", "baritone-dgbe"]) {
+    await page
+      .getByRole("combobox", { name: "Instrument", exact: true })
+      .selectOption(instrument);
+    for (const width of [390, 900, 1280, 1440]) {
+      await page.setViewportSize({ width, height: 1000 });
+      const grid = page.locator(".cs-explore .cs-chords").first();
+      await expect(grid.locator(".cs-chord")).toHaveCount(7);
+      const columns = width < 900 ? 2 : 3;
+      await expect
+        .poll(() =>
+          grid.evaluate(
+            (el) => getComputedStyle(el).gridTemplateColumns.split(" ").length,
+          ),
+        )
+        .toBe(columns);
+      const boxes = await grid.locator(".cs-chord").evaluateAll((els) =>
+        els.map((el) => {
+          const r = el.getBoundingClientRect();
+          return { x: r.x, y: r.y, right: r.right };
+        }),
+      );
+      for (let i = 1; i < columns; i++) {
+        expect(Math.abs(boxes[i].y - boxes[0].y)).toBeLessThan(2);
+        expect(boxes[i].x).toBeGreaterThan(boxes[i - 1].right);
+      }
+      expect(boxes[columns].y).toBeGreaterThan(boxes[0].y);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+      if (width === 1280 && instrument === "guitar-eadgbe")
+        await page.screenshot({ path: "/tmp/explore-desktop-three.png" });
+    }
+  }
+});
+
 test("exploration scrolls through chapters and resets for a new key", async ({
   page,
 }) => {

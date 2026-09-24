@@ -669,6 +669,14 @@
 .cs-explore-entry .cs-chord {
   width: 100%;
 }
+@media (min-width: 900px) {
+  .chord-sheet .cs-explore .cs-chords {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .cs-explore-entry .cs-chord {
+    max-width: none;
+  }
+}
 .cs-explore-more {
   padding: 1rem;
   text-align: center;
