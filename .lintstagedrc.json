@@ -1,5 +1,6 @@
 {
-  "*.{ts,tsx,js,jsx,json,css,md}": [
-    "npx biome format --write --no-errors-on-unmatched"
-  ]
+  "*.{ts,tsx,js,jsx,mjs,cjs,json,css}": [
+    "biome check --write --no-errors-on-unmatched"
+  ],
+  "*.{astro,md,mdx,yml,yaml}": "prettier --write"
 }

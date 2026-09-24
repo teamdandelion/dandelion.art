@@ -24,10 +24,6 @@
   "files": {
     "includes": [
       "**",
-      "!*.cjs",
-      "!*.js",
-      "!*.mjs",
-      "!*.spec.ts",
       "!**/*.ts.build-*.mjs",
       "!.astro",
       "!**/*.astro",
