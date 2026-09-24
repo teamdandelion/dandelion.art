@@ -1,4 +1,6 @@
+import { generateFingerings } from "./generation.ts";
 import {
+  bassPitch,
   type Chord,
   type Fingering,
   type FrettedInstrument,
@@ -10,6 +12,40 @@ import {
 } from "./index.ts";
 
 export type VoicingQuery = { maxFret?: number; bass?: number };
+const searchCache = new Map<string, Fingering[]>();
+
+export function searchVoicings(
+  chord: Chord,
+  instrument: FrettedInstrument,
+  query: VoicingQuery = {},
+): Fingering[] {
+  const maxFret = query.maxFret ?? 24;
+  const key = JSON.stringify([chord.id, instrument, maxFret]);
+  let shapes = searchCache.get(key);
+  if (!shapes) {
+    shapes = movableFingerings(chord, instrument, maxFret);
+    const seen = new Set(shapes.map((s) => s.frets.join(",")));
+    const counts = new Map<number, number>();
+    for (const shape of generateFingerings(chord, instrument, maxFret)) {
+      const bass = pitchClassNumber(bassPitch(shape.voicing).note);
+      const count = counts.get(bass) ?? 0;
+      if (count >= 12 || seen.has(shape.frets.join(","))) continue;
+      counts.set(bass, count + 1);
+      seen.add(shape.frets.join(","));
+      shapes.push(shape);
+    }
+    if (searchCache.size >= 256)
+      searchCache.delete(searchCache.keys().next().value as string);
+    searchCache.set(key, shapes);
+  }
+  return structuredClone(
+    shapes.filter(
+      (s) =>
+        query.bass === undefined ||
+        pitchClassNumber(bassPitch(s.voicing).note) === query.bass,
+    ),
+  );
+}
 const roots = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
 
 /** Only wholly stopped shapes are movable without changing finger technique. */
