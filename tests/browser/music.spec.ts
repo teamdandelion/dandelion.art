@@ -1,5 +1,45 @@
 import { expect, test } from "@playwright/test";
 
+test("chord detail browses shareable voicings and fits phone and desktop", async ({
+  page,
+}) => {
+  await page.goto(
+    "/music/chord?chord=C&instrument=guitar-eadgbe&frets=x,3,2,0,1,0",
+  );
+  await expect(
+    page.getByRole("heading", { name: "C", exact: true }).first(),
+  ).toBeVisible();
+  await expect(page.locator(".cd-keys")).toContainText("C major");
+  await page
+    .getByRole("button", { name: "Select voicing 2", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "Select voicing 2", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  const href = await page
+    .getByRole("region", { name: "Selected voicing" })
+    .getByRole("link")
+    .getAttribute("href");
+  if (!href) throw new Error("Missing fretboard destination");
+  expect(new URL(page.url()).searchParams.get("frets")).toBe(
+    new URL(href, page.url()).searchParams.get("frets"),
+  );
+  await page.reload();
+  await expect(
+    page.getByRole("region", { name: "Selected voicing" }).getByRole("link"),
+  ).toHaveAttribute("href", href);
+  for (const width of [390, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({ path: `/tmp/chord-detail-${width}.png` });
+  }
+});
+
 test("guitar deep links preserve high frets on phones", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(
@@ -27,13 +67,27 @@ test("chord cards open an editable exact voicing with reset and piano", async ({
 }) => {
   await page.goto("/music/chords");
   const card = page.locator(".cs-chord").first();
-  const link = card.getByRole("link", { name: /Explore .* on fretboard/ });
+  const link = card.getByRole("link", { name: /Explore .* chord/ });
   const href = await link.getAttribute("href");
   if (!href) throw new Error("Missing voicing link");
   const expected = new URL(href, "https://example.com").searchParams.get(
     "frets",
   );
   await link.click();
+  await expect(
+    page.getByRole("heading", { name: "Keys containing this chord" }),
+  ).toBeVisible();
+  await expect
+    .poll(() => new URL(page.url()).searchParams.get("frets"))
+    .toBe(expected);
+  await page.reload();
+  await expect
+    .poll(() => new URL(page.url()).searchParams.get("frets"))
+    .toBe(expected);
+  await page
+    .getByRole("region", { name: "Selected voicing" })
+    .getByRole("link", { name: "Edit on fretboard ↗" })
+    .click();
   await expect(page.locator(".fb-board")).toBeVisible();
   await expect
     .poll(() => new URL(page.url()).searchParams.get("frets"))
@@ -71,10 +125,14 @@ test("chord cards open an editable exact voicing with reset and piano", async ({
     await page.screenshot({ path: `/tmp/voicing-workbench-${width}.png` });
   }
   await page.goto(
-    "/music/atlas?chord=G&instrument=baritone-dgbe&frets=0,0,x,3",
+    "/music/atlas?chord=G&instrument=baritone-dgbe&frets=x,4,3,3",
   );
+  await page
+    .getByRole("region", { name: "Selected voicing" })
+    .getByRole("link", { name: "Edit on fretboard ↗" })
+    .click();
   await expect(
-    page.getByRole("button", { name: "String 2, mute", exact: true }),
+    page.getByRole("button", { name: "String 4, mute", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
 });
 
@@ -361,8 +419,9 @@ test("heading bass controls and slash link work on mobile", async ({
     ),
   ).toBe(true);
   await card.getByRole("link", { name: "G", exact: true }).click();
-  await expect(page.locator(".fb-matches")).toContainText("G");
-  await expect(page.locator(".fb-matches")).toContainText("B");
+  await expect(
+    page.getByRole("region", { name: "Selected voicing" }),
+  ).toContainText("G/B");
 });
 
 test("compact sheet layout at phone and tablet widths", async ({ page }) => {

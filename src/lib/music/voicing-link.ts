@@ -25,3 +25,14 @@ export function parseVoicingLink(params: URLSearchParams) {
     return null;
   return { instrument, frets };
 }
+
+export function chordHref(
+  instrument: FrettedInstrument,
+  frets: readonly (number | null)[],
+  chord: string,
+) {
+  return voicingHref(instrument, frets, chord).replace(
+    "/music/fretboard?",
+    "/music/chord?",
+  );
+}

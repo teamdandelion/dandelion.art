@@ -26,7 +26,11 @@ import {
   predictFretboard,
   recognitionLabel,
 } from "../../lib/music/fretboard";
-import { parseVoicingLink, voicingHref } from "../../lib/music/voicing-link";
+import {
+  chordHref,
+  parseVoicingLink,
+  voicingHref,
+} from "../../lib/music/voicing-link";
 import { searchVoicings } from "../../lib/music/voicing-search";
 import { useMusicPreferences } from "./MusicSettings";
 import { PianoDiagram, PlayButton } from "./VoicingPlayback";
@@ -127,6 +131,13 @@ function Board({
           </strong>
         )}
         <p>{noteList || "—"}</p>
+        {matches[0] && (
+          <p>
+            <a href={chordHref(instrument, frets, matches[0].chord.symbol)}>
+              About {matches[0].chord.symbol} · more voicings ↗
+            </a>
+          </p>
+        )}
         <div className="fb-voicing-actions">
           <button
             type="button"
