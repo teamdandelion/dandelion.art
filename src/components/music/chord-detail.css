@@ -65,25 +65,10 @@
   border: 1px solid var(--ca-line);
   border-radius: 8px;
 }
-.cd-select {
-  display: block;
-  width: 100%;
-  padding: 0.5rem;
-  border-radius: 6px;
-}
-.cd-select[aria-pressed="true"] {
-  outline: 2px solid var(--ca-accent);
-}
-.cd-select .ca-uke-diagram {
+.cd-shape .ca-uke-diagram {
   width: 180px;
   max-width: 100%;
   margin: auto;
-}
-.cd-shape a {
-  display: block;
-  padding: 0.75rem 0;
-  font-size: 0.85rem;
-  text-align: center;
 }
 @media (max-width: 640px) {
   .cd-selected {

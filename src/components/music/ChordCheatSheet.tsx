@@ -30,7 +30,7 @@ import { searchVoicings } from "../../lib/music/voicing-search";
 import ChordExploration from "./ChordExploration";
 import ChordTheoryHelp from "./ChordTheoryHelp";
 import { useMusicPreferences } from "./MusicSettings";
-import UkeDiagram from "./UkeDiagram";
+import VoicingWidget from "./VoicingWidget";
 import "./chord-atlas.css";
 import "./chord-cheat-sheet.css";
 
@@ -102,41 +102,19 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
         </fieldset>
       </div>
       {fingering ? (
-        <>
-          <a href={href} aria-label={`Explore ${symbol} chord`}>
-            <UkeDiagram
-              chord={chord}
-              fingering={fingering}
-              instrument={instrument}
-              reference
-            />
-          </a>
-          <div className="cs-card-controls">
-            <div className="cs-voicing-controls">
-              <button
-                type="button"
-                aria-label={`Previous ${chord.symbol} voicing`}
-                disabled={filtered.length < 2}
-                onClick={() =>
-                  setIndex((index + filtered.length - 1) % filtered.length)
-                }
-              >
-                ←
-              </button>
-              <span aria-live="polite">
-                {(index % filtered.length) + 1}/{filtered.length}
-              </span>
-              <button
-                type="button"
-                aria-label={`Next ${chord.symbol} voicing`}
-                disabled={filtered.length < 2}
-                onClick={() => setIndex((index + 1) % filtered.length)}
-              >
-                →
-              </button>
-            </div>
-          </div>
-        </>
+        <VoicingWidget
+          chord={chord}
+          fingering={fingering}
+          instrument={instrument}
+          diagramHref={href}
+          navigation={{
+            index: index % filtered.length,
+            count: filtered.length,
+            previous: () =>
+              setIndex((index + filtered.length - 1) % filtered.length),
+            next: () => setIndex((index + 1) % filtered.length),
+          }}
+        />
       ) : (
         <span>No shape in this range</span>
       )}

@@ -16,15 +16,11 @@ import {
   voicingSymbol,
 } from "../../lib/music/analysis";
 import { KEY_ROOTS } from "../../lib/music/preferences";
-import {
-  chordHref,
-  parseVoicingLink,
-  voicingHref,
-} from "../../lib/music/voicing-link";
+import { chordHref, parseVoicingLink } from "../../lib/music/voicing-link";
 import { searchVoicings } from "../../lib/music/voicing-search";
 import { useMusicPreferences } from "./MusicSettings";
-import UkeDiagram from "./UkeDiagram";
 import { PianoDiagram, PlayButton } from "./VoicingPlayback";
+import VoicingWidget from "./VoicingWidget";
 import "./chord-atlas.css";
 import "./chord-cheat-sheet.css";
 import "./chord-detail.css";
@@ -102,43 +98,20 @@ function Detail({
       <section aria-label="Selected voicing" className="cd-selected">
         {selected ? (
           <>
-            <div>
-              <UkeDiagram
-                chord={chord}
-                fingering={selected}
-                instrument={instrument}
-                reference
-              />
-              <a
-                className="ca-button"
-                href={voicingHref(instrument, selected.frets, chord.symbol)}
-              >
-                Edit on fretboard ↗
-              </a>
-            </div>
+            <VoicingWidget
+              chord={chord}
+              fingering={selected}
+              instrument={instrument}
+              navigation={{
+                index,
+                count: shapes.length,
+                previous: () =>
+                  setIndex((index + shapes.length - 1) % shapes.length),
+                next: () => setIndex((index + 1) % shapes.length),
+              }}
+            />
             <div>
               <h2>{voicingSymbol(chord, selected.voicing)}</h2>
-              <p>
-                Voicing {index + 1} of {shapes.length}
-              </p>
-              <div className="cd-controls">
-                <button
-                  className="ca-button"
-                  type="button"
-                  onClick={() =>
-                    setIndex((index + shapes.length - 1) % shapes.length)
-                  }
-                >
-                  Previous voicing
-                </button>
-                <button
-                  className="ca-button"
-                  type="button"
-                  onClick={() => setIndex((index + 1) % shapes.length)}
-                >
-                  Next voicing
-                </button>
-              </div>
               <PlayButton voicing={selected.voicing} />
               <details>
                 <summary>Piano · this voicing</summary>
@@ -169,26 +142,19 @@ function Detail({
         <div className="cd-grid">
           {shapes.slice(0, count).map((shape, i) => (
             <div className="cd-shape" key={shape.id}>
-              <button
-                type="button"
-                className="cd-select"
-                aria-label={`Select voicing ${i + 1}`}
-                aria-pressed={index === i}
-                onClick={() => setIndex(i)}
-              >
-                <UkeDiagram
-                  chord={chord}
-                  fingering={shape}
-                  instrument={instrument}
-                  reference
-                />
-                <span>
-                  {i + 1} · {voicingSymbol(chord, shape.voicing)}
-                </span>
-              </button>
-              <a href={voicingHref(instrument, shape.frets, chord.symbol)}>
-                Edit on fretboard ↗
-              </a>
+              <VoicingWidget
+                chord={chord}
+                fingering={shape}
+                instrument={instrument}
+                selection={{
+                  label: `Select voicing ${i + 1}`,
+                  selected: index === i,
+                  onSelect: () => setIndex(i),
+                }}
+              />
+              <span>
+                {i + 1} · {voicingSymbol(chord, shape.voicing)}
+              </span>
             </div>
           ))}
         </div>

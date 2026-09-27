@@ -10,6 +10,20 @@ test("chord detail browses shareable voicings and fits phone and desktop", async
     page.getByRole("heading", { name: "C", exact: true }).first(),
   ).toBeVisible();
   await expect(page.locator(".cd-keys")).toContainText("C major");
+  const selectedWidget = page.getByRole("region", { name: "Selected voicing" });
+  await expect(selectedWidget.locator(".vw-previous")).toBeVisible();
+  await expect(selectedWidget.locator(".vw-fretboard svg")).toBeVisible();
+  await expect(selectedWidget.locator(".vw-next")).toBeVisible();
+  await expect(
+    page
+      .getByRole("region", { name: "Voicing library" })
+      .locator(".vw-previous, .vw-next"),
+  ).toHaveCount(0);
+  await expect(
+    page
+      .getByRole("region", { name: "Voicing library" })
+      .locator(".vw-fretboard"),
+  ).toHaveCount(6);
   await page
     .getByRole("button", { name: "Select voicing 2", exact: true })
     .click();
@@ -86,7 +100,7 @@ test("chord cards open an editable exact voicing with reset and piano", async ({
     .toBe(expected);
   await page
     .getByRole("region", { name: "Selected voicing" })
-    .getByRole("link", { name: "Edit on fretboard ↗" })
+    .getByRole("link", { name: /Edit .* on fretboard/ })
     .click();
   await expect(page.locator(".fb-board")).toBeVisible();
   await expect
@@ -129,7 +143,7 @@ test("chord cards open an editable exact voicing with reset and piano", async ({
   );
   await page
     .getByRole("region", { name: "Selected voicing" })
-    .getByRole("link", { name: "Edit on fretboard ↗" })
+    .getByRole("link", { name: /Edit .* on fretboard/ })
     .click();
   await expect(
     page.getByRole("button", { name: "String 4, mute", exact: true }),
