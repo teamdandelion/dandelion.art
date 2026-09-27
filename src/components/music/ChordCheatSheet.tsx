@@ -25,6 +25,7 @@ import {
   practiceRows,
 } from "../../lib/music/practice";
 import { KEY_ROOTS } from "../../lib/music/preferences";
+import { voicingHref } from "../../lib/music/voicing-link";
 import { searchVoicings } from "../../lib/music/voicing-search";
 import ChordExploration from "./ChordExploration";
 import ChordTheoryHelp from "./ChordTheoryHelp";
@@ -58,7 +59,9 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
   const symbol = fingering
     ? voicingSymbol(chord, fingering.voicing)
     : chord.symbol;
-  const href = `/music/atlas?chord=${encodeURIComponent(symbol)}`;
+  const href = fingering
+    ? voicingHref(instrument, fingering.frets, symbol)
+    : `/music/fretboard?chord=${encodeURIComponent(symbol)}&instrument=${instrument.id}`;
   const availableBass = new Set(
     shapes.map((s) => pitchClassNumber(bassPitch(s.voicing).note)),
   );
@@ -100,7 +103,7 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
       </div>
       {fingering ? (
         <>
-          <a href={href} aria-label={`Open ${symbol} in chord atlas`}>
+          <a href={href} aria-label={`Explore ${symbol} on fretboard`}>
             <UkeDiagram
               chord={chord}
               fingering={fingering}
@@ -227,9 +230,6 @@ export default function ChordCheatSheet() {
         <nav className="cs-nav" aria-label="Music tools">
           <a href="/music">Music</a>
           <a href="/music/fretboard">Fretboard ↗</a>
-          <a className="cs-atlas-link" href="/music/atlas">
-            Chord atlas ↗
-          </a>
         </nav>
         <div className="cs-heading-row">
           <h1 className="cs-title">

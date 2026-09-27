@@ -1,18 +1,15 @@
 ---
-import ChordAtlas from "../../components/music/ChordAtlas";
+import FretboardExplorer from "../../components/music/FretboardExplorer";
 import LayoutDefault from "../../layouts/LayoutDefault.astro";
 ---
 
 <LayoutDefault
-  title="Chord atlas — dandelion.art"
-  description="Guitar and ukulele chord diagrams, exact piano voicings, inversions, and an interactive map of shared notes."
+  title="Explore voicing — dandelion.art"
+  description="Hear and edit a chord voicing on the fretboard."
   noindex
 >
-  <ChordAtlas client:load />
+  <FretboardExplorer client:load />
   <noscript>
-    <p>
-      JavaScript is needed to select other chords, explore the graph, and play
-      audio. The C-major reference above is available without it.
-    </p>
+    <p>Enable JavaScript to explore and hear this voicing.</p>
   </noscript>
 </LayoutDefault>
