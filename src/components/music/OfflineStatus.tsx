@@ -4,7 +4,6 @@ export default function OfflineStatus() {
   const [status, setStatus] = useState("Preparing offline reference…");
   const [registration, setRegistration] = useState<ServiceWorkerRegistration>();
   const [update, setUpdate] = useState(false);
-  const [storageMessage, setStorageMessage] = useState("");
   useEffect(() => {
     if (!("serviceWorker" in navigator)) {
       setStatus("Offline storage is unavailable in this browser.");
@@ -88,36 +87,6 @@ export default function OfflineStatus() {
           Update available · reload
         </button>
       )}
-      <details>
-        <summary>Use offline on iPhone</summary>
-        <p>
-          In Safari, use Share → Add to Home Screen. Open the home-screen app
-          online and wait for “Available offline” before switching to airplane
-          mode. The music reference works offline; Home and Art are not
-          downloaded.
-        </p>
-        <button
-          type="button"
-          disabled={!registration?.active}
-          onClick={async () => {
-            try {
-              const persisted = await navigator.storage?.persist?.();
-              setStorageMessage(
-                persisted
-                  ? "Persistent storage enabled."
-                  : "Your browser manages offline storage. Keep a backup of personal content.",
-              );
-            } catch {
-              setStorageMessage(
-                "Storage persistence could not be requested. The reference remains cached.",
-              );
-            }
-          }}
-        >
-          Keep offline storage
-        </button>
-        <p>{storageMessage}</p>
-      </details>
     </aside>
   );
 }

@@ -144,6 +144,10 @@ test("music cold-starts offline and navigates without document reloads", async (
     "Offline-emulation bug #42775; origin-stopped coverage above exercises WebKit.",
   );
   await page.goto("/music/chords/");
+  await expect(
+    page.getByText("Use offline on iPhone", { exact: true }),
+  ).toHaveCount(0);
+  await expect(page.locator(".music-offline details")).toHaveCount(0);
   await expect(page.locator(".music-offline output")).toHaveText(
     "Available offline",
   );

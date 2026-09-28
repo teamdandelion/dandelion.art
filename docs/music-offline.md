@@ -32,8 +32,8 @@ deleted. Never reuse this prefix for user-generated content.
 Playwright tests cover fresh-window offline startup, unvisited query URLs,
 client navigation without document reloads, Back, piano, update approval, and
 failed-download recovery. They do not substitute for the installed iPhone shell.
-Browser storage can be cleared or evicted; persistent storage is requested only
-on a user tap and isn't guaranteed. Future songs need separate IndexedDB storage
+Browser storage can be cleared or evicted; storage retention isn't guaranteed.
+Future songs need separate IndexedDB storage
 and export/sync, not the disposable app cache.
 
 Playwright 1.63's WebKit offline-emulation flag has a known navigation bug
