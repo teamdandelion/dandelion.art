@@ -1,0 +1,35 @@
+---
+import LayoutDefault from "../../../layouts/LayoutDefault.astro";
+import { SONGS } from "../../../lib/music/songs";
+import "../../../components/music/songs.css";
+---
+
+<LayoutDefault
+  title="Songs — dandelion.art"
+  description="Songs to practice, with lyrics and chord voicings."
+  noindex
+>
+  <article class="songs-index">
+    <nav aria-label="Music tools">
+      <a href="/music/">Music</a>
+      <a href="/music/chords/">Chords ↗</a>
+    </nav>
+    <header>
+      <p class="song-eyebrow">Practice library</p>
+      <h1>Songs</h1>
+      <p>A few songs to spend time with.</p>
+    </header>
+    <div class="songs-list">
+      {SONGS.map((song) => (
+        <a class="song-index-card" href={`/music/songs/${song.id}/`}>
+          <div>
+            <h2>{song.title}</h2>
+            <p>{song.artist}</p>
+          </div>
+          <span aria-hidden="true">↗</span>
+          <small>{song.chords.join(" · ")}</small>
+        </a>
+      ))}
+    </div>
+  </article>
+</LayoutDefault>
