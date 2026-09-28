@@ -46,8 +46,7 @@ function Practice({
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement | null>(null);
   const [scrolling, setScrolling] = useState(false);
-  const [speedLevel, setSpeedLevel] = useState(2);
-  const speed = speedLevel * 8;
+  const [speed, setSpeed] = useState(12);
   const shapes = useMemo(
     () =>
       Object.fromEntries(
@@ -170,19 +169,19 @@ function Practice({
           <button
             type="button"
             aria-label="Slower autoscroll"
-            disabled={speedLevel === 1}
-            onClick={() => setSpeedLevel((level) => Math.max(1, level - 1))}
+            disabled={speed === 4}
+            onClick={() => setSpeed((value) => Math.max(4, value - 4))}
           >
             −
           </button>
           <output aria-live="polite" aria-label="Scroll speed level">
-            Speed {speedLevel}
+            {speed} px/s
           </output>
           <button
             type="button"
             aria-label="Faster autoscroll"
-            disabled={speedLevel === 7}
-            onClick={() => setSpeedLevel((level) => Math.min(7, level + 1))}
+            disabled={speed === 60}
+            onClick={() => setSpeed((value) => Math.min(60, value + 4))}
           >
             +
           </button>

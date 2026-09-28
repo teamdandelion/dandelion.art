@@ -121,14 +121,16 @@ test("autoscroll has slower defaults and bounded discrete speed buttons", async 
   const speed = page.getByLabel("Scroll speed level");
   const slower = page.getByRole("button", { name: "Slower autoscroll" });
   const faster = page.getByRole("button", { name: "Faster autoscroll" });
-  await expect(speed).toHaveText("Speed 2");
+  await expect(speed).toHaveText("12 px/s");
   await expect(page.getByRole("slider")).toHaveCount(0);
   await slower.click();
-  await expect(speed).toHaveText("Speed 1");
+  await expect(speed).toHaveText("8 px/s");
+  await slower.click();
+  await expect(speed).toHaveText("4 px/s");
   await expect(slower).toBeDisabled();
-  for (let level = 2; level <= 7; level++) {
+  for (let value = 8; value <= 60; value += 4) {
     await faster.click();
-    await expect(speed).toHaveText(`Speed ${level}`);
+    await expect(speed).toHaveText(`${value} px/s`);
   }
   await expect(faster).toBeDisabled();
   await page.getByRole("button", { name: "Start autoscroll" }).click();
