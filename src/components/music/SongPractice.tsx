@@ -205,10 +205,6 @@ function Practice({
           setActive(symbol);
         }}
       />
-      <p className="song-source">
-        Arrangement from {song.source.toLowerCase()}. Chord placement follows
-        the supplied chart; autoscroll speed is not a tempo marking.
-      </p>
       <dialog
         className="cs-modal song-modal"
         ref={dialog}
@@ -260,7 +256,7 @@ export default function SongPractice({ song }: { song: Song }) {
         <a href="/music/chords/">Chords ↗</a>
       </nav>
       <header className="song-heading">
-        <p className="song-eyebrow">Practice / {song.artist}</p>
+        <p className="song-eyebrow">{song.artist}</p>
         <h1>{song.title}</h1>
         {song.note && <p className="song-source">{song.note}</p>}
         <label className="song-instrument">

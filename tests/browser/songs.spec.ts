@@ -1,5 +1,19 @@
 import { expect, test } from "@playwright/test";
 
+test("songs omit filler copy while retaining useful chart notes", async ({
+  page,
+}) => {
+  await page.goto("/music/songs/");
+  await expect(page.getByText("A few songs to spend time with.")).toHaveCount(
+    0,
+  );
+  await expect(page.getByText("Practice library")).toHaveCount(0);
+  await page.getByRole("link", { name: /Hallelujah/ }).click();
+  await expect(page.getByText(/Arrangement from/)).toHaveCount(0);
+  await expect(page.getByText(/no capo for the original studio/)).toBeVisible();
+  await expect(page.locator(".song-eyebrow")).toHaveText("Jeff Buckley");
+});
+
 test("long song lines wrap on phones with no internal scrollbars", async ({
   page,
 }) => {
