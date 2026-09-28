@@ -1,5 +1,60 @@
 import { expect, test } from "@playwright/test";
 
+test("measure prototype advances in musical time, pauses and keeps position when tempo changes", async ({
+  page,
+}) => {
+  await page.clock.install();
+  await page.goto("/music/songs/ocean-eyes/");
+  await page
+    .getByRole("combobox", { name: "Scroll mode" })
+    .selectOption("measures");
+  await expect(page.getByLabel("Practice BPM")).toHaveText("72 BPM");
+  await page.screenshot({
+    path: "/tmp/measure-scroll-phone.png",
+    animations: "disabled",
+  });
+  const bar = page.getByLabel("Current measure");
+  await expect(bar).toHaveText("Bar 1/74");
+  await page
+    .getByRole("combobox", { name: "Intro 1 line 1 bars" })
+    .selectOption("1");
+  await expect(bar).toHaveText("Bar 1/73");
+  await page
+    .getByRole("button", { name: "Start measures", exact: true })
+    .click();
+  await page.clock.runFor(3500);
+  await expect(bar).toHaveText("Bar 2/73");
+  await expect(page.locator(".song-line-active")).toContainText("G/B");
+  await page.getByRole("button", { name: "Pause measures" }).click();
+  await page.clock.runFor(10000);
+  await expect(bar).toHaveText("Bar 2/73");
+  await page.getByRole("button", { name: "Faster tempo" }).click();
+  await expect(page.getByLabel("Practice BPM")).toHaveText("76 BPM");
+  await expect(bar).toHaveText("Bar 2/73");
+  await page.setViewportSize({ width: 320, height: 844 });
+  await expect(bar).toHaveText("Bar 2/73");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page
+    .getByRole("button", { name: "Start measures", exact: true })
+    .click();
+  await page.mouse.wheel(0, 10);
+  await expect(
+    page.getByRole("button", { name: "Start measures", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Restart measures", exact: true })
+    .click();
+  await expect(bar).toHaveText("Bar 1/73");
+  await page
+    .getByRole("combobox", { name: "Scroll mode" })
+    .selectOption("pixels");
+  await expect(page.getByLabel("Scroll speed level")).toHaveText("12 px/s");
+});
+
 test("songs omit filler copy while retaining useful chart notes", async ({
   page,
 }) => {

@@ -8,6 +8,7 @@ import { parseChordSelection } from "../../lib/music/analysis";
 import { type Song, songChords } from "../../lib/music/song";
 import { chordHref } from "../../lib/music/voicing-link";
 import { searchVoicings } from "../../lib/music/voicing-search";
+import MeasureScroll from "./MeasureScroll";
 import { useMusicPreferences } from "./MusicSettings";
 import SongScore from "./SongScore";
 import { PlayButton } from "./VoicingPlayback";
@@ -47,6 +48,12 @@ function Practice({
   const trigger = useRef<HTMLButtonElement | null>(null);
   const [scrolling, setScrolling] = useState(false);
   const [speed, setSpeed] = useState(12);
+  const [scrollMode, setScrollMode] = useState("pixels");
+  const score = useRef<HTMLDivElement>(null);
+  const [bars, setBars] = useState(() =>
+    song.sections.flatMap((section) => section.lines.map(() => 2)),
+  );
+  const [activeLine, setActiveLine] = useState(0);
   const shapes = useMemo(
     () =>
       Object.fromEntries(
@@ -157,36 +164,54 @@ function Practice({
   }
   return (
     <>
-      <div className="song-practice-controls">
-        <button
-          type="button"
-          aria-pressed={scrolling}
-          onClick={() => setScrolling(!scrolling)}
+      <label className="song-scroll-mode">
+        Scroll
+        <select
+          aria-label="Scroll mode"
+          value={scrollMode}
+          onChange={(event) => {
+            setScrolling(false);
+            setScrollMode(event.target.value);
+          }}
         >
-          {scrolling ? "Pause autoscroll" : "Start autoscroll"}
-        </button>
-        <fieldset className="song-speed" aria-label="Scroll speed">
+          <option value="pixels">Steady</option>
+          <option value="measures">Measures (prototype)</option>
+        </select>
+      </label>
+      {scrollMode === "measures" ? (
+        <MeasureScroll score={score} bars={bars} onActiveLine={setActiveLine} />
+      ) : (
+        <div className="song-practice-controls">
           <button
             type="button"
-            aria-label="Slower autoscroll"
-            disabled={speed === 4}
-            onClick={() => setSpeed((value) => Math.max(4, value - 4))}
+            aria-pressed={scrolling}
+            onClick={() => setScrolling(!scrolling)}
           >
-            −
+            {scrolling ? "Pause autoscroll" : "Start autoscroll"}
           </button>
-          <output aria-live="polite" aria-label="Scroll speed level">
-            {speed} px/s
-          </output>
-          <button
-            type="button"
-            aria-label="Faster autoscroll"
-            disabled={speed === 60}
-            onClick={() => setSpeed((value) => Math.min(60, value + 4))}
-          >
-            +
-          </button>
-        </fieldset>
-      </div>
+          <fieldset className="song-speed" aria-label="Scroll speed">
+            <button
+              type="button"
+              aria-label="Slower autoscroll"
+              disabled={speed === 4}
+              onClick={() => setSpeed((value) => Math.max(4, value - 4))}
+            >
+              −
+            </button>
+            <output aria-live="polite" aria-label="Scroll speed level">
+              {speed} px/s
+            </output>
+            <button
+              type="button"
+              aria-label="Faster autoscroll"
+              disabled={speed === 60}
+              onClick={() => setSpeed((value) => Math.min(60, value + 4))}
+            >
+              +
+            </button>
+          </fieldset>
+        </div>
+      )}
       <details className="song-voicings">
         <summary>Voicings · {symbols.join(" · ")}</summary>
         <div className="song-shapes">
@@ -197,13 +222,27 @@ function Practice({
           ))}
         </div>
       </details>
-      <SongScore
-        song={song}
-        onChord={(symbol, button) => {
-          trigger.current = button;
-          setActive(symbol);
-        }}
-      />
+      <div ref={score}>
+        <SongScore
+          song={song}
+          timing={
+            scrollMode === "measures"
+              ? {
+                  bars,
+                  activeLine,
+                  onBarsChange: (index, count) =>
+                    setBars((current) =>
+                      current.map((value, i) => (i === index ? count : value)),
+                    ),
+                }
+              : undefined
+          }
+          onChord={(symbol, button) => {
+            trigger.current = button;
+            setActive(symbol);
+          }}
+        />
+      </div>
       <dialog
         className="cs-modal song-modal"
         ref={dialog}
