@@ -1,5 +1,41 @@
 import { expect, test } from "@playwright/test";
 
+test("piano icons open exact voicings and restore focus on phones", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(
+    "/music/chord?chord=C&instrument=guitar-eadgbe&frets=x,3,2,0,1,0",
+  );
+  const selected = page.getByRole("region", { name: "Selected voicing" });
+  const trigger = selected.getByRole("button", {
+    name: "Show C piano voicing",
+  });
+  await trigger.click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator("svg title")).toContainText("C3");
+  await expect(dialog.locator("svg title")).toContainText("E4");
+  const bounds = await dialog.boundingBox();
+  if (!bounds) throw new Error("Missing modal bounds");
+  expect(bounds.x).toBeGreaterThanOrEqual(0);
+  expect(bounds.x + bounds.width).toBeLessThanOrEqual(390);
+  await page.screenshot({ path: "/tmp/piano-modal-390.png" });
+  await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
+  await expect(trigger).toBeFocused();
+  const library = page.getByRole("region", { name: "Voicing library" });
+  await expect(library.locator(".vw-piano")).toHaveCount(6);
+  const widget = library.locator(".vw-widget").first();
+  const title = await widget.locator(".vw-title").boundingBox();
+  const diagram = await widget.locator(".vw-select").boundingBox();
+  if (!title || !diagram) throw new Error("Missing card bounds");
+  expect(title.y + title.height).toBeLessThanOrEqual(diagram.y);
+  await widget.locator(".vw-piano").click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.getByRole("button", { name: "Close piano voicing" }).click();
+});
+
 test("chord detail browses shareable voicings and fits phone and desktop", async ({
   page,
 }) => {
@@ -118,13 +154,14 @@ test("chord cards open an editable exact voicing with reset and piano", async ({
   await expect
     .poll(() => new URL(page.url()).searchParams.get("frets"))
     .toBe(expected);
-  await page.getByText("Piano · same sounding notes", { exact: true }).click();
+  await page.getByRole("button", { name: /Show .* piano voicing/ }).click();
   await expect(page.locator(".ca-piano")).toBeVisible();
   await expect(
-    page.getByRole("button", {
+    page.getByRole("dialog").getByRole("button", {
       name: "Hear this voicing as a synthesized chord",
     }),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Close piano voicing" }).click();
   await expect(
     page.locator("#progression-playground, #key-chords, .ca-controls"),
   ).toHaveCount(0);

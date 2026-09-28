@@ -19,7 +19,7 @@ import { KEY_ROOTS } from "../../lib/music/preferences";
 import { chordHref, parseVoicingLink } from "../../lib/music/voicing-link";
 import { searchVoicings } from "../../lib/music/voicing-search";
 import { useMusicPreferences } from "./MusicSettings";
-import { PianoDiagram, PlayButton } from "./VoicingPlayback";
+import { PlayButton } from "./VoicingPlayback";
 import VoicingWidget from "./VoicingWidget";
 import "./chord-atlas.css";
 import "./chord-cheat-sheet.css";
@@ -99,6 +99,7 @@ function Detail({
         {selected ? (
           <>
             <VoicingWidget
+              title={voicingSymbol(chord, selected.voicing)}
               chord={chord}
               fingering={selected}
               instrument={instrument}
@@ -111,14 +112,7 @@ function Detail({
               }}
             />
             <div>
-              <h2>{voicingSymbol(chord, selected.voicing)}</h2>
               <PlayButton voicing={selected.voicing} />
-              <details>
-                <summary>Piano · this voicing</summary>
-                <div className="cd-piano">
-                  <PianoDiagram chord={chord} voicing={selected.voicing} />
-                </div>
-              </details>
             </div>
           </>
         ) : (
@@ -143,6 +137,7 @@ function Detail({
           {shapes.slice(0, count).map((shape, i) => (
             <div className="cd-shape" key={shape.id}>
               <VoicingWidget
+                title={`${i + 1} · ${voicingSymbol(chord, shape.voicing)}`}
                 chord={chord}
                 fingering={shape}
                 instrument={instrument}
@@ -152,9 +147,6 @@ function Detail({
                   onSelect: () => setIndex(i),
                 }}
               />
-              <span>
-                {i + 1} · {voicingSymbol(chord, shape.voicing)}
-              </span>
             </div>
           ))}
         </div>

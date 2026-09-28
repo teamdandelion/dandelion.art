@@ -33,7 +33,8 @@ import {
 } from "../../lib/music/voicing-link";
 import { searchVoicings } from "../../lib/music/voicing-search";
 import { useMusicPreferences } from "./MusicSettings";
-import { PianoDiagram, PlayButton } from "./VoicingPlayback";
+import PianoVoicingButton from "./PianoVoicingButton";
+import { PlayButton } from "./VoicingPlayback";
 import "./chord-atlas.css";
 import "./chord-cheat-sheet.css";
 import "./fretboard.css";
@@ -147,6 +148,9 @@ function Board({
             Reset voicing
           </button>
           {pitches.length > 0 && <PlayButton voicing={voicing} />}
+          {pitches.length > 0 && (
+            <PianoVoicingButton voicing={voicing} chord={matches[0]?.chord} />
+          )}
         </div>
         <output className="fb-preview" aria-live="polite">
           {preview || "\u00a0"}
@@ -295,14 +299,6 @@ function Board({
           </button>
         </div>
       </section>
-      {pitches.length > 0 && (
-        <details className="fb-piano">
-          <summary>Piano · same sounding notes</summary>
-          <div className="ca-piano-scroll">
-            <PianoDiagram voicing={voicing} chord={matches[0]?.chord} />
-          </div>
-        </details>
-      )}
       <dialog
         ref={help}
         className="cs-modal"

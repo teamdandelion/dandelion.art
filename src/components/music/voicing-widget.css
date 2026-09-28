@@ -17,18 +17,28 @@
 }
 .vw-controls {
   display: grid;
-  grid-template-columns: 44px 1fr 44px;
+  grid-template-columns: minmax(32px, 1fr) repeat(2, minmax(32px, 44px)) minmax(
+      32px,
+      1fr
+    );
   grid-template-rows: 16px 44px;
   gap: 3px;
   align-items: center;
   margin-top: 4px;
 }
-.vw-controls button,
-.vw-controls a {
+.vw-piano {
+  grid-column: 3;
+  grid-row: 2;
+  justify-self: center;
+}
+.vw-controls > button,
+.vw-controls > a,
+.fb-voicing-actions .vw-piano {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
+  width: 100%;
+  max-width: 44px;
   height: 44px;
   border: 1px solid var(--ca-line);
   border-radius: 6px;
@@ -44,8 +54,9 @@
   grid-row: 2;
 }
 .vw-next {
-  grid-column: 3;
+  grid-column: 4;
   grid-row: 2;
+  justify-self: end;
 }
 .vw-fretboard {
   grid-column: 2;
@@ -53,7 +64,7 @@
   justify-self: center;
 }
 .vw-count {
-  grid-column: 3;
+  grid-column: 4;
   grid-row: 1;
   font-size: 12px;
   color: var(--ca-muted);
@@ -62,8 +73,21 @@
 .vw-controls:not(:has(.vw-count)) {
   grid-template-rows: 44px;
 }
-.vw-controls:not(:has(.vw-count)) .vw-fretboard {
+.vw-controls:not(:has(.vw-count)) .vw-fretboard,
+.vw-controls:not(:has(.vw-count)) .vw-piano {
   grid-row: 1;
+}
+.vw-title {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+}
+.pv-modal {
+  max-width: min(640px, calc(100vw - 24px));
+}
+.pv-keyboard {
+  overflow-x: auto;
+  padding: 1rem 0;
 }
 .vw-sr {
   position: absolute;

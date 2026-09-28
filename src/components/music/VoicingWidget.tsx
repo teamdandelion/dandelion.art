@@ -1,5 +1,6 @@
 import type { Chord, Fingering, FrettedInstrument } from "../../lib/music";
 import { voicingHref } from "../../lib/music/voicing-link";
+import PianoVoicingButton from "./PianoVoicingButton";
 import UkeDiagram from "./UkeDiagram";
 import "./voicing-widget.css";
 
@@ -8,6 +9,7 @@ type Props = {
   fingering: Fingering;
   instrument: FrettedInstrument;
   diagramHref?: string;
+  title?: string;
   selection?: { label: string; selected: boolean; onSelect: () => void };
   navigation?: {
     index: number;
@@ -24,6 +26,7 @@ export default function VoicingWidget({
   diagramHref,
   selection,
   navigation,
+  title,
 }: Props) {
   const diagram = (
     <UkeDiagram
@@ -38,6 +41,7 @@ export default function VoicingWidget({
   const pegs = courses === 6 ? [5, 10, 15] : [6, 14];
   return (
     <div className="vw-widget">
+      {title && <h3 className="vw-title">{title}</h3>}
       {selection ? (
         <button
           type="button"
@@ -94,8 +98,8 @@ export default function VoicingWidget({
           <span className="vw-sr">{label}</span>
           <svg
             viewBox="0 0 28 32"
-            width="26"
-            height="30"
+            width="19"
+            height="22"
             fill="none"
             stroke="currentColor"
             strokeWidth="1.5"
@@ -115,6 +119,7 @@ export default function VoicingWidget({
             ))}
           </svg>
         </a>
+        <PianoVoicingButton chord={chord} voicing={fingering.voicing} />
       </div>
     </div>
   );
