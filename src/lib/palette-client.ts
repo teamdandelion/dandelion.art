@@ -24,7 +24,7 @@ export function setAppearance(patch: {
   ) {
     url.searchParams.set("palette", root.dataset.palette ?? DEFAULT_PALETTE);
     url.searchParams.set("theme", root.dataset.theme ?? "light");
-    history.replaceState(null, "", url);
+    history.replaceState(history.state, "", url);
   }
   const toggle = document.querySelector<HTMLInputElement>(
     "[data-theme-toggle]",

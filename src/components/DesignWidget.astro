@@ -3,6 +3,7 @@ import PaletteTuner from "./PaletteTuner.astro";
 ---
 
 <button
+  transition:persist="design-launcher"
   class="design-launcher"
   type="button"
   aria-label="Design settings"
@@ -29,7 +30,12 @@ import PaletteTuner from "./PaletteTuner.astro";
     <circle cx="18" cy="11" r=".8" />
   </svg>
 </button>
-<dialog id="design-tray" class="design-tray" aria-labelledby="design-title">
+<dialog
+  transition:persist="design-tray"
+  id="design-tray"
+  class="design-tray"
+  aria-labelledby="design-title"
+>
   <header>
     <h2 id="design-title">Design</h2>
     <a href="/design/palettes/">Full lab ↗</a>
@@ -45,6 +51,7 @@ import PaletteTuner from "./PaletteTuner.astro";
 <script>
   import { applyColors } from "../lib/palette-custom";
   applyColors();
+  document.addEventListener("astro:page-load", applyColors);
   const launcher =
     document.querySelector<HTMLButtonElement>(".design-launcher")!;
   const tray = document.querySelector<HTMLDialogElement>(".design-tray")!;
