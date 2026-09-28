@@ -63,6 +63,9 @@
   grid-row: 2;
   justify-self: center;
 }
+.vw-controls:not(:has(.vw-piano)) .vw-fretboard {
+  grid-column: 2 / 4;
+}
 .vw-count {
   grid-column: 4;
   grid-row: 1;

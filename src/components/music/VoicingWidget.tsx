@@ -10,6 +10,7 @@ type Props = {
   instrument: FrettedInstrument;
   diagramHref?: string;
   title?: string;
+  showPiano?: boolean;
   selection?: { label: string; selected: boolean; onSelect: () => void };
   navigation?: {
     index: number;
@@ -27,6 +28,7 @@ export default function VoicingWidget({
   selection,
   navigation,
   title,
+  showPiano = true,
 }: Props) {
   const diagram = (
     <UkeDiagram
@@ -119,7 +121,9 @@ export default function VoicingWidget({
             ))}
           </svg>
         </a>
-        <PianoVoicingButton chord={chord} voicing={fingering.voicing} />
+        {showPiano && (
+          <PianoVoicingButton chord={chord} voicing={fingering.voicing} />
+        )}
       </div>
     </div>
   );

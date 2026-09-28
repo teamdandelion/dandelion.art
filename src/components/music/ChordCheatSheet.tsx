@@ -103,6 +103,7 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
       </div>
       {fingering ? (
         <VoicingWidget
+          showPiano={false}
           chord={chord}
           fingering={fingering}
           instrument={instrument}

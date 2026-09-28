@@ -34,6 +34,9 @@ test("piano icons open exact voicings and restore focus on phones", async ({
   await widget.locator(".vw-piano").click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.getByRole("button", { name: "Close piano voicing" }).click();
+  await page.goto("/music/chords/");
+  await expect(page.locator(".vw-fretboard").first()).toBeVisible();
+  await expect(page.locator(".vw-piano")).toHaveCount(0);
 });
 
 test("chord detail browses shareable voicings and fits phone and desktop", async ({
