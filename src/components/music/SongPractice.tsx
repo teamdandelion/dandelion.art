@@ -61,7 +61,8 @@ function Practice({
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement | null>(null);
   const [scrolling, setScrolling] = useState(false);
-  const [speed, setSpeed] = useState(24);
+  const [speedLevel, setSpeedLevel] = useState(2);
+  const speed = speedLevel * 8;
   const shapes = useMemo(
     () =>
       Object.fromEntries(
@@ -187,18 +188,27 @@ function Practice({
         >
           {scrolling ? "Pause autoscroll" : "Start autoscroll"}
         </button>
-        <label>
-          Speed{" "}
-          <input
-            aria-label="Scroll speed"
-            type="range"
-            min="8"
-            max="60"
-            step="4"
-            value={speed}
-            onChange={(event) => setSpeed(Number(event.target.value))}
-          />
-        </label>
+        <fieldset className="song-speed" aria-label="Scroll speed">
+          <button
+            type="button"
+            aria-label="Slower autoscroll"
+            disabled={speedLevel === 1}
+            onClick={() => setSpeedLevel((level) => Math.max(1, level - 1))}
+          >
+            −
+          </button>
+          <output aria-live="polite" aria-label="Scroll speed level">
+            Speed {speedLevel}
+          </output>
+          <button
+            type="button"
+            aria-label="Faster autoscroll"
+            disabled={speedLevel === 7}
+            onClick={() => setSpeedLevel((level) => Math.min(7, level + 1))}
+          >
+            +
+          </button>
+        </fieldset>
       </div>
       <details className="song-voicings">
         <summary>Voicings · {symbols.join(" · ")}</summary>

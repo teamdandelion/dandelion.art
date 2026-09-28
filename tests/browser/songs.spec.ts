@@ -1,5 +1,37 @@
 import { expect, test } from "@playwright/test";
 
+test("autoscroll has slower defaults and bounded discrete speed buttons", async ({
+  page,
+}) => {
+  await page.goto("/music/songs/ocean-eyes/");
+  const speed = page.getByLabel("Scroll speed level");
+  const slower = page.getByRole("button", { name: "Slower autoscroll" });
+  const faster = page.getByRole("button", { name: "Faster autoscroll" });
+  await expect(speed).toHaveText("Speed 2");
+  await expect(page.getByRole("slider")).toHaveCount(0);
+  await slower.click();
+  await expect(speed).toHaveText("Speed 1");
+  await expect(slower).toBeDisabled();
+  for (let level = 2; level <= 7; level++) {
+    await faster.click();
+    await expect(speed).toHaveText(`Speed ${level}`);
+  }
+  await expect(faster).toBeDisabled();
+  await page.getByRole("button", { name: "Start autoscroll" }).click();
+  await slower.click();
+  await expect(
+    page.getByRole("button", { name: "Pause autoscroll" }),
+  ).toBeVisible();
+  for (const width of [390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  }
+});
+
 test("baritone turnaround taps load exact per-occurrence shapes without changing other instruments", async ({
   page,
 }) => {

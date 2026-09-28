@@ -60,16 +60,23 @@
   background: var(--site-bg, var(--color-base-100));
   border-bottom: 1px solid var(--site-border);
 }
-.song-practice-controls label {
+.song-speed {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   color: var(--site-muted);
   font-size: 0.8rem;
 }
-.song-practice-controls input {
-  width: clamp(70px, 15vw, 120px);
-  accent-color: var(--site-accent);
+.song-speed button {
+  min-width: 44px;
+  font-size: 1.2rem;
+}
+.song-speed output {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.song-speed button:disabled {
+  opacity: 0.4;
 }
 .song-voicings {
   margin: 1rem 0;
