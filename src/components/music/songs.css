@@ -78,6 +78,40 @@
 .song-speed button:disabled {
   opacity: 0.4;
 }
+.song-scroll-mode,
+.song-timing-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.6rem 0;
+  font-size: 0.8rem;
+  color: var(--site-muted);
+}
+.song-scroll-mode select,
+.song-timing-options select,
+.song-timing-options button,
+.song-line-bars select {
+  min-height: 36px;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid var(--site-border);
+  border-radius: 6px;
+  background: var(--site-surface);
+  color: var(--site-text);
+}
+.song-timing-options small {
+  flex-basis: 100%;
+}
+.song-line-bars {
+  flex-basis: 100%;
+  font:
+    0.75rem ui-sans-serif,
+    sans-serif;
+}
+.song-line-active {
+  background: var(--site-soft);
+  border-radius: 6px;
+}
 .song-voicings {
   margin: 1rem 0;
 }
