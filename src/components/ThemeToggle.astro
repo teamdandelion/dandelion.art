@@ -22,17 +22,22 @@
 
 <script>
   import { setAppearance } from "../lib/palette-client";
-  const themeToggle = document.querySelector<HTMLInputElement>(
-    "[data-theme-toggle]",
-  );
+  function setupTheme() {
+    const themeToggle = document.querySelector<HTMLInputElement>(
+      "[data-theme-toggle]",
+    );
 
-  if (themeToggle) {
-    const currentTheme = document.documentElement.getAttribute("data-theme");
-    themeToggle.checked = currentTheme === "light";
+    if (themeToggle && !themeToggle.dataset.bound) {
+      themeToggle.dataset.bound = "true";
+      const currentTheme = document.documentElement.getAttribute("data-theme");
+      themeToggle.checked = currentTheme === "light";
 
-    themeToggle.addEventListener("change", () => {
-      const theme = themeToggle.checked ? "light" : "dark";
-      setAppearance({ theme });
-    });
+      themeToggle.addEventListener("change", () => {
+        const theme = themeToggle.checked ? "light" : "dark";
+        setAppearance({ theme });
+      });
+    }
   }
+  setupTheme();
+  document.addEventListener("astro:page-load", setupTheme);
 </script>

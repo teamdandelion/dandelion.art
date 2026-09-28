@@ -69,7 +69,11 @@ export function updateColors(overrides: Overrides) {
   window.dispatchEvent(new Event("palette-colors-change"));
 }
 export function syncColorAddress() {
-  history.replaceState(null, "", withColorParams(new URL(location.href)));
+  history.replaceState(
+    history.state,
+    "",
+    withColorParams(new URL(location.href)),
+  );
 }
 export function colorShareUrl() {
   const url = withColorParams(new URL(location.href));

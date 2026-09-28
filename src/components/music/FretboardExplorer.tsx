@@ -88,7 +88,11 @@ function Board({
     })),
   };
   useEffect(() => {
-    window.history.replaceState(null, "", voicingHref(instrument, frets));
+    window.history.replaceState(
+      window.history.state,
+      "",
+      voicingHref(instrument, frets),
+    );
   }, [instrument, frets]);
   const select = (index: number, fret: number | null) =>
     setFrets((current) =>

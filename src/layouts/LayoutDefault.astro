@@ -5,6 +5,8 @@ import ThemeToggle from "../components/ThemeToggle.astro";
 import MusicSettings from "../components/music/MusicSettings";
 import PaletteHead from "../components/PaletteHead.astro";
 import DesignWidget from "../components/DesignWidget.astro";
+import { ClientRouter } from "astro:transitions";
+import OfflineStatus from "../components/music/OfflineStatus";
 import { DEFAULT_PALETTE } from "../lib/palettes";
 import "../styles/style.css";
 import "../styles/tailwind.css";
@@ -41,6 +43,14 @@ const isMusic = pathname === "/music" || pathname.startsWith("/music/");
     )}
     <title>{title}</title>
     <PaletteHead />
+    {isMusic && (
+      <>
+        <ClientRouter />
+        <link rel="manifest" href="/music/manifest.webmanifest" />
+        <link rel="apple-touch-icon" href="/music/icon-192.png" />
+        <meta name="theme-color" content="#312c50" />
+      </>
+    )}
   </head>
   <body>
     <div class="min-h-screen bg-base-100" data-page-content>
@@ -105,6 +115,9 @@ const isMusic = pathname === "/music" || pathname.startsWith("/music/");
       <main
         class:list={["max-w-5xl mx-auto px-5 py-8", { "music-page": isMusic }]}
       >
+        {isMusic && (
+          <OfflineStatus client:load transition:persist="music-offline" />
+        )}
         <slot />
       </main>
     </div>
@@ -114,7 +127,30 @@ const isMusic = pathname === "/music" || pathname.startsWith("/music/");
   </body>
 </html>
 
+<script>
+  document.addEventListener("astro:before-swap", (event) => {
+    for (const key of ["theme", "palette", "designTools"]) {
+      const value = document.documentElement.dataset[key];
+      if (value) event.newDocument.documentElement.dataset[key] = value;
+    }
+  });
+</script>
+
 <style>
+  :global(.music-offline) {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin-bottom: 1.5rem;
+    color: var(--site-muted);
+    font-size: 0.8rem;
+  }
+  :global(.music-offline button) {
+    min-height: 44px;
+    padding: 0.5rem;
+    text-decoration: underline;
+  }
   .music-link {
     display: grid;
     place-items: center;

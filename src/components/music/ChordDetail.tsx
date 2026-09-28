@@ -78,7 +78,7 @@ function Detail({
     document.title = `${chord.symbol} · ${instrument.name} — dandelion.art`;
     if (selected)
       window.history.replaceState(
-        null,
+        window.history.state,
         "",
         chordHref(instrument, selected.frets, chord.symbol),
       );
