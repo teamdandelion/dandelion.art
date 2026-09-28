@@ -45,7 +45,7 @@
   flex-wrap: wrap;
   gap: 8px 20px;
 }
-.fb-matches a {
+.fb-matches > span {
   color: var(--ca-ink);
   text-underline-offset: 4px;
   text-decoration: underline;
@@ -233,4 +233,28 @@
   .fb-narrow-label {
     display: inline;
   }
+}
+.fb-matches > span {
+  display: inline-block;
+  margin-right: 0.75rem;
+}
+.fb-piano {
+  margin-top: 1rem;
+}
+.fb-piano summary {
+  cursor: pointer;
+  padding: 0.5rem 0;
+}
+.fb-piano .ca-piano-scroll {
+  overflow-x: auto;
+  padding: 1rem 0;
+}
+.fb-voicing-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.fb-voicing-actions .ca-audio {
+  margin: 0;
 }

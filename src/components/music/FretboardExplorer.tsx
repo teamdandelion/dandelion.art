@@ -9,12 +9,15 @@ import {
   type FrettedInstrument,
   formatNote,
   formatPitch,
+  INSTRUMENTS,
   type Key,
   keyScale,
   midi,
   parseNote,
   pitchClassNumber,
+  type Voicing,
 } from "../../lib/music";
+import { parseChordSelection } from "../../lib/music/analysis";
 import {
   FRET_MARKERS,
   fretboardPitches,
@@ -23,7 +26,15 @@ import {
   predictFretboard,
   recognitionLabel,
 } from "../../lib/music/fretboard";
+import {
+  chordHref,
+  parseVoicingLink,
+  voicingHref,
+} from "../../lib/music/voicing-link";
+import { searchVoicings } from "../../lib/music/voicing-search";
 import { useMusicPreferences } from "./MusicSettings";
+import PianoVoicingButton from "./PianoVoicingButton";
+import { PlayButton } from "./VoicingPlayback";
 import "./chord-atlas.css";
 import "./chord-cheat-sheet.css";
 import "./fretboard.css";
@@ -31,13 +42,13 @@ import "./fretboard.css";
 function Board({
   instrument,
   tonalKey,
+  initialFrets,
 }: {
   instrument: FrettedInstrument;
   tonalKey: Key;
+  initialFrets: (number | null)[];
 }) {
-  const [frets, setFrets] = useState<(number | null)[]>(
-    instrument.courses.map(() => 0),
-  );
+  const [frets, setFrets] = useState<(number | null)[]>(initialFrets);
   const help = useRef<HTMLDialogElement>(null);
   const opener = useRef<HTMLButtonElement>(null);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -55,9 +66,10 @@ function Board({
     };
   }, [helpOpen]);
   const pitches = fretboardPitches(instrument, frets);
+  const maxFret = Math.max(12, ...initialFrets.map((f) => f ?? 0));
   const predictions = useMemo(
-    () => predictFretboard(instrument, frets, tonalKey),
-    [instrument, frets, tonalKey],
+    () => predictFretboard(instrument, frets, tonalKey, maxFret),
+    [instrument, frets, tonalKey, maxFret],
   );
   const [preview, setPreview] = useState("");
   const noteList = [...new Set(pitches)]
@@ -65,7 +77,19 @@ function Board({
     .join(" · ");
   const matches = identifyChords(pitches, tonalKey, true);
   const scale = new Set(keyScale(tonalKey).map(pitchClassNumber));
-  const positions = [null, ...Array.from({ length: 13 }, (_, i) => i)];
+  const positions = [null, ...Array.from({ length: maxFret + 1 }, (_, i) => i)];
+  const voicing: Voicing = {
+    id: `${instrument.id}:${frets.join(",")}`,
+    chordId: matches[0]?.chord.id ?? "custom",
+    voices: pitches.map((pitch, index) => ({
+      id: String(index),
+      pitch: pitchAt(pitch, tonalKey),
+      toneDegree: 0,
+    })),
+  };
+  useEffect(() => {
+    window.history.replaceState(null, "", voicingHref(instrument, frets));
+  }, [instrument, frets]);
   const select = (index: number, fret: number | null) =>
     setFrets((current) =>
       current.map((value, i) => (index === i ? fret : value)),
@@ -92,17 +116,14 @@ function Board({
         {matches.length ? (
           <div className="fb-matches">
             {matches.map(({ chord, bass, coverage }) => (
-              <a
-                key={chord.id}
-                href={`/music/atlas?${new URLSearchParams({ chord: `${chord.symbol}/${bass}`, instrument: instrument.id, frets: frets.map((fret) => fret ?? "x").join(",") })}`}
-              >
+              <span key={chord.id}>
                 <strong>{chord.symbol}</strong>
                 {pitchClassNumber(chord.root) !==
                   pitchClassNumber(parseNote(bass)) && <span> / {bass}</span>}
                 {coverage?.kind === "omitted" && (
                   <small> (fifth omitted)</small>
                 )}
-              </a>
+              </span>
             ))}
           </div>
         ) : (
@@ -111,6 +132,26 @@ function Board({
           </strong>
         )}
         <p>{noteList || "—"}</p>
+        {matches[0] && (
+          <p>
+            <a href={chordHref(instrument, frets, matches[0].chord.symbol)}>
+              About {matches[0].chord.symbol} · more voicings ↗
+            </a>
+          </p>
+        )}
+        <div className="fb-voicing-actions">
+          <button
+            type="button"
+            className="ca-button"
+            onClick={() => setFrets(initialFrets)}
+          >
+            Reset voicing
+          </button>
+          {pitches.length > 0 && <PlayButton voicing={voicing} />}
+          {pitches.length > 0 && (
+            <PianoVoicingButton voicing={voicing} chord={matches[0]?.chord} />
+          )}
+        </div>
         <output className="fb-preview" aria-live="polite">
           {preview || "\u00a0"}
         </output>
@@ -316,7 +357,33 @@ function Board({
 }
 
 export default function FretboardExplorer() {
-  const { instrument, tonic, mode } = useMusicPreferences();
+  const {
+    instrument: savedInstrument,
+    tonic,
+    mode,
+    ready,
+  } = useMusicPreferences();
+  const [request, setRequest] = useState<URLSearchParams | null>(null);
+  useEffect(() => setRequest(new URLSearchParams(window.location.search)), []);
+  const linked = useMemo(
+    () => (request ? parseVoicingLink(request) : null),
+    [request],
+  );
+  const instrument =
+    linked?.instrument ??
+    INSTRUMENTS.find((i) => i.id === request?.get("instrument")) ??
+    savedInstrument;
+  const initialFrets = useMemo(() => {
+    if (linked) return linked.frets;
+    const chord = parseChordSelection(request?.get("chord") ?? "");
+    if (chord)
+      return (
+        searchVoicings(chord.chord, instrument, {
+          bass: chord.bass ? pitchClassNumber(chord.bass) : undefined,
+        })[0]?.frets ?? instrument.courses.map(() => 0)
+      );
+    return instrument.courses.map(() => 0);
+  }, [linked, request, instrument]);
   const tonalKey = useMemo<Key>(
     () => ({ tonic: parseNote(tonic), mode }),
     [tonic, mode],
@@ -325,13 +392,24 @@ export default function FretboardExplorer() {
     <article className="chord-atlas fretboard-explorer">
       <nav className="cs-nav" aria-label="Music tools">
         <a href="/music">Music</a>
-        <a href="/music/chords">Chords ↗</a>
-        <a href="/music/atlas">Chord atlas ↗</a>
+        <a href="/music/chords">← Chords</a>
       </nav>
       <header className="cs-intro">
-        <h1>Fretboard</h1>
+        <h1>
+          {request?.has("frets") || request?.has("chord")
+            ? "Explore voicing"
+            : "Fretboard"}
+        </h1>
+        <p>{instrument.name} · Tap a note to change the shape.</p>
       </header>
-      <Board key={instrument.id} instrument={instrument} tonalKey={tonalKey} />
+      {ready && request && (
+        <Board
+          key={`${instrument.id}:${initialFrets.join(",")}`}
+          instrument={instrument}
+          tonalKey={tonalKey}
+          initialFrets={initialFrets}
+        />
+      )}
     </article>
   );
 }

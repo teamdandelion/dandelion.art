@@ -20,7 +20,7 @@ export function sheetEntry(
     chord,
     instrument,
     fingering: findFingerings(chord, instrument)[0] ?? null,
-    href: `/music/atlas?chord=${encodeURIComponent(chord.symbol)}`,
+    href: `/music/chord?chord=${encodeURIComponent(chord.symbol)}&instrument=${instrument.id}`,
   };
 }
 export type SheetEntry = ReturnType<typeof sheetEntry>;

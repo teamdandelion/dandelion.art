@@ -25,11 +25,12 @@ import {
   practiceRows,
 } from "../../lib/music/practice";
 import { KEY_ROOTS } from "../../lib/music/preferences";
+import { chordHref } from "../../lib/music/voicing-link";
 import { searchVoicings } from "../../lib/music/voicing-search";
 import ChordExploration from "./ChordExploration";
 import ChordTheoryHelp from "./ChordTheoryHelp";
 import { useMusicPreferences } from "./MusicSettings";
-import UkeDiagram from "./UkeDiagram";
+import VoicingWidget from "./VoicingWidget";
 import "./chord-atlas.css";
 import "./chord-cheat-sheet.css";
 
@@ -58,7 +59,9 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
   const symbol = fingering
     ? voicingSymbol(chord, fingering.voicing)
     : chord.symbol;
-  const href = `/music/atlas?chord=${encodeURIComponent(symbol)}`;
+  const href = fingering
+    ? chordHref(instrument, fingering.frets, symbol)
+    : `/music/chord?chord=${encodeURIComponent(symbol)}&instrument=${instrument.id}`;
   const availableBass = new Set(
     shapes.map((s) => pitchClassNumber(bassPitch(s.voicing).note)),
   );
@@ -99,41 +102,20 @@ function VoicingCard({ entry }: { entry: SheetEntry }) {
         </fieldset>
       </div>
       {fingering ? (
-        <>
-          <a href={href} aria-label={`Open ${symbol} in chord atlas`}>
-            <UkeDiagram
-              chord={chord}
-              fingering={fingering}
-              instrument={instrument}
-              reference
-            />
-          </a>
-          <div className="cs-card-controls">
-            <div className="cs-voicing-controls">
-              <button
-                type="button"
-                aria-label={`Previous ${chord.symbol} voicing`}
-                disabled={filtered.length < 2}
-                onClick={() =>
-                  setIndex((index + filtered.length - 1) % filtered.length)
-                }
-              >
-                ←
-              </button>
-              <span aria-live="polite">
-                {(index % filtered.length) + 1}/{filtered.length}
-              </span>
-              <button
-                type="button"
-                aria-label={`Next ${chord.symbol} voicing`}
-                disabled={filtered.length < 2}
-                onClick={() => setIndex((index + 1) % filtered.length)}
-              >
-                →
-              </button>
-            </div>
-          </div>
-        </>
+        <VoicingWidget
+          showPiano={false}
+          chord={chord}
+          fingering={fingering}
+          instrument={instrument}
+          diagramHref={href}
+          navigation={{
+            index: index % filtered.length,
+            count: filtered.length,
+            previous: () =>
+              setIndex((index + filtered.length - 1) % filtered.length),
+            next: () => setIndex((index + 1) % filtered.length),
+          }}
+        />
       ) : (
         <span>No shape in this range</span>
       )}
@@ -227,9 +209,6 @@ export default function ChordCheatSheet() {
         <nav className="cs-nav" aria-label="Music tools">
           <a href="/music">Music</a>
           <a href="/music/fretboard">Fretboard ↗</a>
-          <a className="cs-atlas-link" href="/music/atlas">
-            Chord atlas ↗
-          </a>
         </nav>
         <div className="cs-heading-row">
           <h1 className="cs-title">
