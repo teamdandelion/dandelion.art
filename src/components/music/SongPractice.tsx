@@ -318,6 +318,7 @@ export default function SongPractice({ song }: { song: Song }) {
       <header className="song-heading">
         <p className="song-eyebrow">Practice / {song.artist}</p>
         <h1>{song.title}</h1>
+        {song.note && <p className="song-source">{song.note}</p>}
         <label className="song-instrument">
           Instrument{" "}
           <select

@@ -76,7 +76,7 @@ test("Ocean Eyes preserves the supplied section order and chord vocabulary", () 
 });
 
 test("song voicings are available on each instrument and preserve slash bass", () => {
-  for (const symbol of SONGS[0].chords) {
+  for (const symbol of new Set(SONGS.flatMap((song) => song.chords))) {
     const selection = parseChordSelection(symbol);
     assert.ok(selection);
     for (const instrument of INSTRUMENTS) {
@@ -90,6 +90,40 @@ test("song voicings are available on each instrument and preserve slash bass", (
             pitchClassNumber(bassPitch(shape.voicing).note),
             pitchClassNumber(selection.bass),
           );
+    }
+  }
+});
+
+test("Hallelujah preserves the PDF structure and has no Ocean Eyes overrides", () => {
+  const song = SONGS.find((song) => song.id === "hallelujah");
+  assert.ok(song);
+  assert.deepEqual(song.chords, ["C", "Am", "F", "G", "E7"]);
+  assert.deepEqual(
+    song.sections.map((s) => s.title),
+    [
+      "Intro",
+      "Verse 1",
+      "Chorus",
+      "Verse 2",
+      "Chorus",
+      "Verse 3",
+      "Chorus",
+      "Verse 4",
+      "Chorus",
+      "Verse 5",
+      "Outro",
+    ],
+  );
+  assert.equal(song.sections.flatMap((s) => s.lines).length, 39);
+  assert.equal(song.turnaroundVoicings, undefined);
+  for (const section of song.sections) {
+    for (const line of section.lines) {
+      assert.ok(
+        line.chords
+          .trim()
+          .split(/\s+/)
+          .every((symbol) => song.chords.includes(symbol)),
+      );
     }
   }
 });

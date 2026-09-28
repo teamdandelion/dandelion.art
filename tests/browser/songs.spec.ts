@@ -1,5 +1,53 @@
 import { expect, test } from "@playwright/test";
 
+test("Hallelujah is linked, responsive, playable and available offline", async ({
+  page,
+  context,
+}) => {
+  await page.goto("/music/songs/");
+  await page.getByRole("link", { name: /Hallelujah/ }).click();
+  await expect(
+    page.getByRole("heading", { name: "Hallelujah", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".song-score section")).toHaveCount(11);
+  await expect(page.getByText(/no capo for the original studio/)).toBeVisible();
+  for (const width of [390, 1280]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.screenshot({
+      path: `/tmp/song-hallelujah-${width}.png`,
+      animations: "disabled",
+    });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  }
+  await page
+    .getByRole("button", { name: "Show E7 voicing", exact: true })
+    .first()
+    .click();
+  await expect(
+    page.getByRole("dialog", { name: "E7 voicing", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("dialog").locator(".vw-fretboard"),
+  ).toHaveAttribute("href", /frets=/);
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".music-offline output")).toHaveText(
+    "Available offline",
+  );
+  await context.setOffline(true);
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "Hallelujah", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Start autoscroll" }).click();
+  await expect(
+    page.getByRole("button", { name: "Pause autoscroll" }),
+  ).toBeVisible();
+});
+
 test("autoscroll has slower defaults and bounded discrete speed buttons", async ({
   page,
 }) => {

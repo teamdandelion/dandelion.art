@@ -5,6 +5,7 @@ export type Song = {
   title: string;
   artist: string;
   source: string;
+  note?: string;
   chords: string[];
   sections: SongSection[];
   turnaroundVoicings?: {
@@ -83,6 +84,13 @@ const chorus: SongLine[] = [
     lyrics: "Falling into your ocean eyes",
   },
   { chords: "      G G/B C", lyrics: "Those ocean eyes" },
+];
+
+const hallelujahChorus: SongLine[] = [
+  {
+    chords: "     F           Am          F           C    G   C      Am C Am",
+    lyrics: "Hallelujah, hallelujah, hallelujah, hallelu-u-u-u-jah ....",
+  },
 ];
 
 export const SONGS: Song[] = [
@@ -176,6 +184,186 @@ export const SONGS: Song[] = [
         ],
       },
       { title: "Chorus", lines: chorus },
+    ],
+  },
+  {
+    id: "hallelujah",
+    title: "Hallelujah",
+    artist: "Jeff Buckley",
+    source: "Your uploaded chord chart",
+    note: "Chart note: no capo for the original studio version; capo 1 for the official video. Diagrams show uncapoed shapes.",
+    chords: ["C", "Am", "F", "G", "E7"],
+    sections: [
+      { title: "Intro", lines: [{ chords: "C Am C Am" }] },
+      {
+        title: "Verse 1",
+        lines: [
+          {
+            chords: "  C                 Am",
+            lyrics: "I heard there was a secret chord",
+          },
+          {
+            chords: "     C                   Am",
+            lyrics: "That David played and it pleased the Lord",
+          },
+          {
+            chords: "    F                          G      C        G",
+            lyrics: "But you don't really care for music, do you?",
+          },
+          {
+            chords: "        C                  F           G",
+            lyrics: "Well it goes like this the fourth, the fifth",
+          },
+          {
+            chords: "    Am                 F",
+            lyrics: "The minor fall and the major lift",
+          },
+          {
+            chords: "    G               E7          Am",
+            lyrics: "The baffled king composing hallelujah",
+          },
+        ],
+      },
+      { title: "Chorus", lines: hallelujahChorus },
+      {
+        title: "Verse 2",
+        lines: [
+          {
+            chords: "           C                        Am",
+            lyrics: "Well, your faith was strong but you needed proof",
+          },
+          {
+            chords: "    C               Am",
+            lyrics: "You saw her bathing on the roof",
+          },
+          {
+            chords: "    F                         G   C            G",
+            lyrics: "Her beauty and the moonlight overthrew you",
+          },
+          {
+            chords: "    C               F       G",
+            lyrics: "She tied you to her kitchen chair",
+          },
+          {
+            chords: "    Am                        F",
+            lyrics: "She broke your throne and she cut your hair",
+          },
+          {
+            chords: "    G                  E7            Am",
+            lyrics: "And from your lips she drew the hallelujah",
+          },
+        ],
+      },
+      { title: "Chorus", lines: hallelujahChorus },
+      {
+        title: "Verse 3",
+        lines: [
+          {
+            chords: "C               Am",
+            lyrics: "Baby, I've been here before",
+          },
+          {
+            chords: "     C                       Am",
+            lyrics: "I've seen this room and I've walked this floor, you know",
+          },
+          {
+            chords: "  F                    G      C          G",
+            lyrics: "I used to live alone before I knew you",
+          },
+          {
+            chords: "     C                     F      G",
+            lyrics: "I've seen your flag on the marble arch",
+          },
+          {
+            chords: "    Am            F",
+            lyrics: "And love is not a victory march",
+          },
+          {
+            chords: "       G               E7          Am",
+            lyrics: "It's a cold and it's a broken hallelujah",
+          },
+        ],
+      },
+      { title: "Chorus", lines: hallelujahChorus },
+      {
+        title: "Verse 4",
+        lines: [
+          {
+            chords: "            C                   Am",
+            lyrics: "Well, there was a time when you let me know",
+          },
+          {
+            chords: "       C            Am",
+            lyrics: "What's really going on below",
+          },
+          {
+            chords: "    F                       G     C        G",
+            lyrics: "But now you never show that to me do you",
+          },
+          {
+            chords: "      C             F        G",
+            lyrics: "But remember when I moved in you",
+          },
+          {
+            chords: "        Am            F",
+            lyrics: "And the holy dove was moving too",
+          },
+          {
+            chords: "    G               E7            Am",
+            lyrics: "And every breath we drew was hallelujah",
+          },
+        ],
+      },
+      { title: "Chorus", lines: hallelujahChorus },
+      {
+        title: "Verse 5",
+        lines: [
+          {
+            chords: "      C               Am",
+            lyrics: "Well, maybe there's a God above",
+          },
+          {
+            chords: "    C             Am",
+            lyrics: "But all I've ever learned from love",
+          },
+          {
+            chords: "    F                     G      C        G",
+            lyrics: "Was how to shoot somebody who outdrew you",
+          },
+          {
+            chords: "         C                  F       G",
+            lyrics: "And it's not a cry that you hear at night",
+          },
+          {
+            chords: "     Am                 F",
+            lyrics: "It's not somebody who's seen the light",
+          },
+          {
+            chords: "       G               E7          Am",
+            lyrics: "It's a cold and it's a broken hallelujah",
+          },
+        ],
+      },
+      {
+        title: "Outro",
+        lines: [
+          {
+            chords: "     F           Am          F           C    G",
+            lyrics: "Hallelujah, hallelujah, hallelujah, hallelu-u-u-u ....",
+          },
+          {
+            chords: "     F           Am          F           C    G",
+            lyrics: "Hallelujah, hallelujah, hallelujah, hallelu-u-u-u ....",
+          },
+          {
+            chords:
+              "     F           Am          F                     G    F    Am   F   Am",
+            lyrics:
+              "Hallelujah, hallelujah, hallelujah, hallelu-u-u-u-u-u-u-u-u-u-u-u-u-u-u-ujah ....",
+          },
+          { chords: "     F   G     C", lyrics: "Halleluuuuuuuujah" },
+        ],
+      },
     ],
   },
 ];
