@@ -23,6 +23,57 @@ export type SongToken = {
   frets?: number[];
 };
 
+/** Wrap both rows at the same character offset, never cutting a chord button. */
+export function wrapSongLine(tokens: SongToken[], lyrics = "", columns = 40) {
+  const chords = tokens.map((token) => token.text).join("");
+  let position = 0;
+  const spans = tokens.map((token) => {
+    const start = position;
+    position += token.text.length;
+    return { token, start, end: position };
+  });
+  const length = Math.max(chords.length, lyrics.length);
+  const rows: { offset: number; tokens: SongToken[]; lyrics: string }[] = [];
+  const capacity = Math.max(8, Math.floor(columns));
+  const safe = (at: number) =>
+    !spans.some(
+      ({ token, start, end }) => token.symbol && start < at && at < end,
+    );
+  for (let start = 0; start < length; ) {
+    let end = Math.min(start + capacity, length);
+    if (end < length) {
+      while (end > start && !safe(end)) end--;
+      // Prefer a lyric word boundary, then a hyphen in a long sung syllable.
+      let boundary = 0;
+      for (const separator of [/\s/, /-/]) {
+        for (let at = end; at > start + capacity / 2; at--) {
+          if (safe(at) && separator.test(lyrics[at - 1] ?? "")) {
+            boundary = at;
+            break;
+          }
+        }
+        if (boundary) break;
+      }
+      if (boundary) end = boundary;
+    }
+    rows.push({
+      offset: start,
+      tokens: spans
+        .filter((span) => span.end > start && span.start < end)
+        .map(({ token, start: from, end: to }) => ({
+          ...token,
+          text: token.text.slice(
+            Math.max(0, start - from),
+            Math.min(to, end) - from,
+          ),
+        })),
+      lyrics: lyrics.slice(start, end),
+    });
+    start = end;
+  }
+  return rows;
+}
+
 /** Explicit fret positions survive changes to the voicing enumeration. */
 export function songTokens(
   song: Song,

@@ -1,5 +1,46 @@
 import { expect, test } from "@playwright/test";
 
+test("long song lines wrap on phones with no internal scrollbars", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const song of ["hallelujah", "ocean-eyes"]) {
+    await page.goto(`/music/songs/${song}/`);
+    for (const width of [320, 390, 430, 1280]) {
+      await page.setViewportSize({ width, height: 844 });
+      await expect
+        .poll(() =>
+          page
+            .locator(".song-line-row")
+            .evaluateAll((rows) =>
+              rows.every((row) => row.scrollWidth <= row.clientWidth + 1),
+            ),
+        )
+        .toBe(true);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth <= innerWidth,
+        ),
+      ).toBe(true);
+    }
+  }
+  await page.goto("/music/songs/hallelujah/");
+  await page.setViewportSize({ width: 390, height: 844 });
+  const chorus = page.locator(".song-score section").nth(2);
+  await expect
+    .poll(() => chorus.locator(".song-line-row").count())
+    .toBeGreaterThan(1);
+  await chorus.scrollIntoViewIfNeeded();
+  await chorus.screenshot({ path: "/tmp/hallelujah-wrapped-chorus.png" });
+  await chorus
+    .getByRole("button", { name: "Show Am voicing", exact: true })
+    .last()
+    .click();
+  await expect(
+    page.getByRole("dialog", { name: "Am voicing", exact: true }),
+  ).toBeVisible();
+});
+
 test("Hallelujah is linked, responsive, playable and available offline", async ({
   page,
   context,

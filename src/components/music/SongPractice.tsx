@@ -6,7 +6,12 @@ import {
   realizeFingering,
 } from "../../lib/music";
 import { parseChordSelection } from "../../lib/music/analysis";
-import { type Song, type SongToken, songTokens } from "../../lib/music/songs";
+import {
+  type Song,
+  type SongToken,
+  songTokens,
+  wrapSongLine,
+} from "../../lib/music/songs";
 import { chordHref } from "../../lib/music/voicing-link";
 import { searchVoicings } from "../../lib/music/voicing-search";
 import { useMusicPreferences } from "./MusicSettings";
@@ -63,6 +68,26 @@ function Practice({
   const [scrolling, setScrolling] = useState(false);
   const [speedLevel, setSpeedLevel] = useState(2);
   const speed = speedLevel * 8;
+  const score = useRef<HTMLDivElement>(null);
+  const measure = useRef<HTMLSpanElement>(null);
+  const [columns, setColumns] = useState(32);
+  useEffect(() => {
+    const container = score.current;
+    const ruler = measure.current;
+    if (!container || !ruler) return;
+    const resize = () => {
+      const characterWidth = ruler.getBoundingClientRect().width;
+      if (characterWidth > 0)
+        setColumns(
+          Math.max(8, Math.floor((container.clientWidth - 2) / characterWidth)),
+        );
+    };
+    const observer = new ResizeObserver(resize);
+    observer.observe(container);
+    observer.observe(ruler);
+    resize();
+    return () => observer.disconnect();
+  }, []);
   const shapes = useMemo(
     () =>
       Object.fromEntries(
@@ -220,7 +245,12 @@ function Practice({
           ))}
         </div>
       </details>
-      <div className="song-score">
+      <div className="song-score" ref={score}>
+        <span
+          className="song-line song-measure"
+          ref={measure}
+          aria-hidden="true"
+        />
         {song.sections.map((section, sectionIndex) => (
           <section
             key={`${section.title}-${sectionIndex}`}
@@ -232,27 +262,35 @@ function Practice({
                 className="song-line"
                 key={`${line.chords}-${line.lyrics ?? ""}-${lineIndex}`}
               >
-                <div className="song-chord-line">
-                  {sections[sectionIndex][lineIndex].map((token, i) =>
-                    token.symbol ? (
-                      <button
-                        key={`${i}-${token.text}`}
-                        type="button"
-                        aria-label={`Show ${token.symbol} voicing`}
-                        data-voicing={token.frets?.join(",")}
-                        onClick={(event) => {
-                          trigger.current = event.currentTarget;
-                          setActive(token);
-                        }}
-                      >
-                        {token.text}
-                      </button>
-                    ) : (
-                      <span key={`${i}-${token.text}`}>{token.text}</span>
-                    ),
-                  )}
-                </div>
-                {line.lyrics && <p>{line.lyrics}</p>}
+                {wrapSongLine(
+                  sections[sectionIndex][lineIndex],
+                  line.lyrics,
+                  columns,
+                ).map((row) => (
+                  <div className="song-line-row" key={row.offset}>
+                    <div className="song-chord-line">
+                      {row.tokens.map((token, i) =>
+                        token.symbol ? (
+                          <button
+                            key={`${i}-${token.text}`}
+                            type="button"
+                            aria-label={`Show ${token.symbol} voicing`}
+                            data-voicing={token.frets?.join(",")}
+                            onClick={(event) => {
+                              trigger.current = event.currentTarget;
+                              setActive(token);
+                            }}
+                          >
+                            {token.text}
+                          </button>
+                        ) : (
+                          <span key={`${i}-${token.text}`}>{token.text}</span>
+                        ),
+                      )}
+                    </div>
+                    {row.lyrics && <p>{row.lyrics}</p>}
+                  </div>
+                ))}
               </div>
             ))}
           </section>

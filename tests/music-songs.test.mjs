@@ -6,7 +6,41 @@ import {
   INSTRUMENTS,
   pitchClassNumber,
 } from "../src/lib/music/index.ts";
-import { SONGS, songTokens } from "../src/lib/music/songs.ts";
+import { SONGS, songTokens, wrapSongLine } from "../src/lib/music/songs.ts";
+
+test("responsive song rows preserve every lyric, chord and custom voicing without overflow", () => {
+  for (const song of SONGS) {
+    for (const instrument of INSTRUMENTS) {
+      song.sections.forEach((section, s) => {
+        section.lines.forEach((line, l) => {
+          const tokens = songTokens(song, instrument.id, s, l);
+          for (const columns of [20, 32, 40, 78]) {
+            const rows = wrapSongLine(tokens, line.lyrics, columns);
+            assert.equal(rows.map((r) => r.lyrics).join(""), line.lyrics ?? "");
+            assert.equal(
+              rows
+                .flatMap((r) => r.tokens)
+                .map((t) => t.text)
+                .join(""),
+              tokens.map((t) => t.text).join(""),
+            );
+            assert.deepEqual(
+              rows.flatMap((r) => r.tokens).filter((t) => t.symbol),
+              tokens.filter((t) => t.symbol),
+            );
+            for (const row of rows) {
+              assert.ok(row.lyrics.length <= columns);
+              assert.ok(
+                row.tokens.map((t) => t.text).join("").length <= columns,
+              );
+            }
+          }
+        });
+      });
+    }
+  }
+});
+
 import { searchVoicings } from "../src/lib/music/voicing-search.ts";
 
 test("custom turnarounds apply only to baritone and only raise doubled endings", () => {

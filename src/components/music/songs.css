@@ -118,7 +118,6 @@
   margin-bottom: 1rem;
 }
 .song-line {
-  overflow-x: auto;
   padding-bottom: 0.65rem;
   font:
     16px / 1.55 ui-monospace,
@@ -130,7 +129,17 @@
 .song-line p,
 .song-chord-line {
   white-space: pre;
-  min-width: max-content;
+}
+.song-measure {
+  position: absolute;
+  visibility: hidden;
+  width: 1ch;
+  height: 0;
+  padding: 0;
+  pointer-events: none;
+}
+.song-line-row + .song-line-row {
+  margin-top: 0.35rem;
 }
 .song-chord-line button {
   padding: 0;
