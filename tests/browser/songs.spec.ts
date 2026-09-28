@@ -11,9 +11,11 @@ test("long song lines wrap on phones with no internal scrollbars", async ({
       await expect
         .poll(() =>
           page
-            .locator(".song-line-row")
-            .evaluateAll((rows) =>
-              rows.every((row) => row.scrollWidth <= row.clientWidth + 1),
+            .locator(".song-line")
+            .evaluateAll(
+              (rows) =>
+                rows.length > 0 &&
+                rows.every((row) => row.scrollWidth <= row.clientWidth + 1),
             ),
         )
         .toBe(true);
@@ -28,7 +30,16 @@ test("long song lines wrap on phones with no internal scrollbars", async ({
   await page.setViewportSize({ width: 390, height: 844 });
   const chorus = page.locator(".song-score section").nth(2);
   await expect
-    .poll(() => chorus.locator(".song-line-row").count())
+    .poll(() =>
+      chorus
+        .locator(".song-word")
+        .evaluateAll(
+          (words) =>
+            new Set(
+              words.map((word) => Math.round(word.getBoundingClientRect().top)),
+            ).size,
+        ),
+    )
     .toBeGreaterThan(1);
   await chorus.scrollIntoViewIfNeeded();
   await chorus.screenshot({ path: "/tmp/hallelujah-wrapped-chorus.png" });
@@ -121,45 +132,49 @@ test("autoscroll has slower defaults and bounded discrete speed buttons", async 
   }
 });
 
-test("baritone turnaround taps load exact per-occurrence shapes without changing other instruments", async ({
+test("all instruments use the original chart and obsolete baritone overrides are discarded", async ({
   page,
 }) => {
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      "music.song-shapes.v1:ocean-eyes:baritone-dgbe",
+      JSON.stringify({
+        "occurrence:1:4:0": "10,12,12,12",
+        Cmaj7: "10,12,12,12",
+      }),
+    ),
+  );
   await page.goto("/music/songs/ocean-eyes/");
   const instrument = page.getByRole("combobox", { name: "Song instrument" });
-  await instrument.selectOption("baritone-dgbe");
-  const intro = page.locator(".song-score section").first();
-  for (const frets of ["0,0,0,3", "0,0,0,7", "2,0,1,0"]) {
-    await intro.locator(`[data-voicing="${frets}"]`).click();
-    const dialog = page.getByRole("dialog");
-    await expect(dialog).toBeVisible();
-    const href = await dialog.locator(".vw-fretboard").getAttribute("href");
-    expect(decodeURIComponent(href ?? "")).toContain(frets);
+  for (const value of await instrument
+    .locator("option")
+    .evaluateAll((options) =>
+      options
+        .map((option) => option.getAttribute("value") ?? "")
+        .filter(Boolean),
+    )) {
+    await instrument.selectOption(value);
+    const trigger = page
+      .getByRole("button", { name: "Show G/B voicing", exact: true })
+      .first();
+    await expect(trigger).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Show Cmaj7 voicing", exact: true }),
+    ).toHaveCount(0);
+    await trigger.click();
+    await expect(
+      page.getByRole("dialog", { name: "G/B voicing", exact: true }),
+    ).toBeVisible();
     await page.keyboard.press("Escape");
   }
-  await page
-    .getByRole("button", { name: "Show Cmaj7 voicing", exact: true })
-    .first()
-    .click();
   expect(
-    decodeURIComponent(
-      (await page
-        .getByRole("dialog")
-        .locator(".vw-fretboard")
-        .getAttribute("href")) ?? "",
+    await page.evaluate(() =>
+      JSON.parse(
+        localStorage.getItem("music.song-shapes.v1:ocean-eyes:baritone-dgbe") ??
+          "{}",
+      ),
     ),
-  ).toContain("10,12,12,12");
-  await page.keyboard.press("Escape");
-  await page.reload();
-  await expect(instrument).toHaveValue("baritone-dgbe");
-  await expect(intro.locator('[data-voicing="2,0,1,0"]')).toBeVisible();
-  await instrument.selectOption("guitar-eadgbe");
-  await expect(
-    page.getByRole("button", { name: "Show G/B voicing", exact: true }).first(),
-  ).toBeVisible();
-  await expect(page.locator("[data-voicing]")).toHaveCount(0);
-  await expect(
-    page.getByRole("button", { name: "Show Cmaj7 voicing", exact: true }),
-  ).toHaveCount(0);
+  ).toEqual({});
 });
 
 test("song chart has responsive lyrics, persistent voicings, piano and exact fretboard links", async ({
@@ -224,7 +239,9 @@ test("songs cold-open offline and autoscroll pauses on interaction", async ({
   const song = await context.newPage();
   await song.goto("/music/songs/ocean-eyes/");
   await expect(song.getByRole("heading", { name: "Ocean Eyes" })).toBeVisible();
-  await expect(song.locator(".song-line p").first()).toBeVisible();
+  await expect(
+    song.locator(".song-lyric").filter({ hasText: "been" }).first(),
+  ).toBeVisible();
   await song.getByRole("button", { name: "Start autoscroll" }).click();
   const before = await song.evaluate(() => scrollY);
   await expect

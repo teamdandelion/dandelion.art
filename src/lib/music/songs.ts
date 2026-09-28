@@ -1,146 +1,85 @@
-export type SongLine = { chords: string; lyrics?: string };
-export type SongSection = { title: string; lines: SongLine[] };
-export type Song = {
-  id: string;
-  title: string;
-  artist: string;
-  source: string;
-  note?: string;
-  chords: string[];
-  sections: SongSection[];
-  turnaroundVoicings?: {
-    instrumentId: string;
-    normal: SongVoicing[];
-    higher: SongVoicing[];
-    higherAt: [number, number, number][];
-  };
-};
-export type SongVoicing = { symbol: string; frets: number[] };
-export type SongToken = {
-  text: string;
-  symbol?: string;
-  choiceKey?: string;
-  frets?: number[];
-};
+import type { Song, SongLine } from "./song";
 
-/** Wrap both rows at the same character offset, never cutting a chord button. */
-export function wrapSongLine(tokens: SongToken[], lyrics = "", columns = 40) {
-  const chords = tokens.map((token) => token.text).join("");
-  let position = 0;
-  const spans = tokens.map((token) => {
-    const start = position;
-    position += token.text.length;
-    return { token, start, end: position };
-  });
-  const length = Math.max(chords.length, lyrics.length);
-  const rows: { offset: number; tokens: SongToken[]; lyrics: string }[] = [];
-  const capacity = Math.max(8, Math.floor(columns));
-  const safe = (at: number) =>
-    !spans.some(
-      ({ token, start, end }) => token.symbol && start < at && at < end,
-    );
-  for (let start = 0; start < length; ) {
-    let end = Math.min(start + capacity, length);
-    if (end < length) {
-      while (end > start && !safe(end)) end--;
-      // Prefer a lyric word boundary, then a hyphen in a long sung syllable.
-      let boundary = 0;
-      for (const separator of [/\s/, /-/]) {
-        for (let at = end; at > start + capacity / 2; at--) {
-          if (safe(at) && separator.test(lyrics[at - 1] ?? "")) {
-            boundary = at;
-            break;
-          }
-        }
-        if (boundary) break;
-      }
-      if (boundary) end = boundary;
-    }
-    rows.push({
-      offset: start,
-      tokens: spans
-        .filter((span) => span.end > start && span.start < end)
-        .map(({ token, start: from, end: to }) => ({
-          ...token,
-          text: token.text.slice(
-            Math.max(0, start - from),
-            Math.min(to, end) - from,
-          ),
-        })),
-      lyrics: lyrics.slice(start, end),
-    });
-    start = end;
-  }
-  return rows;
-}
-
-/** Explicit fret positions survive changes to the voicing enumeration. */
-export function songTokens(
-  song: Song,
-  instrumentId: string,
-  section: number,
-  line: number,
-): SongToken[] {
-  const tokens: SongToken[] = song.sections[section].lines[line].chords
-    .split(/(\s+)/)
-    .map((text) => ({
-      text,
-      ...(song.chords.includes(text) ? { symbol: text } : {}),
-    }));
-  const arrangement = song.turnaroundVoicings;
-  if (!arrangement || arrangement.instrumentId !== instrumentId) return tokens;
-  const notes = tokens
-    .map((token, index) => (token.symbol ? index : -1))
-    .filter((index) => index >= 0);
-  let turnaround = 0;
-  for (let i = 0; i < notes.length - 2; i++) {
-    const group = notes.slice(i, i + 3);
-    if (group.map((index) => tokens[index].symbol).join(" ") !== "G G/B C")
-      continue;
-    const higher = arrangement.higherAt.some(
-      ([s, l, t]) => s === section && l === line && t === turnaround,
-    );
-    const voicings = higher ? arrangement.higher : arrangement.normal;
-    group.forEach((index, offset) => {
-      tokens[index] = {
-        text: voicings[offset].symbol,
-        ...voicings[offset],
-        choiceKey: `occurrence:${section}:${line}:${i + offset}`,
-      };
-    });
-    turnaround++;
-    i += 2;
-  }
-  return tokens;
-}
-
-// Transcribed from the user's two-page practice PDF; not an official score.
-const chorus: SongLine[] = [
-  { chords: "   C Dsus2 Em   C Dsus2 Em", lyrics: "No fair" },
+// Practice charts transcribed from the supplied PDFs. Chords anchor to lyric segments.
+const oceanEyesChorus: SongLine[] = [
   {
-    chords: "           C           Dsus2   Em",
-    lyrics: "You really know how to make me cry",
+    segments: [
+      { text: "No " },
+      { chord: "C", text: "fa" },
+      { chord: "Dsus2", text: "ir" },
+      { chord: "Em", text: "" },
+      { chord: "C", text: "" },
+      { chord: "Dsus2", text: "" },
+      { chord: "Em", text: "" },
+    ],
   },
   {
-    chords: "                     G G/B C",
-    lyrics: "When you gimme those ocean eyes",
+    segments: [
+      { text: "You really " },
+      { chord: "C", text: "know how to " },
+      { chord: "Dsus2", text: "make me " },
+      { chord: "Em", text: "cry" },
+    ],
   },
-  { chords: "    C Dsus2 Em   C Dsus2 Em", lyrics: "I'm scared" },
   {
-    chords: "           C           Dsus2      Em",
-    lyrics: "I've never fallen from quite this high",
+    segments: [
+      { text: "When you gimme those " },
+      { chord: "G", text: "oc" },
+      { chord: "G/B", text: "ean " },
+      { chord: "C", text: "eyes" },
+    ],
   },
   {
-    chords: "                  G G/B C",
-    lyrics: "Falling into your ocean eyes",
+    segments: [
+      { text: "I'm " },
+      { chord: "C", text: "sc" },
+      { chord: "Dsus2", text: "ared" },
+      { chord: "Em", text: "" },
+      { chord: "C", text: "" },
+      { chord: "Dsus2", text: "" },
+      { chord: "Em", text: "" },
+    ],
   },
-  { chords: "      G G/B C", lyrics: "Those ocean eyes" },
+  {
+    segments: [
+      { text: "I've never " },
+      { chord: "C", text: "fallen from " },
+      { chord: "Dsus2", text: "quite this " },
+      { chord: "Em", text: "high" },
+    ],
+  },
+  {
+    segments: [
+      { text: "Falling into your " },
+      { chord: "G", text: "oc" },
+      { chord: "G/B", text: "ean " },
+      { chord: "C", text: "eyes" },
+    ],
+  },
+  {
+    segments: [
+      { text: "Those " },
+      { chord: "G", text: "oc" },
+      { chord: "G/B", text: "ean " },
+      { chord: "C", text: "eyes" },
+    ],
+  },
 ];
 
 const hallelujahChorus: SongLine[] = [
   {
-    chords: "     F           Am          F           C    G   C      Am C Am",
-    lyrics: "Hallelujah, hallelujah, hallelujah, hallelu-u-u-u-jah ....",
+    segments: [
+      { text: "Halle" },
+      { chord: "F", text: "lujah, halle" },
+      { chord: "Am", text: "lujah, halle" },
+      { chord: "F", text: "lujah, halle" },
+      { chord: "C", text: "lu-u-" },
+      { chord: "G", text: "u-u-" },
+      { chord: "C", text: "jah ..." },
+      { chord: "Am", text: "." },
+      { chord: "C", text: "" },
+      { chord: "Am", text: "" },
+    ],
   },
 ];
 
@@ -150,91 +89,184 @@ export const SONGS: Song[] = [
     title: "Ocean Eyes",
     artist: "Billie Eilish",
     source: "Your uploaded chord chart",
-    chords: ["C", "Dsus2", "Em", "G", "G/B"],
-    turnaroundVoicings: {
-      instrumentId: "baritone-dgbe",
-      normal: [
-        { symbol: "G", frets: [0, 0, 0, 3] },
-        { symbol: "G", frets: [0, 0, 0, 7] },
-        { symbol: "C", frets: [2, 0, 1, 0] },
-      ],
-      higher: [
-        { symbol: "G", frets: [0, 0, 0, 7] },
-        { symbol: "G", frets: [0, 0, 0, 10] },
-        { symbol: "Cmaj7", frets: [10, 12, 12, 12] },
-      ],
-      // Second halves of consecutive turnarounds: verse/chorus endings and
-      // the doubled instrumental line. Isolated turnarounds stay lower.
-      higherAt: [
-        [1, 4, 0],
-        [2, 6, 0],
-        [3, 4, 0],
-        [4, 6, 0],
-        [5, 3, 1],
-        [6, 6, 0],
-      ],
-    },
     sections: [
       {
         title: "Intro",
-        lines: [{ chords: "C Dsus2 Em   (×3)" }, { chords: "G G/B C" }],
+        lines: [
+          {
+            segments: [
+              { chord: "C", text: "" },
+              { chord: "Dsus2", text: "" },
+              { chord: "Em", text: "" },
+              { text: "(×3)" },
+            ],
+          },
+          {
+            segments: [
+              { chord: "G", text: "" },
+              { chord: "G/B", text: "" },
+              { chord: "C", text: "" },
+            ],
+          },
+        ],
       },
       {
         title: "Verse 1",
         lines: [
           {
-            chords: "C    Dsus2 Em           C   Dsus2 Em",
-            lyrics: "I’ve been watching you for some time",
+            segments: [
+              { chord: "C", text: "I’ve " },
+              { chord: "Dsus2", text: "been w" },
+              { chord: "Em", text: "atching you f" },
+              { chord: "C", text: "or s" },
+              { chord: "Dsus2", text: "ome ti" },
+              { chord: "Em", text: "me" },
+            ],
           },
           {
-            chords: "C     Dsus2 Em               G G/B C",
-            lyrics: "Can’t stop staring at those ocean eyes",
+            segments: [
+              { chord: "C", text: "Can’t " },
+              { chord: "Dsus2", text: "stop s" },
+              { chord: "Em", text: "taring at those o" },
+              { chord: "G", text: "ce" },
+              { chord: "G/B", text: "an e" },
+              { chord: "C", text: "yes" },
+            ],
           },
           {
-            chords: "C  Dsus2 Em         C Dsus2 Em",
-            lyrics: "Burning cities and napalm skies",
+            segments: [
+              { chord: "C", text: "Bur" },
+              { chord: "Dsus2", text: "ning c" },
+              { chord: "Em", text: "ities and n" },
+              { chord: "C", text: "ap" },
+              { chord: "Dsus2", text: "alm sk" },
+              { chord: "Em", text: "ies" },
+            ],
           },
           {
-            chords: "C  Dsus2 Em                  G G/B C",
-            lyrics: "Fifteen flares inside those ocean eyes",
+            segments: [
+              { chord: "C", text: "Fif" },
+              { chord: "Dsus2", text: "teen f" },
+              { chord: "Em", text: "lares inside those o" },
+              { chord: "G", text: "ce" },
+              { chord: "G/B", text: "an e" },
+              { chord: "C", text: "yes" },
+            ],
           },
-          { chords: "     G G/B C", lyrics: "Your ocean eyes" },
+          {
+            segments: [
+              { text: "Your " },
+              { chord: "G", text: "oc" },
+              { chord: "G/B", text: "ean " },
+              { chord: "C", text: "eyes" },
+            ],
+          },
         ],
       },
-      { title: "Chorus", lines: chorus },
+      {
+        title: "Chorus",
+        lines: oceanEyesChorus,
+      },
       {
         title: "Verse 2",
         lines: [
           {
-            chords: "C    Dsus2 Em                C     Dsus2 Em",
-            lyrics: "I've been walking through a world gone blind",
+            segments: [
+              { chord: "C", text: "I've " },
+              { chord: "Dsus2", text: "been w" },
+              { chord: "Em", text: "alking through a w" },
+              { chord: "C", text: "orld g" },
+              { chord: "Dsus2", text: "one bl" },
+              { chord: "Em", text: "ind" },
+            ],
           },
           {
-            chords: "C     Dsus2 Em               G   G/B C",
-            lyrics: "Can't stop thinking of your diamond mind",
+            segments: [
+              { chord: "C", text: "Can't " },
+              { chord: "Dsus2", text: "stop t" },
+              { chord: "Em", text: "hinking of your d" },
+              { chord: "G", text: "iamo" },
+              { chord: "G/B", text: "nd m" },
+              { chord: "C", text: "ind" },
+            ],
           },
           {
-            chords: "C   Dsus2 Em            C       Dsus2 Em",
-            lyrics: "Careful creature made friends with time",
+            segments: [
+              { chord: "C", text: "Care" },
+              { chord: "Dsus2", text: "ful cr" },
+              { chord: "Em", text: "eature made fr" },
+              { chord: "C", text: "iends wi" },
+              { chord: "Dsus2", text: "th tim" },
+              { chord: "Em", text: "e" },
+            ],
           },
           {
-            chords: "   C    Dsus2 Em            G   G/B C",
-            lyrics: "He left her lonely with a diamond mind",
+            segments: [
+              { text: "He " },
+              { chord: "C", text: "left " },
+              { chord: "Dsus2", text: "her lo" },
+              { chord: "Em", text: "nely with a di" },
+              { chord: "G", text: "amon" },
+              { chord: "G/B", text: "d mi" },
+              { chord: "C", text: "nd" },
+            ],
           },
-          { chords: "          G G/B C", lyrics: "And those ocean eyes" },
+          {
+            segments: [
+              { text: "And those " },
+              { chord: "G", text: "oc" },
+              { chord: "G/B", text: "ean " },
+              { chord: "C", text: "eyes" },
+            ],
+          },
         ],
       },
-      { title: "Chorus", lines: chorus },
+      {
+        title: "Chorus",
+        lines: oceanEyesChorus,
+      },
       {
         title: "Instrumental",
         lines: [
-          { chords: "C Dsus2 Em   (×3)" },
-          { chords: "G G/B C" },
-          { chords: "C Dsus2 Em   (×3)" },
-          { chords: "G G/B C     G G/B C" },
+          {
+            segments: [
+              { chord: "C", text: "" },
+              { chord: "Dsus2", text: "" },
+              { chord: "Em", text: "" },
+              { text: "(×3)" },
+            ],
+          },
+          {
+            segments: [
+              { chord: "G", text: "" },
+              { chord: "G/B", text: "" },
+              { chord: "C", text: "" },
+            ],
+          },
+          {
+            segments: [
+              { chord: "C", text: "" },
+              { chord: "Dsus2", text: "" },
+              { chord: "Em", text: "" },
+              { text: "(×3)" },
+            ],
+          },
+          {
+            segments: [
+              { chord: "G", text: "" },
+              { chord: "G/B", text: "" },
+              { chord: "C", text: "" },
+              { chord: "G", text: "" },
+              { chord: "G/B", text: "" },
+              { chord: "C", text: "" },
+            ],
+          },
         ],
       },
-      { title: "Chorus", lines: chorus },
+      {
+        title: "Chorus",
+        lines: oceanEyesChorus,
+      },
     ],
   },
   {
@@ -243,155 +275,287 @@ export const SONGS: Song[] = [
     artist: "Jeff Buckley",
     source: "Your uploaded chord chart",
     note: "Chart note: no capo for the original studio version; capo 1 for the official video. Diagrams show uncapoed shapes.",
-    chords: ["C", "Am", "F", "G", "E7"],
     sections: [
-      { title: "Intro", lines: [{ chords: "C Am C Am" }] },
+      {
+        title: "Intro",
+        lines: [
+          {
+            segments: [
+              { chord: "C", text: "" },
+              { chord: "Am", text: "" },
+              { chord: "C", text: "" },
+              { chord: "Am", text: "" },
+            ],
+          },
+        ],
+      },
       {
         title: "Verse 1",
         lines: [
           {
-            chords: "  C                 Am",
-            lyrics: "I heard there was a secret chord",
+            segments: [
+              { text: "I " },
+              { chord: "C", text: "heard there was a " },
+              { chord: "Am", text: "secret chord" },
+            ],
           },
           {
-            chords: "     C                   Am",
-            lyrics: "That David played and it pleased the Lord",
+            segments: [
+              { text: "That " },
+              { chord: "C", text: "David played and it " },
+              { chord: "Am", text: "pleased the Lord" },
+            ],
           },
           {
-            chords: "    F                          G      C        G",
-            lyrics: "But you don't really care for music, do you?",
+            segments: [
+              { text: "But " },
+              { chord: "F", text: "you don't really care for m" },
+              { chord: "G", text: "usic, d" },
+              { chord: "C", text: "o you?" },
+              { chord: "G", text: "" },
+            ],
           },
           {
-            chords: "        C                  F           G",
-            lyrics: "Well it goes like this the fourth, the fifth",
+            segments: [
+              { text: "Well it " },
+              { chord: "C", text: "goes like this the " },
+              { chord: "F", text: "fourth, the " },
+              { chord: "G", text: "fifth" },
+            ],
           },
           {
-            chords: "    Am                 F",
-            lyrics: "The minor fall and the major lift",
+            segments: [
+              { text: "The " },
+              { chord: "Am", text: "minor fall and the " },
+              { chord: "F", text: "major lift" },
+            ],
           },
           {
-            chords: "    G               E7          Am",
-            lyrics: "The baffled king composing hallelujah",
+            segments: [
+              { text: "The " },
+              { chord: "G", text: "baffled king com" },
+              { chord: "E7", text: "posing halle" },
+              { chord: "Am", text: "lujah" },
+            ],
           },
         ],
       },
-      { title: "Chorus", lines: hallelujahChorus },
+      {
+        title: "Chorus",
+        lines: hallelujahChorus,
+      },
       {
         title: "Verse 2",
         lines: [
           {
-            chords: "           C                        Am",
-            lyrics: "Well, your faith was strong but you needed proof",
+            segments: [
+              { text: "Well, your " },
+              { chord: "C", text: "faith was strong but you " },
+              { chord: "Am", text: "needed proof" },
+            ],
           },
           {
-            chords: "    C               Am",
-            lyrics: "You saw her bathing on the roof",
+            segments: [
+              { text: "You " },
+              { chord: "C", text: "saw her bathing " },
+              { chord: "Am", text: "on the roof" },
+            ],
           },
           {
-            chords: "    F                         G   C            G",
-            lyrics: "Her beauty and the moonlight overthrew you",
+            segments: [
+              { text: "Her " },
+              { chord: "F", text: "beauty and the moonlight o" },
+              { chord: "G", text: "vert" },
+              { chord: "C", text: "hrew you" },
+              { chord: "G", text: "" },
+            ],
           },
           {
-            chords: "    C               F       G",
-            lyrics: "She tied you to her kitchen chair",
+            segments: [
+              { text: "She " },
+              { chord: "C", text: "tied you to her " },
+              { chord: "F", text: "kitchen " },
+              { chord: "G", text: "chair" },
+            ],
           },
           {
-            chords: "    Am                        F",
-            lyrics: "She broke your throne and she cut your hair",
+            segments: [
+              { text: "She " },
+              { chord: "Am", text: "broke your throne and she " },
+              { chord: "F", text: "cut your hair" },
+            ],
           },
           {
-            chords: "    G                  E7            Am",
-            lyrics: "And from your lips she drew the hallelujah",
+            segments: [
+              { text: "And " },
+              { chord: "G", text: "from your lips she " },
+              { chord: "E7", text: "drew the halle" },
+              { chord: "Am", text: "lujah" },
+            ],
           },
         ],
       },
-      { title: "Chorus", lines: hallelujahChorus },
+      {
+        title: "Chorus",
+        lines: hallelujahChorus,
+      },
       {
         title: "Verse 3",
         lines: [
           {
-            chords: "C               Am",
-            lyrics: "Baby, I've been here before",
+            segments: [
+              { chord: "C", text: "Baby, I've been " },
+              { chord: "Am", text: "here before" },
+            ],
           },
           {
-            chords: "     C                       Am",
-            lyrics: "I've seen this room and I've walked this floor, you know",
+            segments: [
+              { text: "I've " },
+              { chord: "C", text: "seen this room and I've " },
+              { chord: "Am", text: "walked this floor, you know" },
+            ],
           },
           {
-            chords: "  F                    G      C          G",
-            lyrics: "I used to live alone before I knew you",
+            segments: [
+              { text: "I " },
+              { chord: "F", text: "used to live alone be" },
+              { chord: "G", text: "fore I " },
+              { chord: "C", text: "knew you" },
+              { chord: "G", text: "" },
+            ],
           },
           {
-            chords: "     C                     F      G",
-            lyrics: "I've seen your flag on the marble arch",
+            segments: [
+              { text: "I've " },
+              { chord: "C", text: "seen your flag on the " },
+              { chord: "F", text: "marble " },
+              { chord: "G", text: "arch" },
+            ],
           },
           {
-            chords: "    Am            F",
-            lyrics: "And love is not a victory march",
+            segments: [
+              { text: "And " },
+              { chord: "Am", text: "love is not a " },
+              { chord: "F", text: "victory march" },
+            ],
           },
           {
-            chords: "       G               E7          Am",
-            lyrics: "It's a cold and it's a broken hallelujah",
+            segments: [
+              { text: "It's a " },
+              { chord: "G", text: "cold and it's a " },
+              { chord: "E7", text: "broken halle" },
+              { chord: "Am", text: "lujah" },
+            ],
           },
         ],
       },
-      { title: "Chorus", lines: hallelujahChorus },
+      {
+        title: "Chorus",
+        lines: hallelujahChorus,
+      },
       {
         title: "Verse 4",
         lines: [
           {
-            chords: "            C                   Am",
-            lyrics: "Well, there was a time when you let me know",
+            segments: [
+              { text: "Well, there " },
+              { chord: "C", text: "was a time when you " },
+              { chord: "Am", text: "let me know" },
+            ],
           },
           {
-            chords: "       C            Am",
-            lyrics: "What's really going on below",
+            segments: [
+              { text: "What's " },
+              { chord: "C", text: "really going " },
+              { chord: "Am", text: "on below" },
+            ],
           },
           {
-            chords: "    F                       G     C        G",
-            lyrics: "But now you never show that to me do you",
+            segments: [
+              { text: "But " },
+              { chord: "F", text: "now you never show that " },
+              { chord: "G", text: "to me " },
+              { chord: "C", text: "do you" },
+              { chord: "G", text: "" },
+            ],
           },
           {
-            chords: "      C             F        G",
-            lyrics: "But remember when I moved in you",
+            segments: [
+              { text: "But re" },
+              { chord: "C", text: "member when I " },
+              { chord: "F", text: "moved in " },
+              { chord: "G", text: "you" },
+            ],
           },
           {
-            chords: "        Am            F",
-            lyrics: "And the holy dove was moving too",
+            segments: [
+              { text: "And the " },
+              { chord: "Am", text: "holy dove was " },
+              { chord: "F", text: "moving too" },
+            ],
           },
           {
-            chords: "    G               E7            Am",
-            lyrics: "And every breath we drew was hallelujah",
+            segments: [
+              { text: "And " },
+              { chord: "G", text: "every breath we " },
+              { chord: "E7", text: "drew was halle" },
+              { chord: "Am", text: "lujah" },
+            ],
           },
         ],
       },
-      { title: "Chorus", lines: hallelujahChorus },
+      {
+        title: "Chorus",
+        lines: hallelujahChorus,
+      },
       {
         title: "Verse 5",
         lines: [
           {
-            chords: "      C               Am",
-            lyrics: "Well, maybe there's a God above",
+            segments: [
+              { text: "Well, " },
+              { chord: "C", text: "maybe there's a " },
+              { chord: "Am", text: "God above" },
+            ],
           },
           {
-            chords: "    C             Am",
-            lyrics: "But all I've ever learned from love",
+            segments: [
+              { text: "But " },
+              { chord: "C", text: "all I've ever " },
+              { chord: "Am", text: "learned from love" },
+            ],
           },
           {
-            chords: "    F                     G      C        G",
-            lyrics: "Was how to shoot somebody who outdrew you",
+            segments: [
+              { text: "Was " },
+              { chord: "F", text: "how to shoot somebody " },
+              { chord: "G", text: "who out" },
+              { chord: "C", text: "drew you" },
+              { chord: "G", text: "" },
+            ],
           },
           {
-            chords: "         C                  F       G",
-            lyrics: "And it's not a cry that you hear at night",
+            segments: [
+              { text: "And it's " },
+              { chord: "C", text: "not a cry that you " },
+              { chord: "F", text: "hear at " },
+              { chord: "G", text: "night" },
+            ],
           },
           {
-            chords: "     Am                 F",
-            lyrics: "It's not somebody who's seen the light",
+            segments: [
+              { text: "It's " },
+              { chord: "Am", text: "not somebody who's " },
+              { chord: "F", text: "seen the light" },
+            ],
           },
           {
-            chords: "       G               E7          Am",
-            lyrics: "It's a cold and it's a broken hallelujah",
+            segments: [
+              { text: "It's a " },
+              { chord: "G", text: "cold and it's a " },
+              { chord: "E7", text: "broken halle" },
+              { chord: "Am", text: "lujah" },
+            ],
           },
         ],
       },
@@ -399,20 +563,46 @@ export const SONGS: Song[] = [
         title: "Outro",
         lines: [
           {
-            chords: "     F           Am          F           C    G",
-            lyrics: "Hallelujah, hallelujah, hallelujah, hallelu-u-u-u ....",
+            segments: [
+              { text: "Halle" },
+              { chord: "F", text: "lujah, halle" },
+              { chord: "Am", text: "lujah, halle" },
+              { chord: "F", text: "lujah, halle" },
+              { chord: "C", text: "lu-u-" },
+              { chord: "G", text: "u-u ...." },
+            ],
           },
           {
-            chords: "     F           Am          F           C    G",
-            lyrics: "Hallelujah, hallelujah, hallelujah, hallelu-u-u-u ....",
+            segments: [
+              { text: "Halle" },
+              { chord: "F", text: "lujah, halle" },
+              { chord: "Am", text: "lujah, halle" },
+              { chord: "F", text: "lujah, halle" },
+              { chord: "C", text: "lu-u-" },
+              { chord: "G", text: "u-u ...." },
+            ],
           },
           {
-            chords:
-              "     F           Am          F                     G    F    Am   F   Am",
-            lyrics:
-              "Hallelujah, hallelujah, hallelujah, hallelu-u-u-u-u-u-u-u-u-u-u-u-u-u-u-ujah ....",
+            segments: [
+              { text: "Halle" },
+              { chord: "F", text: "lujah, halle" },
+              { chord: "Am", text: "lujah, halle" },
+              { chord: "F", text: "lujah, hallelu-u-u-u-u" },
+              { chord: "G", text: "-u-u-" },
+              { chord: "F", text: "u-u-u" },
+              { chord: "Am", text: "-u-u-" },
+              { chord: "F", text: "u-u-" },
+              { chord: "Am", text: "u-ujah ...." },
+            ],
           },
-          { chords: "     F   G     C", lyrics: "Halleluuuuuuuujah" },
+          {
+            segments: [
+              { text: "Halle" },
+              { chord: "F", text: "luuu" },
+              { chord: "G", text: "uuuuuj" },
+              { chord: "C", text: "ah" },
+            ],
+          },
         ],
       },
     ],

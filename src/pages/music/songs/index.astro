@@ -1,6 +1,7 @@
 ---
 import LayoutDefault from "../../../layouts/LayoutDefault.astro";
 import { SONGS } from "../../../lib/music/songs";
+import { songChords } from "../../../lib/music/song";
 import "../../../components/music/songs.css";
 ---
 
@@ -27,7 +28,7 @@ import "../../../components/music/songs.css";
             <p>{song.artist}</p>
           </div>
           <span aria-hidden="true">↗</span>
-          <small>{song.chords.join(" · ")}</small>
+          <small>{songChords(song).join(" · ")}</small>
         </a>
       ))}
     </div>

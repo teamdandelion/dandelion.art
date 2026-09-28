@@ -118,6 +118,10 @@
   margin-bottom: 1rem;
 }
 .song-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  row-gap: 0.35rem;
   padding-bottom: 0.65rem;
   font:
     16px / 1.55 ui-monospace,
@@ -126,23 +130,30 @@
     Consolas,
     monospace;
 }
-.song-line p,
-.song-chord-line {
-  white-space: pre;
+.song-word {
+  display: inline-flex;
+  max-width: 100%;
 }
-.song-measure {
-  position: absolute;
-  visibility: hidden;
-  width: 1ch;
-  height: 0;
-  padding: 0;
-  pointer-events: none;
+.song-segment {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
 }
-.song-line-row + .song-line-row {
-  margin-top: 0.35rem;
+.song-lyric {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-width: 100%;
 }
-.song-chord-line button {
-  padding: 0;
+.song-chord-space {
+  height: 32px;
+}
+.song-instrumental {
+  min-width: max-content;
+  padding-right: 1ch;
+}
+.song-line button {
+  padding: 0 0.4ch 0 0;
   margin: 0;
   border: 0;
   border-radius: 2px;
@@ -155,7 +166,7 @@
   text-decoration-color: var(--site-border);
   text-underline-offset: 4px;
 }
-.song-chord-line button:hover {
+.song-line button:hover {
   background: var(--site-soft);
 }
 .song-modal {

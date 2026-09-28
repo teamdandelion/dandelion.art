@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import test from "node:test";
 import { parseChordSelection } from "../src/lib/music/analysis.ts";
 import {
@@ -6,86 +7,52 @@ import {
   INSTRUMENTS,
   pitchClassNumber,
 } from "../src/lib/music/index.ts";
-import { SONGS, songTokens, wrapSongLine } from "../src/lib/music/songs.ts";
-
-test("responsive song rows preserve every lyric, chord and custom voicing without overflow", () => {
-  for (const song of SONGS) {
-    for (const instrument of INSTRUMENTS) {
-      song.sections.forEach((section, s) => {
-        section.lines.forEach((line, l) => {
-          const tokens = songTokens(song, instrument.id, s, l);
-          for (const columns of [20, 32, 40, 78]) {
-            const rows = wrapSongLine(tokens, line.lyrics, columns);
-            assert.equal(rows.map((r) => r.lyrics).join(""), line.lyrics ?? "");
-            assert.equal(
-              rows
-                .flatMap((r) => r.tokens)
-                .map((t) => t.text)
-                .join(""),
-              tokens.map((t) => t.text).join(""),
-            );
-            assert.deepEqual(
-              rows.flatMap((r) => r.tokens).filter((t) => t.symbol),
-              tokens.filter((t) => t.symbol),
-            );
-            for (const row of rows) {
-              assert.ok(row.lyrics.length <= columns);
-              assert.ok(
-                row.tokens.map((t) => t.text).join("").length <= columns,
-              );
-            }
-          }
-        });
-      });
-    }
-  }
-});
-
+import { songChords } from "../src/lib/music/song.ts";
+import { lyricWords } from "../src/lib/music/song-layout.ts";
+import { SONGS } from "../src/lib/music/songs.ts";
 import { searchVoicings } from "../src/lib/music/voicing-search.ts";
 
-test("custom turnarounds apply only to baritone and only raise doubled endings", () => {
-  const song = SONGS[0];
-  for (const instrument of INSTRUMENTS.filter(
-    (i) => i.id !== "baritone-dgbe",
-  )) {
-    song.sections.forEach((section, s) => {
-      section.lines.forEach((line, l) => {
-        const tokens = songTokens(song, instrument.id, s, l);
-        assert.equal(tokens.map((t) => t.text).join(""), line.chords);
-        assert.ok(tokens.every((t) => !t.frets));
-      });
-    });
-  }
-  const shapes = (s, l) =>
-    songTokens(song, "baritone-dgbe", s, l)
-      .filter((t) => t.frets)
-      .map((t) => [t.symbol, t.frets]);
-  const normal = [
-    ["G", [0, 0, 0, 3]],
-    ["G", [0, 0, 0, 7]],
-    ["C", [2, 0, 1, 0]],
-  ];
-  const higher = [
-    ["G", [0, 0, 0, 7]],
-    ["G", [0, 0, 0, 10]],
-    ["Cmaj7", [10, 12, 12, 12]],
-  ];
-  assert.deepEqual(shapes(0, 1), normal);
-  for (const s of [1, 3]) {
-    assert.deepEqual(shapes(s, 3), normal);
-    assert.deepEqual(shapes(s, 4), higher);
-  }
-  for (const s of [2, 4, 6]) {
-    assert.deepEqual(shapes(s, 5), normal);
-    assert.deepEqual(shapes(s, 6), higher);
-  }
-  assert.deepEqual(shapes(5, 3), [...normal, ...higher]);
-});
+// Captured from the original PDF transcription before migrating the representation.
+const sourceHashes = {
+  "ocean-eyes": {
+    lyrics: "d86ea02ab53d36d637a11664c6bec41f3cda1423a9fa24821f0a2a50c235517f",
+    chords: "cc2c4377daa8cc217e798e52cc0d910c374b2d3a4100f541a87c8bc9cf749e9e",
+  },
+  hallelujah: {
+    lyrics: "edf834fd488ee0a74fb55130e248574fd86b4092b14822dd1e6c1a22b44349fe",
+    chords: "d8f7199a7b08d767d3f001ad696229d25cb82b47b9afe3eca0ede784c0ac80ac",
+  },
+};
+const hash = (value) =>
+  createHash("sha256").update(JSON.stringify(value)).digest("hex");
 
-test("Ocean Eyes preserves the supplied section order and chord vocabulary", () => {
-  const song = SONGS[0];
+test("segment migration preserves original lyrics, chords and section order", () => {
+  for (const song of SONGS) {
+    const lyrics = song.sections.map((s) =>
+      s.lines.map((l) =>
+        l.segments.map((s) => (s.text === "(×3)" ? "" : s.text)).join(""),
+      ),
+    );
+    const chords = song.sections.map((s) =>
+      s.lines.map((l) => l.segments.flatMap((s) => (s.chord ? [s.chord] : []))),
+    );
+    assert.equal(hash(lyrics), sourceHashes[song.id].lyrics);
+    assert.equal(hash(chords), sourceHashes[song.id].chords);
+    assert.equal("turnaroundVoicings" in song, false);
+    for (const line of song.sections.flatMap((s) => s.lines)) {
+      assert.deepEqual(Object.keys(line), ["segments"]);
+      for (const segment of line.segments) {
+        assert.ok(
+          Object.keys(segment).every((key) => ["text", "chord"].includes(key)),
+        );
+        if (segment.chord) assert.ok(parseChordSelection(segment.chord));
+      }
+    }
+  }
+  assert.deepEqual(songChords(SONGS[0]), ["C", "Dsus2", "Em", "G", "G/B"]);
+  assert.deepEqual(songChords(SONGS[1]), ["C", "Am", "F", "G", "E7"]);
   assert.deepEqual(
-    song.sections.map((s) => s.title),
+    SONGS[0].sections.map((s) => s.title),
     [
       "Intro",
       "Verse 1",
@@ -96,44 +63,8 @@ test("Ocean Eyes preserves the supplied section order and chord vocabulary", () 
       "Chorus",
     ],
   );
-  assert.deepEqual(song.chords, ["C", "Dsus2", "Em", "G", "G/B"]);
-  for (const section of song.sections)
-    for (const line of section.lines) {
-      for (const token of line.chords.split(/\s+/).filter(Boolean)) {
-        assert.ok(
-          song.chords.includes(token) || token === "(×3)",
-          `Unknown chord ${token}`,
-        );
-      }
-    }
-  assert.equal(song.sections.filter((s) => s.title === "Chorus").length, 3);
-});
-
-test("song voicings are available on each instrument and preserve slash bass", () => {
-  for (const symbol of new Set(SONGS.flatMap((song) => song.chords))) {
-    const selection = parseChordSelection(symbol);
-    assert.ok(selection);
-    for (const instrument of INSTRUMENTS) {
-      const shapes = searchVoicings(selection.chord, instrument, {
-        bass: selection.bass ? pitchClassNumber(selection.bass) : undefined,
-      });
-      assert.ok(shapes.length, `${symbol} missing on ${instrument.name}`);
-      if (selection.bass)
-        for (const shape of shapes)
-          assert.equal(
-            pitchClassNumber(bassPitch(shape.voicing).note),
-            pitchClassNumber(selection.bass),
-          );
-    }
-  }
-});
-
-test("Hallelujah preserves the PDF structure and has no Ocean Eyes overrides", () => {
-  const song = SONGS.find((song) => song.id === "hallelujah");
-  assert.ok(song);
-  assert.deepEqual(song.chords, ["C", "Am", "F", "G", "E7"]);
   assert.deepEqual(
-    song.sections.map((s) => s.title),
+    SONGS[1].sections.map((s) => s.title),
     [
       "Intro",
       "Verse 1",
@@ -148,16 +79,65 @@ test("Hallelujah preserves the PDF structure and has no Ocean Eyes overrides", (
       "Outro",
     ],
   );
-  assert.equal(song.sections.flatMap((s) => s.lines).length, 39);
-  assert.equal(song.turnaroundVoicings, undefined);
-  for (const section of song.sections) {
-    for (const line of section.lines) {
-      assert.ok(
-        line.chords
-          .trim()
-          .split(/\s+/)
-          .every((symbol) => song.chords.includes(symbol)),
+});
+
+test("word layout retains text and mid-word chord anchors without character measurement", () => {
+  assert.deepEqual(
+    lyricWords([
+      { text: "hal" },
+      { chord: "C", text: "lelujah " },
+      { chord: "Am", text: "again" },
+    ]),
+    [
+      [{ text: "hal" }, { chord: "C", text: "lelujah " }],
+      [{ chord: "Am", text: "again" }],
+    ],
+  );
+  assert.deepEqual(
+    lyricWords([
+      { chord: "C", text: "" },
+      { chord: "Am", text: "" },
+    ]),
+    [[{ chord: "C", text: "" }], [{ chord: "Am", text: "" }]],
+  );
+  assert.deepEqual(lyricWords([]), []);
+  for (const song of SONGS) {
+    for (const line of song.sections.flatMap((s) => s.lines)) {
+      const before = JSON.stringify(line.segments);
+      const parts = lyricWords(line.segments).flat();
+      assert.equal(
+        parts.map((p) => p.text).join(""),
+        line.segments.map((p) => p.text).join(""),
       );
+      const anchors = (segments) => {
+        let offset = 0;
+        return segments.flatMap((segment) => {
+          const anchor = segment.chord ? [[offset, segment.chord]] : [];
+          offset += segment.text.length;
+          return anchor;
+        });
+      };
+      assert.deepEqual(anchors(parts), anchors(line.segments));
+      assert.equal(JSON.stringify(line.segments), before);
+    }
+  }
+});
+
+test("song voicings are available on every instrument and preserve slash bass", () => {
+  for (const symbol of new Set(SONGS.flatMap(songChords))) {
+    const selection = parseChordSelection(symbol);
+    assert.ok(selection);
+    for (const instrument of INSTRUMENTS) {
+      const shapes = searchVoicings(selection.chord, instrument, {
+        bass: selection.bass ? pitchClassNumber(selection.bass) : undefined,
+      });
+      assert.ok(shapes.length, `${symbol} missing on ${instrument.name}`);
+      if (selection.bass)
+        for (const shape of shapes)
+          assert.equal(
+            pitchClassNumber(bassPitch(shape.voicing).note),
+            pitchClassNumber(selection.bass),
+          );
     }
   }
 });
