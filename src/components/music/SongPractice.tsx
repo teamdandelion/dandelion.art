@@ -3,9 +3,10 @@ import {
   type FrettedInstrument,
   INSTRUMENTS,
   pitchClassNumber,
+  realizeFingering,
 } from "../../lib/music";
 import { parseChordSelection } from "../../lib/music/analysis";
-import type { Song } from "../../lib/music/songs";
+import { type Song, type SongToken, songTokens } from "../../lib/music/songs";
 import { chordHref } from "../../lib/music/voicing-link";
 import { searchVoicings } from "../../lib/music/voicing-search";
 import { useMusicPreferences } from "./MusicSettings";
@@ -39,7 +40,24 @@ function Practice({
     }
     return {};
   });
-  const [active, setActive] = useState<string | null>(null);
+  const [active, setActive] = useState<SongToken | null>(null);
+  const sections = useMemo(
+    () =>
+      song.sections.map((section, s) =>
+        section.lines.map((_, l) => songTokens(song, instrument.id, s, l)),
+      ),
+    [song, instrument.id],
+  );
+  const symbols = useMemo(
+    () => [
+      ...new Set(
+        sections
+          .flat(2)
+          .flatMap((token) => (token.symbol ? [token.symbol] : [])),
+      ),
+    ],
+    [sections],
+  );
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement | null>(null);
   const [scrolling, setScrolling] = useState(false);
@@ -47,7 +65,7 @@ function Practice({
   const shapes = useMemo(
     () =>
       Object.fromEntries(
-        song.chords.map((symbol) => {
+        symbols.map((symbol) => {
           const selection = parseChordSelection(symbol);
           if (!selection) throw new Error(`Invalid song chord: ${symbol}`);
           return [
@@ -63,7 +81,7 @@ function Practice({
           ];
         }),
       ),
-    [song, instrument],
+    [symbols, instrument],
   );
   useEffect(() => {
     try {
@@ -117,12 +135,19 @@ function Practice({
       document.removeEventListener("visibilitychange", stop);
     };
   }, [scrolling, speed]);
-  function renderVoicing(symbol: string, withPlayback = false) {
-    const { chord, fingerings } = shapes[symbol];
+  function renderVoicing(token: SongToken, withPlayback = false) {
+    const symbol = token.symbol ?? token.text;
+    const { chord, fingerings: found } = shapes[symbol];
+    const preferred = token.frets?.join(",");
+    const fingerings =
+      preferred && !found.some((shape) => shape.frets.join(",") === preferred)
+        ? [realizeFingering(chord, token.frets ?? [], instrument), ...found]
+        : found;
+    const choiceKey = token.choiceKey ?? symbol;
     const index = Math.max(
       0,
       fingerings.findIndex(
-        (shape) => shape.frets.join(",") === choices[symbol],
+        (shape) => shape.frets.join(",") === (choices[choiceKey] ?? preferred),
       ),
     );
     const shape = fingerings[index];
@@ -130,7 +155,7 @@ function Practice({
     const choose = (next: number) =>
       setChoices((current) => ({
         ...current,
-        [symbol]: fingerings[next].frets.join(","),
+        [choiceKey]: fingerings[next].frets.join(","),
       }));
     return (
       <>
@@ -176,11 +201,11 @@ function Practice({
         </label>
       </div>
       <details className="song-voicings">
-        <summary>Voicings · {song.chords.join(" · ")}</summary>
+        <summary>Voicings · {symbols.join(" · ")}</summary>
         <div className="song-shapes">
-          {song.chords.map((symbol) => (
+          {symbols.map((symbol) => (
             <div className="song-shape" key={symbol}>
-              {renderVoicing(symbol)}
+              {renderVoicing({ text: symbol, symbol })}
             </div>
           ))}
         </div>
@@ -198,21 +223,22 @@ function Practice({
                 key={`${line.chords}-${line.lyrics ?? ""}-${lineIndex}`}
               >
                 <div className="song-chord-line">
-                  {line.chords.split(/(\s+)/).map((token, i) =>
-                    song.chords.includes(token) ? (
+                  {sections[sectionIndex][lineIndex].map((token, i) =>
+                    token.symbol ? (
                       <button
-                        key={`${i}-${token}`}
+                        key={`${i}-${token.text}`}
                         type="button"
-                        aria-label={`Show ${token} voicing`}
+                        aria-label={`Show ${token.symbol} voicing`}
+                        data-voicing={token.frets?.join(",")}
                         onClick={(event) => {
                           trigger.current = event.currentTarget;
                           setActive(token);
                         }}
                       >
-                        {token}
+                        {token.text}
                       </button>
                     ) : (
-                      <span key={`${i}-${token}`}>{token}</span>
+                      <span key={`${i}-${token.text}`}>{token.text}</span>
                     ),
                   )}
                 </div>
@@ -224,12 +250,15 @@ function Practice({
       </div>
       <p className="song-source">
         Arrangement from {song.source.toLowerCase()}. Chord placement follows
-        the supplied chart; autoscroll speed is not a tempo marking.
+        {song.turnaroundVoicings?.instrumentId === instrument.id
+          ? "your baritone arrangement, with Cmaj7 in the higher turnarounds"
+          : "the supplied chart"}
+        ; autoscroll speed is not a tempo marking.
       </p>
       <dialog
         className="cs-modal song-modal"
         ref={dialog}
-        aria-label={`${active ?? "Chord"} voicing`}
+        aria-label={`${active?.symbol ?? "Chord"} voicing`}
         onCancel={(event) => {
           if (event.target !== event.currentTarget) return;
           event.preventDefault();

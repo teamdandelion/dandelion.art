@@ -6,8 +6,47 @@ import {
   INSTRUMENTS,
   pitchClassNumber,
 } from "../src/lib/music/index.ts";
-import { SONGS } from "../src/lib/music/songs.ts";
+import { SONGS, songTokens } from "../src/lib/music/songs.ts";
 import { searchVoicings } from "../src/lib/music/voicing-search.ts";
+
+test("custom turnarounds apply only to baritone and only raise doubled endings", () => {
+  const song = SONGS[0];
+  for (const instrument of INSTRUMENTS.filter(
+    (i) => i.id !== "baritone-dgbe",
+  )) {
+    song.sections.forEach((section, s) => {
+      section.lines.forEach((line, l) => {
+        const tokens = songTokens(song, instrument.id, s, l);
+        assert.equal(tokens.map((t) => t.text).join(""), line.chords);
+        assert.ok(tokens.every((t) => !t.frets));
+      });
+    });
+  }
+  const shapes = (s, l) =>
+    songTokens(song, "baritone-dgbe", s, l)
+      .filter((t) => t.frets)
+      .map((t) => [t.symbol, t.frets]);
+  const normal = [
+    ["G", [0, 0, 0, 3]],
+    ["G", [0, 0, 0, 7]],
+    ["C", [2, 0, 1, 0]],
+  ];
+  const higher = [
+    ["G", [0, 0, 0, 7]],
+    ["G", [0, 0, 0, 10]],
+    ["Cmaj7", [10, 12, 12, 12]],
+  ];
+  assert.deepEqual(shapes(0, 1), normal);
+  for (const s of [1, 3]) {
+    assert.deepEqual(shapes(s, 3), normal);
+    assert.deepEqual(shapes(s, 4), higher);
+  }
+  for (const s of [2, 4, 6]) {
+    assert.deepEqual(shapes(s, 5), normal);
+    assert.deepEqual(shapes(s, 6), higher);
+  }
+  assert.deepEqual(shapes(5, 3), [...normal, ...higher]);
+});
 
 test("Ocean Eyes preserves the supplied section order and chord vocabulary", () => {
   const song = SONGS[0];

@@ -1,5 +1,46 @@
 import { expect, test } from "@playwright/test";
 
+test("baritone turnaround taps load exact per-occurrence shapes without changing other instruments", async ({
+  page,
+}) => {
+  await page.goto("/music/songs/ocean-eyes/");
+  const instrument = page.getByRole("combobox", { name: "Song instrument" });
+  await instrument.selectOption("baritone-dgbe");
+  const intro = page.locator(".song-score section").first();
+  for (const frets of ["0,0,0,3", "0,0,0,7", "2,0,1,0"]) {
+    await intro.locator(`[data-voicing="${frets}"]`).click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    const href = await dialog.locator(".vw-fretboard").getAttribute("href");
+    expect(decodeURIComponent(href ?? "")).toContain(frets);
+    await page.keyboard.press("Escape");
+  }
+  await page
+    .getByRole("button", { name: "Show Cmaj7 voicing", exact: true })
+    .first()
+    .click();
+  expect(
+    decodeURIComponent(
+      (await page
+        .getByRole("dialog")
+        .locator(".vw-fretboard")
+        .getAttribute("href")) ?? "",
+    ),
+  ).toContain("10,12,12,12");
+  await page.keyboard.press("Escape");
+  await page.reload();
+  await expect(instrument).toHaveValue("baritone-dgbe");
+  await expect(intro.locator('[data-voicing="2,0,1,0"]')).toBeVisible();
+  await instrument.selectOption("guitar-eadgbe");
+  await expect(
+    page.getByRole("button", { name: "Show G/B voicing", exact: true }).first(),
+  ).toBeVisible();
+  await expect(page.locator("[data-voicing]")).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Show Cmaj7 voicing", exact: true }),
+  ).toHaveCount(0);
+});
+
 test("song chart has responsive lyrics, persistent voicings, piano and exact fretboard links", async ({
   page,
 }) => {

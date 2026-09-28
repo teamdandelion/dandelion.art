@@ -7,7 +7,60 @@ export type Song = {
   source: string;
   chords: string[];
   sections: SongSection[];
+  turnaroundVoicings?: {
+    instrumentId: string;
+    normal: SongVoicing[];
+    higher: SongVoicing[];
+    higherAt: [number, number, number][];
+  };
 };
+export type SongVoicing = { symbol: string; frets: number[] };
+export type SongToken = {
+  text: string;
+  symbol?: string;
+  choiceKey?: string;
+  frets?: number[];
+};
+
+/** Explicit fret positions survive changes to the voicing enumeration. */
+export function songTokens(
+  song: Song,
+  instrumentId: string,
+  section: number,
+  line: number,
+): SongToken[] {
+  const tokens: SongToken[] = song.sections[section].lines[line].chords
+    .split(/(\s+)/)
+    .map((text) => ({
+      text,
+      ...(song.chords.includes(text) ? { symbol: text } : {}),
+    }));
+  const arrangement = song.turnaroundVoicings;
+  if (!arrangement || arrangement.instrumentId !== instrumentId) return tokens;
+  const notes = tokens
+    .map((token, index) => (token.symbol ? index : -1))
+    .filter((index) => index >= 0);
+  let turnaround = 0;
+  for (let i = 0; i < notes.length - 2; i++) {
+    const group = notes.slice(i, i + 3);
+    if (group.map((index) => tokens[index].symbol).join(" ") !== "G G/B C")
+      continue;
+    const higher = arrangement.higherAt.some(
+      ([s, l, t]) => s === section && l === line && t === turnaround,
+    );
+    const voicings = higher ? arrangement.higher : arrangement.normal;
+    group.forEach((index, offset) => {
+      tokens[index] = {
+        text: voicings[offset].symbol,
+        ...voicings[offset],
+        choiceKey: `occurrence:${section}:${line}:${i + offset}`,
+      };
+    });
+    turnaround++;
+    i += 2;
+  }
+  return tokens;
+}
 
 // Transcribed from the user's two-page practice PDF; not an official score.
 const chorus: SongLine[] = [
@@ -39,6 +92,29 @@ export const SONGS: Song[] = [
     artist: "Billie Eilish",
     source: "Your uploaded chord chart",
     chords: ["C", "Dsus2", "Em", "G", "G/B"],
+    turnaroundVoicings: {
+      instrumentId: "baritone-dgbe",
+      normal: [
+        { symbol: "G", frets: [0, 0, 0, 3] },
+        { symbol: "G", frets: [0, 0, 0, 7] },
+        { symbol: "C", frets: [2, 0, 1, 0] },
+      ],
+      higher: [
+        { symbol: "G", frets: [0, 0, 0, 7] },
+        { symbol: "G", frets: [0, 0, 0, 10] },
+        { symbol: "Cmaj7", frets: [10, 12, 12, 12] },
+      ],
+      // Second halves of consecutive turnarounds: verse/chorus endings and
+      // the doubled instrumental line. Isolated turnarounds stay lower.
+      higherAt: [
+        [1, 4, 0],
+        [2, 6, 0],
+        [3, 4, 0],
+        [4, 6, 0],
+        [5, 3, 1],
+        [6, 6, 0],
+      ],
+    },
     sections: [
       {
         title: "Intro",
