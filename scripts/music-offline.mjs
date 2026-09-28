@@ -29,12 +29,16 @@ export default function musicOffline() {
               await visit(dependency);
           }
         };
-        for (const entry of await readdir(`${root}music`, {
-          withFileTypes: true,
-        })) {
-          if (entry.isDirectory()) await visit(`/music/${entry.name}/`);
-        }
-        await visit("/music/");
+        const visitPages = async (url) => {
+          const entries = await readdir(`${root}${url.slice(1)}`, {
+            withFileTypes: true,
+          });
+          if (entries.some((entry) => entry.name === "index.html"))
+            await visit(url);
+          for (const entry of entries)
+            if (entry.isDirectory()) await visitPages(`${url}${entry.name}/`);
+        };
+        await visitPages("/music/");
         for (const url of [
           "/music/manifest.webmanifest",
           "/music/icon-192.png",

@@ -1,0 +1,17 @@
+---
+import LayoutDefault from "../../../layouts/LayoutDefault.astro";
+import { SONGS } from "../../../lib/music/songs";
+import SongPractice from "../../../components/music/SongPractice";
+export function getStaticPaths() {
+  return SONGS.map((song) => ({ params: { song: song.id }, props: { song } }));
+}
+const { song } = Astro.props;
+---
+
+<LayoutDefault
+  title={`${song.title} · ${song.artist} — dandelion.art`}
+  description="Lyrics, chord voicings, and a scrolling practice view."
+  noindex
+>
+  <SongPractice song={song} client:load />
+</LayoutDefault>

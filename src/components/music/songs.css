@@ -1,0 +1,229 @@
+.songs-index,
+.chord-atlas.song-page {
+  max-width: 760px;
+  margin: auto;
+}
+.songs-index nav,
+.song-page nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.songs-index nav a,
+.song-page nav a {
+  color: var(--site-accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.song-heading,
+.songs-index header {
+  margin: 2rem 0 1.5rem;
+}
+.song-eyebrow {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--site-muted);
+}
+.song-heading h1,
+.songs-index h1 {
+  font:
+    400 clamp(2.7rem, 8vw, 4rem) / 1.2 Georgia,
+    serif;
+  margin: 0.5rem 0 1rem;
+}
+.song-instrument {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  color: var(--site-muted);
+  font-size: 0.85rem;
+}
+.song-instrument select,
+.song-practice-controls button {
+  min-height: 44px;
+  border: 1px solid var(--site-border);
+  background: var(--site-surface);
+  color: var(--site-text);
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+}
+.song-practice-controls {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0;
+  background: var(--site-bg, var(--color-base-100));
+  border-bottom: 1px solid var(--site-border);
+}
+.song-speed {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--site-muted);
+  font-size: 0.8rem;
+}
+.song-speed button {
+  min-width: 44px;
+  font-size: 1.2rem;
+}
+.song-speed output {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.song-speed button:disabled {
+  opacity: 0.4;
+}
+.song-voicings {
+  margin: 1rem 0;
+}
+.song-voicings summary {
+  min-height: 44px;
+  padding: 0.65rem 0;
+  color: var(--site-accent);
+}
+.song-shapes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0.5rem 0 1.5rem;
+}
+.song-shape {
+  min-width: 0;
+  border: 1px solid var(--site-border);
+  border-radius: 10px;
+  background: var(--site-surface);
+  padding: 0.65rem;
+}
+.song-shape .ca-uke-diagram {
+  width: 100%;
+  max-width: 220px;
+  display: block;
+  margin: auto;
+}
+.song-score section {
+  margin: 1.5rem 0 2.5rem;
+}
+.song-score h2 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--site-muted);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--site-border);
+  margin-bottom: 1rem;
+}
+.song-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  row-gap: 0.35rem;
+  padding-bottom: 0.65rem;
+  font:
+    16px / 1.55 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Consolas,
+    monospace;
+}
+.song-word {
+  display: inline-flex;
+  max-width: 100%;
+}
+.song-segment {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+.song-lyric {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.song-chord-space {
+  height: 32px;
+}
+.song-instrumental {
+  min-width: max-content;
+  padding-right: 1ch;
+}
+.song-line button {
+  padding: 0 0.4ch 0 0;
+  margin: 0;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--site-accent);
+  font: inherit;
+  font-weight: 700;
+  min-height: 32px;
+  text-decoration: underline;
+  text-decoration-color: var(--site-border);
+  text-underline-offset: 4px;
+}
+.song-line button:hover {
+  background: var(--site-soft);
+}
+.song-modal {
+  max-width: min(380px, calc(100vw - 24px));
+}
+.song-modal .ca-uke-diagram {
+  display: block;
+  width: 220px;
+  max-width: 100%;
+  margin: auto;
+}
+.song-modal .ca-audio {
+  margin-top: 1rem;
+}
+.song-source {
+  font-size: 0.75rem;
+  color: var(--site-muted);
+  max-width: 36rem;
+}
+.song-index-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  padding: 1.5rem;
+  border: 1px solid var(--site-border);
+  border-radius: 12px;
+  background: var(--site-surface);
+  margin-top: 1rem;
+}
+.song-index-card h2 {
+  font:
+    400 1.7rem Georgia,
+    serif;
+  margin-bottom: 0.35rem;
+}
+.song-index-card small {
+  grid-column: 1 / -1;
+  color: var(--site-accent);
+}
+@media (max-width: 600px) {
+  .song-shapes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .song-line {
+    font-size: clamp(12px, 3.3vw, 16px);
+  }
+  .song-practice-controls {
+    font-size: 0.85rem;
+  }
+}
+@media print {
+  .song-practice-controls,
+  .song-instrument,
+  .song-voicings {
+    display: none;
+  }
+  .song-line {
+    break-inside: avoid;
+  }
+}
