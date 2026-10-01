@@ -56,10 +56,18 @@ export function dictionaryRows(
   instrument: FrettedInstrument,
   groups: readonly ChordGroup[],
 ) {
-  return CHROMATIC_ROOTS.map((root) => ({
-    root,
-    entries: CHORD_QUALITIES.filter((f) => groups.includes(f.group)).map((f) =>
-      sheetEntry(makeChord(root, f.id), instrument),
+  // Quality first: hear one sound in all twelve roots before introducing the next.
+  // The catalog starts major, minor, dominant 7, major 7, minor 7.
+  return CHORD_QUALITIES.filter((formula) =>
+    groups.includes(formula.group),
+  ).map((formula) => ({
+    quality: formula.id,
+    label: formula.name,
+    shortLabel: ["major", "minor"].includes(formula.id)
+      ? formula.name
+      : formula.suffix,
+    entries: CHROMATIC_ROOTS.map((root) =>
+      sheetEntry(makeChord(root, formula.id), instrument),
     ),
   }));
 }
