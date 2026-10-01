@@ -1,5 +1,105 @@
 import { expect, test } from "@playwright/test";
 
+test("all chords runs through chromatic quality families on phone and desktop", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/music/chords/?view=all");
+  const families = page.locator(".cs-dictionary > section");
+  await expect(families.first().locator("h3")).toHaveText([
+    "C",
+    "D♭",
+    "D",
+    "E♭",
+    "E",
+    "F",
+    "G♭",
+    "G",
+    "A♭",
+    "A",
+    "B♭",
+    "B",
+  ]);
+  await expect(families.nth(1).locator("h3")).toHaveText([
+    "Cm",
+    "D♭m",
+    "Dm",
+    "E♭m",
+    "Em",
+    "Fm",
+    "G♭m",
+    "Gm",
+    "A♭m",
+    "Am",
+    "B♭m",
+    "Bm",
+  ]);
+  await expect(families.nth(2).locator("h3").first()).toHaveText("C7");
+  await expect(families.nth(3).locator("h3").first()).toHaveText("Cmaj7");
+  await expect(families.nth(4).locator("h3").first()).toHaveText("Cm7");
+  for (const [width, columns] of [
+    [390, 2],
+    [1280, 3],
+  ]) {
+    await page.setViewportSize({ width, height: 844 });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    expect(
+      await page
+        .locator(".cs-dictionary .cs-jump a")
+        .evaluateAll((links) =>
+          links.every((link) => link.scrollWidth <= link.clientWidth + 1),
+        ),
+    ).toBe(true);
+    expect(
+      await families
+        .first()
+        .locator(".cs-chords")
+        .evaluate(
+          (el) => getComputedStyle(el).gridTemplateColumns.split(" ").length,
+        ),
+    ).toBe(columns);
+    expect(
+      await page
+        .locator(".cs-dictionary *")
+        .evaluateAll((elements) =>
+          elements
+            .filter((el) => el.getBoundingClientRect().right > innerWidth + 1)
+            .map((el) => `${el.className}: ${el.textContent?.slice(0, 30)}`),
+        ),
+    ).toEqual([]);
+    await page.screenshot({
+      path: `/tmp/chord-practice-${width}.png`,
+      animations: "disabled",
+    });
+  }
+  await page
+    .getByRole("navigation", { name: "Jump to chord family" })
+    .getByRole("link", { name: "Minor seventh", exact: true })
+    .click();
+  await expect(page).toHaveURL(/#quality-m7$/);
+  const first = families.nth(4).locator(".cs-chord").first();
+  const before = await first.locator(".vw-fretboard").getAttribute("href");
+  await first.getByRole("button", { name: "Next Cm7 voicing" }).click();
+  await expect(first.locator(".vw-fretboard")).not.toHaveAttribute(
+    "href",
+    before ?? "",
+  );
+  await page.getByRole("button", { name: "Chords settings" }).click();
+  await page
+    .getByRole("group", { name: "Chord families" })
+    .getByRole("button", { name: "sus2", exact: true })
+    .click();
+  await expect(
+    page
+      .getByRole("region", { name: "Suspended second", exact: true })
+      .locator("h3"),
+  ).toHaveCount(12);
+});
+
 test("piano icons open exact voicings and restore focus on phones", async ({
   page,
 }) => {
@@ -575,7 +675,7 @@ test("heading key selector persists key and offers all chords", async ({
   await expect(key).toHaveValue("major:C");
   await key.selectOption("all");
   await expect(
-    page.getByRole("navigation", { name: "Jump to chord root" }),
+    page.getByRole("navigation", { name: "Jump to chord family" }),
   ).toBeVisible();
   await key.selectOption("natural-minor:C#");
   await expect(page.locator(".cs-section-heading").first()).toContainText(

@@ -10,11 +10,7 @@ import {
   pitchClassNumber,
 } from "../../lib/music";
 import { voicingSymbol } from "../../lib/music/analysis";
-import {
-  practiceSheet,
-  ROOT_ALIASES,
-  type SheetEntry,
-} from "../../lib/music/cheat-sheet";
+import { practiceSheet, type SheetEntry } from "../../lib/music/cheat-sheet";
 import {
   DEFAULT_GROUPS,
   dictionaryRows,
@@ -130,8 +126,11 @@ export default function ChordCheatSheet() {
   const [optionsOpen, setOptionsOpen] = useState(false);
   const [explore, setExplore] = useState(true);
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("view") === "reference")
-      setExplore(false);
+    const requestedView = new URLSearchParams(window.location.search).get(
+      "view",
+    );
+    if (requestedView === "all") setView("all");
+    if (requestedView === "reference") setExplore(false);
   }, []);
   const musicalKey = useMemo(
     () => ({ tonic: parseNote(tonic), mode }),
@@ -328,7 +327,7 @@ export default function ChordCheatSheet() {
       >
         {view === "key"
           ? `${keyName}: ${rows.reduce((n, row) => n + row.entries.length, 0)} chords.`
-          : `${dictionary.length * dictionary[0].entries.length} chords across all 12 roots.`}
+          : `${dictionary.reduce((count, family) => count + family.entries.length, 0)} chords · 12 roots per family`}
       </output>
       {view === "key" ? (
         explore ? (
@@ -421,21 +420,26 @@ export default function ChordCheatSheet() {
           </>
         )
       ) : (
-        <>
-          <nav className="cs-jump" aria-label="Jump to chord root">
-            {dictionary.map(({ root }) => (
-              <a key={root} href={`#root-${root}`}>
-                {formatNote(parseNote(root))}
+        <div className="cs-dictionary">
+          <nav className="cs-jump" aria-label="Jump to chord family">
+            {dictionary.map(({ quality, label, shortLabel }) => (
+              <a
+                key={quality}
+                href={`#quality-${quality}`}
+                aria-label={label}
+                title={label}
+              >
+                {shortLabel}
               </a>
             ))}
           </nav>
-          {dictionary.map(({ root, entries }) => (
+          {dictionary.map(({ quality, label, entries }) => (
             <section
-              key={root}
+              key={quality}
               className="cs-row"
-              aria-labelledby={`root-${root}`}
+              aria-labelledby={`quality-${quality}`}
             >
-              <h2 id={`root-${root}`}>{ROOT_ALIASES[root] ?? root}</h2>
+              <h2 id={`quality-${quality}`}>{label}</h2>
               <div className="cs-chords">
                 {entries.map((entry) => (
                   <ChordCard key={entry.chord.id} entry={entry} />
@@ -443,7 +447,7 @@ export default function ChordCheatSheet() {
               </div>
             </section>
           ))}
-        </>
+        </div>
       )}
       <footer className="ca-attribution">
         Fingerings:{" "}

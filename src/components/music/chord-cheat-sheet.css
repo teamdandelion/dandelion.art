@@ -670,12 +670,33 @@
   width: 100%;
 }
 @media (min-width: 900px) {
-  .chord-sheet .cs-explore .cs-chords {
+  .chord-sheet .cs-explore .cs-chords,
+  .chord-sheet .cs-dictionary .cs-chords {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .cs-explore-entry .cs-chord {
     max-width: none;
   }
+}
+.cs-dictionary .cs-chord {
+  max-width: none;
+  width: 100%;
+}
+.cs-dictionary .cs-jump {
+  display: flex;
+  flex-wrap: wrap;
+  position: static;
+  gap: 0.4rem;
+}
+.cs-dictionary .cs-jump a {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  min-width: 0;
+  padding: 0.35rem 0.5rem;
+}
+.cs-dictionary h2 {
+  scroll-margin-top: 1rem;
 }
 .cs-explore-more {
   padding: 1rem;
