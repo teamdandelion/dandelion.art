@@ -26,6 +26,89 @@ const sourceHashes = {
 const hash = (value) =>
   createHash("sha256").update(JSON.stringify(value)).digest("hex");
 
+test("uploaded practice charts retain sections, vocabulary and performance cues", () => {
+  const expected = {
+    stitches: {
+      sections: [
+        "Intro",
+        "Verse 1",
+        "Pre-Chorus",
+        "Chorus",
+        "Verse 2",
+        "Pre-Chorus",
+        "Chorus",
+        "Bridge",
+        "Chorus",
+      ],
+      chords: ["Em", "D", "G", "C"],
+      lines: [1, 4, 4, 8, 5, 4, 9, 15, 12],
+    },
+    "fly-me-to-the-moon": {
+      sections: ["Verse 1", "Verse 2", "Instrumental", "Verse 3"],
+      chords: [
+        "Am",
+        "Dm7",
+        "G7",
+        "Cmaj7",
+        "F",
+        "Dm",
+        "E7",
+        "A7",
+        "C",
+        "E",
+        "Fm",
+        "Em",
+        "G",
+      ],
+      lines: [4, 4, 1, 5],
+    },
+    "hey-there-delilah": {
+      sections: [
+        "Intro",
+        "Verse 1",
+        "Chorus",
+        "Verse 2",
+        "Chorus",
+        "Bridge",
+        "Verse 3",
+        "Final Chorus",
+      ],
+      chords: ["C", "Em", "Am", "F", "G"],
+      lines: [1, 8, 3, 8, 2, 6, 5, 4],
+    },
+  };
+  assert.equal(new Set(SONGS.map((s) => s.id)).size, SONGS.length);
+  for (const [id, chart] of Object.entries(expected)) {
+    const song = SONGS.find((s) => s.id === id);
+    assert.ok(song, id);
+    assert.deepEqual(
+      song.sections.map((s) => s.title),
+      chart.sections,
+    );
+    assert.deepEqual(
+      song.sections.map((s) => s.lines.length),
+      chart.lines,
+    );
+    assert.deepEqual(songChords(song), chart.chords);
+  }
+  const text = (id) =>
+    SONGS.find((s) => s.id === id)
+      .sections.flatMap((s) => s.lines)
+      .map((l) => l.segments.map((s) => s.text).join(""))
+      .join("\n");
+  assert.match(text("stitches"), /I thought that I've been hurt before/);
+  assert.equal(text("stitches").match(/\(N\.C\.\)/g).length, 3);
+  assert.match(
+    text("fly-me-to-the-moon"),
+    /Fly me to the moon, let me play among the stars,/,
+  );
+  assert.match(
+    text("hey-there-delilah"),
+    /Hey there Delilah, what’s it like in New York City\?/,
+  );
+  assert.match(text("hey-there-delilah"), /\(full strum\)/);
+});
+
 test("segment migration preserves original lyrics, chords and section order", () => {
   for (const song of SONGS) {
     const lyrics = song.sections.map((s) =>
@@ -36,8 +119,10 @@ test("segment migration preserves original lyrics, chords and section order", ()
     const chords = song.sections.map((s) =>
       s.lines.map((l) => l.segments.flatMap((s) => (s.chord ? [s.chord] : []))),
     );
-    assert.equal(hash(lyrics), sourceHashes[song.id].lyrics);
-    assert.equal(hash(chords), sourceHashes[song.id].chords);
+    if (sourceHashes[song.id]) {
+      assert.equal(hash(lyrics), sourceHashes[song.id].lyrics);
+      assert.equal(hash(chords), sourceHashes[song.id].chords);
+    }
     assert.equal("turnaroundVoicings" in song, false);
     for (const line of song.sections.flatMap((s) => s.lines)) {
       assert.deepEqual(Object.keys(line), ["segments"]);
