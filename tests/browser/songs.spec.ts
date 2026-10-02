@@ -1,5 +1,69 @@
 import { expect, test } from "@playwright/test";
 
+test("new songs are linked, have chord dialogs and cold-open offline", async ({
+  page,
+  context,
+}) => {
+  const songs = [
+    { id: "stitches", title: "Stitches", chord: "Em", count: 9 },
+    {
+      id: "fly-me-to-the-moon",
+      title: "Fly Me to the Moon",
+      chord: "Dm7",
+      count: 4,
+    },
+    {
+      id: "hey-there-delilah",
+      title: "Hey There Delilah",
+      chord: "C",
+      count: 8,
+    },
+  ];
+  for (const song of songs) {
+    await page.goto("/music/songs/");
+    await page.getByRole("link", { name: new RegExp(song.title) }).click();
+    await expect(
+      page.getByRole("heading", { name: song.title, exact: true }),
+    ).toBeVisible();
+    await expect(page.locator(".song-score section")).toHaveCount(song.count);
+    await page
+      .getByRole("button", { name: `Show ${song.chord} voicing`, exact: true })
+      .first()
+      .click();
+    await expect(
+      page.getByRole("dialog", { name: `${song.chord} voicing`, exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("dialog").locator(".vw-fretboard"),
+    ).toHaveAttribute("href", /frets=/);
+    await page.keyboard.press("Escape");
+    await page.screenshot({ path: `/tmp/song-${song.id}-390.png` });
+  }
+  await expect(page.locator(".music-offline output")).toHaveText(
+    "Available offline",
+  );
+  await context.setOffline(true);
+  await page.close();
+  const offline = await context.newPage();
+  for (const song of songs) {
+    await offline.goto(`/music/songs/${song.id}/`);
+    await expect(
+      offline.getByRole("heading", { name: song.title, exact: true }),
+    ).toBeVisible();
+    await offline
+      .getByRole("button", { name: `Show ${song.chord} voicing`, exact: true })
+      .first()
+      .click();
+    await expect(
+      offline.getByRole("dialog", {
+        name: `${song.chord} voicing`,
+        exact: true,
+      }),
+    ).toBeVisible();
+    await offline.keyboard.press("Escape");
+  }
+});
+
 test("songs omit filler copy while retaining useful chart notes", async ({
   page,
 }) => {
@@ -18,7 +82,13 @@ test("long song lines wrap on phones with no internal scrollbars", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  for (const song of ["hallelujah", "ocean-eyes"]) {
+  for (const song of [
+    "hallelujah",
+    "ocean-eyes",
+    "stitches",
+    "fly-me-to-the-moon",
+    "hey-there-delilah",
+  ]) {
     await page.goto(`/music/songs/${song}/`);
     for (const width of [320, 390, 430, 1280]) {
       await page.setViewportSize({ width, height: 844 });
