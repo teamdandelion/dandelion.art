@@ -5,6 +5,7 @@ test("new songs are linked, have chord dialogs and cold-open offline", async ({
   context,
 }) => {
   const songs = [
+    { id: "let-it-be", title: "Let It Be", chord: "Am7/G", count: 11 },
     { id: "stitches", title: "Stitches", chord: "Em", count: 9 },
     {
       id: "fly-me-to-the-moon",
@@ -83,6 +84,7 @@ test("long song lines wrap on phones with no internal scrollbars", async ({
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   for (const song of [
+    "let-it-be",
     "hallelujah",
     "ocean-eyes",
     "stitches",
