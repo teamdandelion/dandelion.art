@@ -394,10 +394,6 @@ export default function FretboardExplorer() {
   );
   return (
     <article className="chord-atlas fretboard-explorer">
-      <nav className="cs-nav" aria-label="Music tools">
-        <a href="/music">Music</a>
-        <a href="/music/chords">← Chords</a>
-      </nav>
       <header className="cs-intro">
         <h1>
           {request?.has("frets") || request?.has("chord")

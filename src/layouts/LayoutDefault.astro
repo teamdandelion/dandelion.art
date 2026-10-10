@@ -6,7 +6,6 @@ import MusicSettings from "../components/music/MusicSettings";
 import PaletteHead from "../components/PaletteHead.astro";
 import DesignWidget from "../components/DesignWidget.astro";
 import { ClientRouter } from "astro:transitions";
-import OfflineStatus from "../components/music/OfflineStatus";
 import { DEFAULT_PALETTE } from "../lib/palettes";
 import "../styles/style.css";
 import "../styles/tailwind.css";
@@ -54,75 +53,98 @@ const isMusic = pathname === "/music" || pathname.startsWith("/music/");
   </head>
   <body>
     <div class="min-h-screen bg-base-100" data-page-content>
-      <header data-site-header class="border-b border-base-300 bg-base-200">
-        <div class="max-w-5xl mx-auto px-5 py-2 flex items-center justify-between">
-          <a href="/" class="flex items-center">
-            <img
-              src={logoUrl}
-              height="28"
-              width="28"
-              alt="logo"
-              class="[html[data-theme='dark']_&]:invert"
-            />
-          </a>
-          <div class="flex items-center gap-6">
-            <nav class="flex items-center gap-6">
-              <a
-                href="/"
-                aria-current={Astro.url.pathname === "/" ? "page" : undefined}
-              >
-                Home
+      {isMusic ? (
+        <header class="music-app-header">
+          <nav aria-label="Music navigation">
+            {[
+              [
+                "Chords",
+                "/music/chords/",
+                ["/music/chords", "/music/chord", "/music/atlas"].includes(
+                  pathname,
+                ),
+              ],
+              ["Songs", "/music/songs/", pathname.startsWith("/music/songs")],
+              [
+                "Fretboard",
+                "/music/fretboard/",
+                pathname === "/music/fretboard",
+              ],
+            ].map(([label, href, active]) => (
+              <a href={String(href)} aria-current={active ? "page" : undefined}>
+                {label}
               </a>
-              <a
-                href="/art"
-                aria-current={
-                  Astro.url.pathname === "/art" ||
-                  Astro.url.pathname.startsWith("/art/")
-                    ? "page"
-                    : undefined
-                }
-              >
-                Art
-              </a>
-              <a
-                href="/music"
-                class="music-link"
-                aria-label="Music"
-                title="Music"
-                aria-current={isMusic ? "page" : undefined}
-              >
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
+            ))}
+          </nav>
+          <MusicSettings client:load transition:persist="music-settings" />
+        </header>
+      ) : (
+        <header data-site-header class="border-b border-base-300 bg-base-200">
+          <div class="max-w-5xl mx-auto px-5 py-2 flex items-center justify-between">
+            <a href="/" class="flex items-center">
+              <img
+                src={logoUrl}
+                height="28"
+                width="28"
+                alt="logo"
+                class="[html[data-theme='dark']_&]:invert"
+              />
+            </a>
+            <div class="flex items-center gap-6">
+              <nav class="flex items-center gap-6">
+                <a
+                  href="/"
+                  aria-current={Astro.url.pathname === "/" ? "page" : undefined}
                 >
-                  <path d="M9 18V5l12-2v13M9 9l12-2" />
-                  <ellipse cx="6" cy="18" rx="3" ry="3" />
-                  <ellipse cx="18" cy="16" rx="3" ry="3" />
-                </svg>
-              </a>
-            </nav>
-            <ThemeToggle />
+                  Home
+                </a>
+                <a
+                  href="/art"
+                  aria-current={
+                    Astro.url.pathname === "/art" ||
+                    Astro.url.pathname.startsWith("/art/")
+                      ? "page"
+                      : undefined
+                  }
+                >
+                  Art
+                </a>
+                <a
+                  href="/music"
+                  class="music-link"
+                  aria-label="Music"
+                  title="Music"
+                  aria-current={isMusic ? "page" : undefined}
+                >
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M9 18V5l12-2v13M9 9l12-2" />
+                    <ellipse cx="6" cy="18" rx="3" ry="3" />
+                    <ellipse cx="18" cy="16" rx="3" ry="3" />
+                  </svg>
+                </a>
+              </nav>
+              <ThemeToggle />
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
       <main
         class:list={["max-w-5xl mx-auto px-5 py-8", { "music-page": isMusic }]}
       >
-        {isMusic && (
-          <OfflineStatus client:load transition:persist="music-offline" />
-        )}
         <slot />
       </main>
     </div>
     {hasQqlLightbox && <QqlLightbox />}
-    {isMusic && <MusicSettings client:load />}
     <DesignWidget />
   </body>
 </html>
@@ -137,12 +159,42 @@ const isMusic = pathname === "/music" || pathname.startsWith("/music/");
 </script>
 
 <style>
+  .music-app-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    max-width: 1024px;
+    margin: auto;
+    border-bottom: 1px solid var(--site-border);
+  }
+  .music-app-header nav {
+    display: flex;
+    flex: 1;
+    gap: 4px;
+  }
+  .music-app-header a {
+    min-height: 44px;
+    display: grid;
+    place-items: center;
+    padding: 0 8px;
+    font-size: 0.95rem;
+    border-radius: 6px;
+  }
+  .music-app-header a[aria-current="page"] {
+    background: var(--site-soft);
+    color: var(--site-accent);
+    font-weight: 600;
+  }
+  .music-page {
+    padding-top: 16px;
+  }
   :global(.music-offline) {
     display: flex;
     align-items: baseline;
     flex-wrap: wrap;
     gap: 0.5rem 1rem;
-    margin-bottom: 1.5rem;
+    margin: 12px 0;
     color: var(--site-muted);
     font-size: 0.8rem;
   }

@@ -23,6 +23,8 @@ import {
 } from "../../lib/music/preferences";
 import "./music-settings.css";
 import "./chord-atlas.css";
+import { setAppearance } from "../../lib/palette-client";
+import OfflineStatus from "./OfflineStatus";
 
 const initial = JSON.stringify(DEFAULT_PREFERENCES);
 let memory = initial;
@@ -138,6 +140,8 @@ function MusicSettingsControls() {
 export default function MusicSettings() {
   const id = useId();
   const [open, setOpen] = useState(false);
+  const [attention, setAttention] = useState(false);
+  const [light, setLight] = useState(true);
   const tray = useRef<HTMLDialogElement>(null);
   const launcher = useRef<HTMLButtonElement>(null);
   const { instrument, tonic, mode } = useMusicPreferences();
@@ -165,20 +169,30 @@ export default function MusicSettings() {
         aria-expanded={open}
         aria-controls={`${id}-tray`}
         title={selection}
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setLight(document.documentElement.dataset.theme === "light");
+          setOpen(true);
+        }}
       >
-        <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
-          <path
-            d="M9 18V6l11-3v12M9 9l11-3"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <ellipse cx="6" cy="18" rx="3" ry="2.5" fill="currentColor" />
-          <ellipse cx="17" cy="15" rx="3" ry="2.5" fill="currentColor" />
+        <svg
+          width="22"
+          height="22"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="m9 3-.5 2-2 1L4.5 5 2 9l1.5 1.5v3L2 15l2.5 4 2-1 2 1 .5 2h6l.5-2 2-1 2 1 2.5-4-1.5-1.5v-3L22 9l-2.5-4-2 1-2-1L15 3Z" />
+          <circle cx="12" cy="12" r="3" />
         </svg>
+        {attention && (
+          <output
+            className="ms-attention"
+            aria-label="Music settings needs attention"
+          />
+        )}
       </button>
       <dialog
         id={`${id}-tray`}
@@ -188,23 +202,6 @@ export default function MusicSettings() {
         onCancel={(event) => {
           event.preventDefault();
           setOpen(false);
-        }}
-        onKeyDown={(event) => {
-          if (event.key !== "Tab") return;
-          const buttons = [
-            ...event.currentTarget.querySelectorAll<HTMLButtonElement>(
-              "button:not(:disabled)",
-            ),
-          ];
-          const first = buttons[0],
-            last = buttons[buttons.length - 1];
-          if (event.shiftKey && document.activeElement === first) {
-            event.preventDefault();
-            last?.focus();
-          } else if (!event.shiftKey && document.activeElement === last) {
-            event.preventDefault();
-            first?.focus();
-          }
         }}
         onPointerDown={(event) => {
           if (event.target !== event.currentTarget) return;
@@ -231,6 +228,22 @@ export default function MusicSettings() {
           </button>
         </header>
         <MusicSettingsControls />
+        <label className="ms-appearance">
+          <input
+            type="checkbox"
+            aria-label="Toggle theme"
+            checked={light}
+            onChange={(event) => {
+              setLight(event.target.checked);
+              setAppearance({ theme: event.target.checked ? "light" : "dark" });
+            }}
+          />{" "}
+          Light theme
+        </label>
+        <OfflineStatus onAttention={setAttention} />
+        <a className="ms-site-link" href="/">
+          Visit dandelion.art ↗
+        </a>
       </dialog>
     </div>
   );

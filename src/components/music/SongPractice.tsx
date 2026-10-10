@@ -15,6 +15,7 @@ import VoicingWidget from "./VoicingWidget";
 import "./chord-atlas.css";
 import "./chord-cheat-sheet.css";
 import "./songs.css";
+import { rememberSong } from "../../lib/music/song-recents";
 
 function Practice({
   song,
@@ -248,11 +249,13 @@ function Practice({
 
 export default function SongPractice({ song }: { song: Song }) {
   const { ready, instrument, update } = useMusicPreferences();
+  useEffect(() => {
+    rememberSong(song.id);
+  }, [song.id]);
   return (
     <article className="chord-atlas song-page">
       <nav aria-label="Music tools">
         <a href="/music/songs/">← Songs</a>
-        <a href="/music/chords/">Chords ↗</a>
       </nav>
       <header className="song-heading">
         <p className="song-eyebrow">{song.artist}</p>

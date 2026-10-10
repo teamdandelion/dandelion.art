@@ -179,7 +179,6 @@ export default function ChordDetail() {
     <article className="chord-atlas chord-detail">
       <nav className="cs-nav">
         <a href="/music/chords">← Chords</a>
-        <a href="/music/fretboard">Fretboard ↗</a>
       </nav>
       {ready &&
         params &&

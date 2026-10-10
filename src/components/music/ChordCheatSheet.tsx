@@ -205,10 +205,6 @@ export default function ChordCheatSheet() {
       inert={!ready}
     >
       <header className="cs-intro">
-        <nav className="cs-nav" aria-label="Music tools">
-          <a href="/music">Music</a>
-          <a href="/music/fretboard">Fretboard ↗</a>
-        </nav>
         <div className="cs-heading-row">
           <h1 className="cs-title">
             <select

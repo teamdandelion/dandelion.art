@@ -1,5 +1,5 @@
 .music-page {
-  padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
 }
 .chord-atlas.music-settings-host {
   margin: 0;
@@ -7,19 +7,36 @@
   max-width: none;
 }
 .ms-launcher {
-  position: fixed;
-  right: max(18px, env(safe-area-inset-right, 0px));
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
-  z-index: 20;
+  position: relative;
   display: grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  border: 1px solid var(--ca-accent);
-  background: var(--ca-paper);
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  border: 0;
+  background: transparent;
   color: var(--ca-accent);
-  box-shadow: 0 4px 18px #0003;
+  font-size: 24px;
+}
+.ms-attention {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ca-accent);
+}
+.ms-appearance,
+.ms-site-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+.ms-site-link {
+  color: var(--ca-accent);
+  text-decoration: underline;
 }
 .ms-tray {
   position: fixed;

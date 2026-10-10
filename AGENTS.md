@@ -8,3 +8,4 @@
 - When a lower layer changes, run `gh stack rebase` and `gh stack push` so every higher layer remains linear.
 - Merge stacks from the bottom up with `gh stack merge`. After merges, run `gh stack sync` before continuing work.
 - Do not force-push, manually rebase published stack branches, or bypass required checks unless the user explicitly asks.
+- For music-app changes, the owner prefers review after merge: implement, verify, publish a PR, and merge when checks pass unless the request says otherwise. Report the merged result; do not bypass checks.
