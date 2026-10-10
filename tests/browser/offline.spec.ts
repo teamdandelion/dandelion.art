@@ -64,6 +64,10 @@ test("offline updates wait for approval and failed downloads preserve the workin
     const update = page.getByRole("button", {
       name: "Update available · reload",
     });
+    await expect(
+      page.getByRole("status", { name: "Music settings needs attention" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: /^Music settings:/ }).click();
     await expect(update).toBeVisible();
     expect(await page.evaluate(() => Reflect.get(window, "updateMarker"))).toBe(
       true,
@@ -197,7 +201,9 @@ test("music cold-starts offline and navigates without document reloads", async (
       Reflect.get(window, "offlineNavigationMarker"),
     ),
   ).toBe(42);
+  await offline.getByRole("button", { name: /^Music settings:/ }).click();
   await offline.getByRole("checkbox", { name: "Toggle theme" }).check();
+  await offline.getByRole("button", { name: "Done", exact: true }).click();
   await expect(offline.locator("html")).toHaveAttribute("data-theme", "light");
   await offline.goBack();
   await expect(

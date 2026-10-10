@@ -2,6 +2,7 @@
 import LayoutDefault from "../../../layouts/LayoutDefault.astro";
 import { SONGS } from "../../../lib/music/songs";
 import { songChords } from "../../../lib/music/song";
+import { orderSongs } from "../../../lib/music/song-recents";
 import "../../../components/music/songs.css";
 ---
 
@@ -11,24 +12,58 @@ import "../../../components/music/songs.css";
   noindex
 >
   <article class="songs-index">
-    <nav aria-label="Music tools">
-      <a href="/music/">Music</a>
-      <a href="/music/chords/">Chords ↗</a>
-    </nav>
     <header>
       <h1>Songs</h1>
     </header>
-    <div class="songs-list">
-      {SONGS.map((song) => (
-        <a class="song-index-card" href={`/music/songs/${song.id}/`}>
+    <div class="songs-list" data-pending>
+      {orderSongs(SONGS, {}).map((song) => (
+        <a
+          class="song-index-card"
+          data-song-id={song.id}
+          data-song-title={song.title}
+          href={`/music/songs/${song.id}/`}
+        >
           <div>
             <h2>{song.title}</h2>
             <p>{song.artist}</p>
           </div>
-          <span aria-hidden="true">↗</span>
+          <span aria-hidden="true">→</span>
           <small>{songChords(song).join(" · ")}</small>
         </a>
       ))}
     </div>
   </article>
 </LayoutDefault>
+
+<style>
+  .songs-list[data-pending] {
+    visibility: hidden;
+  }
+</style>
+<noscript>
+  <style>
+    .songs-index .songs-list[data-pending] {
+      visibility: visible;
+    }
+  </style>
+</noscript>
+<script>
+  import { orderSongs, readSongRecents } from "../../../lib/music/song-recents";
+  function sortSongs() {
+    const list = document.querySelector<HTMLElement>(".songs-list");
+    if (!list) return;
+    const cards = [
+      ...list.querySelectorAll<HTMLAnchorElement>("[data-song-id]"),
+    ].map((element) => ({
+      id: element.dataset.songId!,
+      title: element.dataset.songTitle!,
+      element,
+    }));
+    for (const card of orderSongs(cards, readSongRecents()))
+      list.append(card.element);
+    list.removeAttribute("data-pending");
+  }
+  sortSongs();
+  document.addEventListener("astro:page-load", sortSongs);
+  window.addEventListener("pageshow", sortSongs);
+</script>

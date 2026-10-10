@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
 
-export default function OfflineStatus() {
+export default function OfflineStatus({
+  onAttention,
+}: {
+  onAttention?: (value: boolean) => void;
+}) {
   const [status, setStatus] = useState("Preparing offline reference…");
   const [registration, setRegistration] = useState<ServiceWorkerRegistration>();
   const [update, setUpdate] = useState(false);
+  useEffect(() => {
+    onAttention?.(update || /failed|unavailable/i.test(status));
+  }, [update, status, onAttention]);
   useEffect(() => {
     if (!("serviceWorker" in navigator)) {
       setStatus("Offline storage is unavailable in this browser.");

@@ -1,6 +1,6 @@
 .chord-sheet {
   max-width: 760px;
-  margin-top: -16px;
+  margin-top: 0;
 }
 .cs-family-filters {
   display: flex;
