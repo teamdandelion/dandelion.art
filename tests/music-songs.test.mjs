@@ -28,6 +28,35 @@ const hash = (value) =>
 
 test("uploaded practice charts retain sections, vocabulary and performance cues", () => {
   const expected = {
+    "let-it-be": {
+      sections: [
+        "Intro",
+        "Verse 1",
+        "Chorus",
+        "Verse 2",
+        "Chorus",
+        "Instrumental",
+        "Solo",
+        "Chorus",
+        "Verse 3",
+        "Chorus",
+        "Outro",
+      ],
+      chords: [
+        "C",
+        "G",
+        "Am",
+        "Fmaj7",
+        "F6",
+        "F",
+        "C/E",
+        "Dm7",
+        "Am7/G",
+        "Bb",
+        "F/A",
+      ],
+      lines: [2, 4, 2, 4, 4, 1, 1, 2, 5, 6, 1],
+    },
     stitches: {
       sections: [
         "Intro",
@@ -97,6 +126,11 @@ test("uploaded practice charts retain sections, vocabulary and performance cues"
       .map((l) => l.segments.map((s) => s.text).join(""))
       .join("\n");
   assert.match(text("stitches"), /I thought that I've been hurt before/);
+  assert.match(
+    text("let-it-be"),
+    /When I find myself in times of trouble, Mother Mary comes to me/,
+  );
+  assert.equal(text("let-it-be").match(/\(×2\)/g).length, 2);
   assert.equal(text("stitches").match(/\(N\.C\.\)/g).length, 3);
   assert.match(
     text("fly-me-to-the-moon"),
