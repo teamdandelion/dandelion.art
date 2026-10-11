@@ -10,6 +10,7 @@ import { chordHref } from "../../lib/music/voicing-link";
 import { searchVoicings } from "../../lib/music/voicing-search";
 import { useMusicPreferences } from "./MusicSettings";
 import SongScore from "./SongScore";
+import UkeDiagram from "./UkeDiagram";
 import { PlayButton } from "./VoicingPlayback";
 import VoicingWidget from "./VoicingWidget";
 import "./chord-atlas.css";
@@ -44,6 +45,7 @@ function Practice({
     return {};
   });
   const [active, setActive] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement | null>(null);
   const [scrolling, setScrolling] = useState(false);
@@ -121,7 +123,7 @@ function Practice({
       document.removeEventListener("visibilitychange", stop);
     };
   }, [scrolling, speed]);
-  function renderVoicing(symbol: string, withPlayback = false) {
+  function selectedVoicing(symbol: string) {
     const { chord, fingerings } = shapes[symbol];
     const index = Math.max(
       0,
@@ -129,7 +131,10 @@ function Practice({
         (shape) => shape.frets.join(",") === choices[symbol],
       ),
     );
-    const shape = fingerings[index];
+    return { chord, fingerings, index, shape: fingerings[index] };
+  }
+  function renderVoicing(symbol: string, withPlayback = false) {
+    const { chord, fingerings, index, shape } = selectedVoicing(symbol);
     if (!shape) return <p>No {symbol} shape available for this tuning.</p>;
     const choose = (next: number) =>
       setChoices((current) => ({
@@ -156,6 +161,7 @@ function Practice({
       </>
     );
   }
+  const previewVoicing = preview ? selectedVoicing(preview) : null;
   return (
     <>
       <div className="song-practice-controls">
@@ -200,11 +206,33 @@ function Practice({
       </details>
       <SongScore
         song={song}
+        onPreview={(symbol) => {
+          setPreview(symbol);
+          setScrolling(false);
+        }}
         onChord={(symbol, button) => {
           trigger.current = button;
           setActive(symbol);
         }}
       />
+      {preview && (
+        <output
+          className="song-hold-preview"
+          aria-label={`${preview} voicing preview`}
+        >
+          <span className="song-preview-title">{preview}</span>
+          {previewVoicing?.shape ? (
+            <UkeDiagram
+              chord={previewVoicing.chord}
+              fingering={previewVoicing.shape}
+              instrument={instrument}
+              reference
+            />
+          ) : (
+            <span>No shape available for this tuning.</span>
+          )}
+        </output>
+      )}
       <dialog
         className="cs-modal song-modal"
         ref={dialog}
