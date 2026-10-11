@@ -1,13 +1,16 @@
 import type { Song } from "../../lib/music/song";
 import { lyricWords } from "../../lib/music/song-layout";
+import SongChordButton from "./SongChordButton";
 
 /** Stateless score: each chord travels with its lyric anchor as the browser wraps. */
 export default function SongScore({
   song,
   onChord,
+  onPreview,
 }: {
   song: Song;
   onChord: (symbol: string, button: HTMLButtonElement) => void;
+  onPreview: (symbol: string | null) => void;
 }) {
   return (
     <div className="song-score">
@@ -33,16 +36,11 @@ export default function SongScore({
                       key={`${segmentIndex}-${segment.chord}-${segment.text}`}
                     >
                       {segment.chord ? (
-                        <button
-                          type="button"
-                          aria-label={`Show ${segment.chord} voicing`}
-                          onClick={(event) =>
-                            segment.chord &&
-                            onChord(segment.chord, event.currentTarget)
-                          }
-                        >
-                          {segment.chord}
-                        </button>
+                        <SongChordButton
+                          symbol={segment.chord}
+                          onChord={onChord}
+                          onPreview={onPreview}
+                        />
                       ) : (
                         <span className="song-chord-space" aria-hidden="true" />
                       )}

@@ -153,6 +153,10 @@
   padding-right: 1ch;
 }
 .song-line button {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: pan-y;
   padding: 0 0.4ch 0 0;
   margin: 0;
   border: 0;
@@ -171,6 +175,32 @@
 }
 .song-modal {
   max-width: min(380px, calc(100vw - 24px));
+}
+.song-hold-preview {
+  position: fixed;
+  z-index: 30;
+  pointer-events: none;
+  top: max(70px, env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(250px, calc(100vw - 32px));
+  max-height: calc(100dvh - 90px);
+  overflow: hidden;
+  padding: 12px;
+  border: 1px solid var(--site-border);
+  border-radius: 12px;
+  background: var(--site-surface);
+  box-shadow: 0 8px 32px #0005;
+}
+.song-preview-title {
+  font:
+    400 26px Georgia,
+    serif;
+}
+.song-hold-preview .ca-uke-diagram {
+  display: block;
+  width: 100%;
+  max-height: calc(100dvh - 155px);
 }
 .song-modal .ca-uke-diagram {
   display: block;
