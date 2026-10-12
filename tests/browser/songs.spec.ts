@@ -314,7 +314,7 @@ test("song chart has responsive lyrics, persistent voicings, piano and exact fre
   ).toBeVisible();
 });
 
-test("songs cold-open offline and autoscroll pauses on interaction", async ({
+test("songs cold-open offline and autoscroll continues after manual correction", async ({
   page,
   context,
 }) => {
@@ -337,7 +337,7 @@ test("songs cold-open offline and autoscroll pauses on interaction", async ({
     .toBeGreaterThan(before + 5);
   await song.mouse.wheel(0, 40);
   await expect(
-    song.getByRole("button", { name: "Start autoscroll" }),
+    song.getByRole("button", { name: "Pause autoscroll" }),
   ).toBeVisible();
   await song
     .getByRole("button", { name: "Show C voicing", exact: true })

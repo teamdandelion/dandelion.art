@@ -78,6 +78,27 @@
 .song-speed button:disabled {
   opacity: 0.4;
 }
+.song-page-skips {
+  position: fixed;
+  z-index: 6;
+  right: calc(12px + env(safe-area-inset-right, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  gap: 6px;
+}
+.song-page-skips button {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--site-border);
+  border-radius: 10px;
+  background: var(--site-surface);
+  color: var(--site-accent);
+  font-size: 22px;
+  box-shadow: 0 2px 8px #0002;
+}
+.song-page {
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+}
 .song-voicings {
   margin: 1rem 0;
 }
@@ -248,6 +269,7 @@
   }
 }
 @media print {
+  .song-page-skips,
   .song-practice-controls,
   .song-instrument,
   .song-voicings {
