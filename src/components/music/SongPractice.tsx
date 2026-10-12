@@ -11,6 +11,7 @@ import { searchVoicings } from "../../lib/music/voicing-search";
 import { useMusicPreferences } from "./MusicSettings";
 import SongScore from "./SongScore";
 import UkeDiagram from "./UkeDiagram";
+import { useSongScroll } from "./useSongScroll";
 import { PlayButton } from "./VoicingPlayback";
 import VoicingWidget from "./VoicingWidget";
 import "./chord-atlas.css";
@@ -48,8 +49,8 @@ function Practice({
   const [preview, setPreview] = useState<string | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement | null>(null);
-  const [scrolling, setScrolling] = useState(false);
   const [speed, setSpeed] = useState(12);
+  const { scrolling, setScrolling, skip } = useSongScroll(speed);
   const shapes = useMemo(
     () =>
       Object.fromEntries(
@@ -90,39 +91,7 @@ function Practice({
       document.documentElement.style.overflow = previous;
       trigger.current?.focus({ preventScroll: true });
     };
-  }, [active]);
-  useEffect(() => {
-    if (!scrolling) return;
-    let frame = 0;
-    let last = performance.now();
-    let position = window.scrollY;
-    const tick = (now: number) => {
-      if (document.querySelector("dialog[open]")) {
-        setScrolling(false);
-        return;
-      }
-      position += (Math.min(now - last, 100) * speed) / 1000;
-      last = now;
-      window.scrollTo(0, position);
-      if (
-        window.scrollY + innerHeight >=
-        document.documentElement.scrollHeight - 2
-      )
-        setScrolling(false);
-      else frame = requestAnimationFrame(tick);
-    };
-    const stop = () => setScrolling(false);
-    frame = requestAnimationFrame(tick);
-    window.addEventListener("wheel", stop, { passive: true });
-    window.addEventListener("touchmove", stop, { passive: true });
-    document.addEventListener("visibilitychange", stop);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("wheel", stop);
-      window.removeEventListener("touchmove", stop);
-      document.removeEventListener("visibilitychange", stop);
-    };
-  }, [scrolling, speed]);
+  }, [active, setScrolling]);
   function selectedVoicing(symbol: string) {
     const { chord, fingerings } = shapes[symbol];
     const index = Math.max(
@@ -208,13 +177,31 @@ function Practice({
         song={song}
         onPreview={(symbol) => {
           setPreview(symbol);
-          setScrolling(false);
+          if (symbol) setScrolling(false);
         }}
         onChord={(symbol, button) => {
           trigger.current = button;
           setActive(symbol);
         }}
       />
+      <fieldset className="song-page-skips" aria-label="Adjust song position">
+        <button
+          type="button"
+          aria-label="Back half a page"
+          title="Back half a page"
+          onClick={() => skip(-1)}
+        >
+          ↑
+        </button>
+        <button
+          type="button"
+          aria-label="Forward half a page"
+          title="Forward half a page"
+          onClick={() => skip(1)}
+        >
+          ↓
+        </button>
+      </fieldset>
       {preview && (
         <output
           className="song-hold-preview"

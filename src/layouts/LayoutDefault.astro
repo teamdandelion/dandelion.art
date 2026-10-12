@@ -160,10 +160,13 @@ const isMusic = pathname === "/music" || pathname.startsWith("/music/");
 
 <style>
   .music-app-header {
+    padding-left: calc(16px + env(safe-area-inset-left, 0px));
+    padding-right: calc(16px + env(safe-area-inset-right, 0px));
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 16px;
+    padding-top: 6px;
+    padding-bottom: 6px;
     max-width: 1024px;
     margin: auto;
     border-bottom: 1px solid var(--site-border);
@@ -187,6 +190,8 @@ const isMusic = pathname === "/music" || pathname.startsWith("/music/");
     font-weight: 600;
   }
   .music-page {
+    padding-left: calc(20px + env(safe-area-inset-left, 0px));
+    padding-right: calc(20px + env(safe-area-inset-right, 0px));
     padding-top: 16px;
   }
   :global(.music-offline) {
