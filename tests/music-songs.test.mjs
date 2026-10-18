@@ -28,6 +28,23 @@ const hash = (value) =>
 
 test("uploaded practice charts retain sections, vocabulary and performance cues", () => {
   const expected = {
+    riptide: {
+      sections: [
+        "Intro",
+        "Verse 1",
+        "Pre-Chorus",
+        "Chorus",
+        "Verse 2",
+        "Pre-Chorus",
+        "Chorus",
+        "Interlude · C ×4",
+        "Bridge",
+        "Pre-Chorus · strum once and hold",
+        "Chorus",
+      ],
+      chords: ["Am", "G", "C", "Fmaj7"],
+      lines: [2, 4, 2, 4, 4, 2, 4, 1, 4, 2, 13],
+    },
     "let-it-be": {
       sections: [
         "Intro",
