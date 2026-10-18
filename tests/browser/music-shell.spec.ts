@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { SONGS } from "../../src/lib/music/songs";
 
 test("song index remains readable without JavaScript", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
@@ -119,7 +120,7 @@ test("songs and navigation work with local storage blocked", async ({
     };
   });
   await page.goto("/music/songs/");
-  await expect(page.locator(".song-index-card")).toHaveCount(6);
+  await expect(page.locator(".song-index-card")).toHaveCount(SONGS.length);
   await page.getByRole("link", { name: /Stitches/ }).click();
   await expect(page.locator(".song-score")).toBeVisible();
   await page.getByRole("link", { name: "← Songs", exact: true }).click();
