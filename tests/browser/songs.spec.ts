@@ -5,6 +5,7 @@ test("new songs are linked, have chord dialogs and cold-open offline", async ({
   context,
 }) => {
   const songs = [
+    { id: "riptide", title: "Riptide", chord: "Am", count: 11 },
     { id: "let-it-be", title: "Let It Be", chord: "Am7/G", count: 11 },
     { id: "stitches", title: "Stitches", chord: "Em", count: 9 },
     {

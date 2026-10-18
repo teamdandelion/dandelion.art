@@ -2,6 +2,7 @@ import type { Song, SongLine } from "./song";
 import flyMeToTheMoon from "./songs/fly-me-to-the-moon.ts";
 import heyThereDelilah from "./songs/hey-there-delilah.ts";
 import letItBe from "./songs/let-it-be.ts";
+import riptide from "./songs/riptide.ts";
 import stitches from "./songs/stitches.ts";
 
 // Practice charts transcribed from the supplied PDFs. Chords anchor to lyric segments.
@@ -615,4 +616,5 @@ export const SONGS: Song[] = [
   flyMeToTheMoon,
   heyThereDelilah,
   letItBe,
+  riptide,
 ];
