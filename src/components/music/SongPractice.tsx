@@ -135,31 +135,51 @@ function Practice({
     <>
       <div className="song-practice-controls">
         <button
+          className="song-scroll-toggle"
           type="button"
+          aria-label={scrolling ? "Pause autoscroll" : "Start autoscroll"}
           aria-pressed={scrolling}
           onClick={() => setScrolling(!scrolling)}
         >
-          {scrolling ? "Pause autoscroll" : "Start autoscroll"}
+          <span aria-hidden="true">{scrolling ? "Ⅱ" : "▶"}</span>
         </button>
         <fieldset className="song-speed" aria-label="Scroll speed">
           <button
             type="button"
             aria-label="Slower autoscroll"
             disabled={speed === 4}
-            onClick={() => setSpeed((value) => Math.max(4, value - 4))}
+            onClick={() => setSpeed((value) => Math.max(4, value - 2))}
           >
             −
           </button>
-          <output aria-live="polite" aria-label="Scroll speed level">
-            {speed} px/s
-          </output>
           <button
             type="button"
             aria-label="Faster autoscroll"
             disabled={speed === 60}
-            onClick={() => setSpeed((value) => Math.min(60, value + 4))}
+            onClick={() => setSpeed((value) => Math.min(60, value + 2))}
           >
             +
+          </button>
+        </fieldset>
+        <output aria-live="polite" aria-label="Scroll speed level">
+          {speed} px/s
+        </output>
+        <fieldset className="song-page-skips" aria-label="Adjust song position">
+          <button
+            type="button"
+            aria-label="Back half a page"
+            title="Back half a page"
+            onClick={() => skip(-1)}
+          >
+            ↑
+          </button>
+          <button
+            type="button"
+            aria-label="Forward half a page"
+            title="Forward half a page"
+            onClick={() => skip(1)}
+          >
+            ↓
           </button>
         </fieldset>
       </div>
@@ -184,24 +204,6 @@ function Practice({
           setActive(symbol);
         }}
       />
-      <fieldset className="song-page-skips" aria-label="Adjust song position">
-        <button
-          type="button"
-          aria-label="Back half a page"
-          title="Back half a page"
-          onClick={() => skip(-1)}
-        >
-          ↑
-        </button>
-        <button
-          type="button"
-          aria-label="Forward half a page"
-          title="Forward half a page"
-          onClick={() => skip(1)}
-        >
-          ↓
-        </button>
-      </fieldset>
       {preview && (
         <output
           className="song-hold-preview"

@@ -1,33 +1,44 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  SCROLL_PULSE_MS,
+  scrollPulseProgress,
+} from "../../lib/music/scroll-pulse";
 
 /** One animation owns both steady scrolling and half-page corrections. */
 export function useSongScroll(speed: number) {
-  const [scrolling, setScrolling] = useState(false);
-  const [jump, setJump] = useState<{ direction: number } | null>(null);
+  const [scrolling, updateScrolling] = useState(false);
+  const pulses = useRef<
+    { distance: number; elapsed: number; duration: number }[]
+  >([]);
+  const [wake, setWake] = useState(0);
+  const setScrolling = useCallback((enabled: boolean) => {
+    if (!enabled) pulses.current = [];
+    updateScrolling(enabled);
+  }, []);
   useEffect(() => {
-    if (!scrolling && !jump) return;
+    // A new request wakes an idle loop without restarting existing pulses.
+    void wake;
+    if (!scrolling && !pulses.current.length) return;
     let frame = 0;
     let last = performance.now();
     let position = window.scrollY;
     let written = position;
     let touching = false;
     let resumeAt = 0;
-    const start = position;
-    const distance = (jump?.direction ?? 0) * window.innerHeight * 0.5;
-    const duration = matchMedia("(prefers-reduced-motion: reduce)").matches
-      ? 0
-      : 320;
-    const began = last;
-    let jumping = Boolean(jump);
     const manual = () => {
-      jumping = false;
+      pulses.current = [];
       resumeAt = performance.now() + 180;
     };
-    const touchStart = () => {
+    const isControl = (event: Event) =>
+      event.target instanceof Element &&
+      Boolean(event.target.closest(".song-practice-controls"));
+    const touchStart = (event: Event) => {
+      if (isControl(event)) return;
       touching = true;
       manual();
     };
     const touchEnd = () => {
+      if (!touching) return;
       touching = false;
       manual();
     };
@@ -38,7 +49,7 @@ export function useSongScroll(speed: number) {
     };
     const stop = () => {
       setScrolling(false);
-      setJump(null);
+      pulses.current = [];
     };
     const tick = (now: number) => {
       if (document.querySelector("dialog[open]")) {
@@ -52,12 +63,22 @@ export function useSongScroll(speed: number) {
       }
       if (touching || now < resumeAt) {
         position = window.scrollY;
-      } else if (jumping) {
-        const progress = duration ? Math.min(1, (now - began) / duration) : 1;
-        position = start + distance * (1 - (1 - progress) ** 3);
-        if (progress === 1) jumping = false;
-      } else if (scrolling) {
-        position += (Math.min(now - last, 100) * speed) / 1000;
+      } else {
+        const dt = Math.min(now - last, 100);
+        if (scrolling) position += (dt * speed) / 1000;
+        for (const pulse of pulses.current) {
+          const previous =
+            pulse.duration === 0
+              ? 0
+              : scrollPulseProgress(pulse.elapsed, pulse.duration);
+          pulse.elapsed += dt;
+          position +=
+            pulse.distance *
+            (scrollPulseProgress(pulse.elapsed, pulse.duration) - previous);
+        }
+        pulses.current = pulses.current.filter(
+          (pulse) => pulse.elapsed < pulse.duration,
+        );
       }
       last = now;
       if (!touching && now >= resumeAt) {
@@ -68,16 +89,13 @@ export function useSongScroll(speed: number) {
         position = Math.max(0, Math.min(max, position));
         window.scrollTo({ top: position, behavior: "instant" });
         written = window.scrollY;
-        if (scrolling && !jumping && position >= max) {
+        if (scrolling && !pulses.current.length && position >= max) {
           stop();
           return;
         }
       }
-      if (!jumping && jump) {
-        setJump(null);
-        return;
-      }
-      frame = requestAnimationFrame(tick);
+      if (scrolling || pulses.current.length)
+        frame = requestAnimationFrame(tick);
     };
     frame = requestAnimationFrame(tick);
     window.addEventListener("wheel", manual, { passive: true });
@@ -95,10 +113,19 @@ export function useSongScroll(speed: number) {
       window.removeEventListener("scroll", scroll);
       document.removeEventListener("visibilitychange", stop);
     };
-  }, [scrolling, speed, jump]);
+  }, [scrolling, speed, wake, setScrolling]);
   return {
     scrolling,
     setScrolling,
-    skip: (direction: number) => setJump({ direction }),
+    skip: (direction: number) => {
+      pulses.current.push({
+        distance: direction * innerHeight * 0.5,
+        elapsed: 0,
+        duration: matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? 0
+          : SCROLL_PULSE_MS,
+      });
+      setWake((value) => value + 1);
+    },
   };
 }

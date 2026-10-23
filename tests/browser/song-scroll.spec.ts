@@ -1,5 +1,48 @@
 import { expect, test } from "@playwright/test";
 
+test("controls have large ordered targets and repeated pulses retain every half-page", async ({
+  page,
+}) => {
+  await page.goto("/music/songs/hallelujah/");
+  const play = page.getByRole("button", { name: "Start autoscroll" });
+  const minus = page.getByRole("button", { name: "Slower autoscroll" });
+  const down = page.getByRole("button", { name: "Forward half a page" });
+  const p = await play.boundingBox();
+  const m = await minus.boundingBox();
+  const d = await down.boundingBox();
+  if (!p || !m || !d) throw new Error("Missing scroll controls");
+  expect(p.width).toBeGreaterThan(m.width);
+  expect(p.height).toBeGreaterThan(m.height);
+  expect(m.width).toBeGreaterThanOrEqual(54);
+  expect(m.height).toBeGreaterThanOrEqual(54);
+  expect(m.y).toBeGreaterThan(p.y + p.height);
+  expect(d.y).toBeGreaterThan(m.y + m.height);
+  await page.evaluate(() => scrollTo(0, 800));
+  await page.screenshot({ path: "/tmp/song-flight-controls.png" });
+  await down.click();
+  await page.waitForTimeout(200);
+  // Starts gently, not with the old maximum-velocity jump.
+  expect(await page.evaluate(() => scrollY)).toBeLessThan(880);
+  await down.dispatchEvent("touchstart");
+  await down.dispatchEvent("touchend");
+  await down.click();
+  // Browsers round scroll offsets to physical pixels between requests.
+  await expect
+    .poll(() => page.evaluate(() => Math.abs(scrollY - 1644)))
+    .toBeLessThanOrEqual(1);
+  await page.waitForTimeout(150);
+  expect(
+    await page.evaluate(() => Math.abs(scrollY - 1644)),
+  ).toBeLessThanOrEqual(1);
+  await play.click();
+  await down.click();
+  await page.waitForTimeout(150);
+  await page.getByRole("button", { name: "Pause autoscroll" }).click();
+  const stopped = await page.evaluate(() => scrollY);
+  await page.waitForTimeout(400);
+  expect(await page.evaluate(() => scrollY)).toBe(stopped);
+});
+
 test("touch corrections keep running, then stop at the end of the page", async ({
   page,
 }) => {
@@ -37,17 +80,20 @@ test("manual corrections and smooth skips preserve autoscroll", async ({
     .poll(() => page.evaluate(() => scrollY))
     .toBeGreaterThan(corrected + 5);
   const before = await page.evaluate(() => scrollY);
+  const began = Date.now();
   await page.getByRole("button", { name: "Forward half a page" }).click();
   await expect
     .poll(() => page.evaluate(() => scrollY))
     .toBeGreaterThan(before + 410);
   await page.waitForTimeout(400);
   const after = await page.evaluate(() => scrollY);
-  expect(after - before).toBeLessThan(450);
+  expect(
+    Math.abs(after - before - 422 - (Date.now() - began) * 0.012),
+  ).toBeLessThan(5);
   await page.getByRole("button", { name: "Back half a page" }).click();
   await expect
     .poll(() => page.evaluate(() => scrollY))
-    .toBeLessThan(after - 400);
+    .toBeLessThan(after - 380);
   await expect(
     page.getByRole("button", { name: "Pause autoscroll" }),
   ).toBeVisible();
