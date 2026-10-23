@@ -1,5 +1,34 @@
 import { expect, test } from "@playwright/test";
 
+test("touch nudges survive delayed browser scroll reports without jitter", async ({
+  browser,
+}) => {
+  const page = await browser.newPage({
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+  });
+  await page.goto("http://127.0.0.1:4342/music/songs/hallelujah/");
+  await expect(
+    page.getByRole("button", { name: "Start autoscroll" }),
+  ).toBeVisible();
+  await page.evaluate(() => {
+    window.scrollTo(0, 800);
+    const original = window.scrollTo.bind(window);
+    // Model compositor lag: the visible offset trails the commanded position.
+    window.scrollTo = ((options: ScrollToOptions) => {
+      setTimeout(() => original(options), 80);
+    }) as typeof window.scrollTo;
+  });
+  const down = page.getByRole("button", { name: "Forward half a page" });
+  await down.tap();
+  await expect.poll(() => page.evaluate(() => scrollY)).toBe(1222);
+  await page.getByRole("button", { name: "Back half a page" }).tap();
+  await expect
+    .poll(() => page.evaluate(() => Math.abs(scrollY - 800)))
+    .toBeLessThanOrEqual(1);
+  await page.close();
+});
+
 test("controls have large ordered targets and repeated pulses retain every half-page", async ({
   page,
 }) => {
@@ -13,8 +42,15 @@ test("controls have large ordered targets and repeated pulses retain every half-
   if (!p || !m || !d) throw new Error("Missing scroll controls");
   expect(p.width).toBeGreaterThan(m.width);
   expect(p.height).toBeGreaterThan(m.height);
-  expect(m.width).toBeGreaterThanOrEqual(54);
-  expect(m.height).toBeGreaterThanOrEqual(54);
+  expect(m.width).toBeGreaterThanOrEqual(44);
+  expect(m.height).toBeGreaterThanOrEqual(44);
+  const panel = await page.locator(".song-practice-controls").boundingBox();
+  expect(panel?.height).toBeLessThanOrEqual(144);
+  expect(
+    await page
+      .locator(".song-practice-controls")
+      .evaluate((el) => getComputedStyle(el).borderWidth),
+  ).toBe("0px");
   expect(m.y).toBeGreaterThan(p.y + p.height);
   expect(d.y).toBeGreaterThan(m.y + m.height);
   await page.evaluate(() => scrollTo(0, 800));
@@ -59,7 +95,10 @@ test("touch corrections keep running, then stop at the end of the page", async (
   await expect(
     page.getByRole("button", { name: "Pause autoscroll" }),
   ).toBeVisible();
-  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await page.evaluate(() => {
+    window.dispatchEvent(new Event("wheel"));
+    scrollTo(0, document.documentElement.scrollHeight);
+  });
   await expect(
     page.getByRole("button", { name: "Start autoscroll" }),
   ).toBeVisible();
@@ -69,8 +108,12 @@ test("manual corrections and smooth skips preserve autoscroll", async ({
   page,
 }) => {
   await page.goto("/music/songs/hallelujah/");
-  await page.getByRole("button", { name: "Start autoscroll" }).click();
+  await expect(
+    page.getByRole("button", { name: "Start autoscroll" }),
+  ).toBeVisible();
   await page.evaluate(() => scrollTo(0, 900));
+  await expect.poll(() => page.evaluate(() => scrollY)).toBe(900);
+  await page.getByRole("button", { name: "Start autoscroll" }).click();
   await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(905);
   await page.mouse.wheel(0, -200);
   await page.waitForTimeout(400);

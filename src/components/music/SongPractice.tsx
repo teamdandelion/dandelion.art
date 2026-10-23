@@ -152,6 +152,9 @@ function Practice({
           >
             −
           </button>
+          <output aria-live="polite" aria-label="Scroll speed level">
+            {speed / 2}
+          </output>
           <button
             type="button"
             aria-label="Faster autoscroll"
@@ -161,9 +164,6 @@ function Practice({
             +
           </button>
         </fieldset>
-        <output aria-live="polite" aria-label="Scroll speed level">
-          {speed} px/s
-        </output>
         <fieldset className="song-page-skips" aria-label="Adjust song position">
           <button
             type="button"
