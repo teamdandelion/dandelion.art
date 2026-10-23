@@ -49,55 +49,47 @@
   padding: 0.4rem 0.7rem;
 }
 .song-practice-controls {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.6rem 0;
-  background: var(--site-bg, var(--color-base-100));
-  border-bottom: 1px solid var(--site-border);
+  position: fixed;
+  right: calc(12px + env(safe-area-inset-right, 0px));
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  z-index: 6;
+  display: grid;
+  gap: 6px;
+  width: 128px;
+  padding: 6px;
+  border: 1px solid var(--site-border);
+  border-radius: 16px;
+  background: var(--site-bg);
+  box-shadow: 0 3px 14px #0002;
 }
-.song-speed {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.song-practice-controls button {
+  min-height: 54px;
+  font-size: 25px;
+  touch-action: manipulation;
+}
+.song-practice-controls .song-scroll-toggle {
+  min-height: 72px;
+  font-size: 32px;
+  color: var(--site-accent);
+}
+.song-practice-controls output {
+  text-align: center;
   color: var(--site-muted);
-  font-size: 0.8rem;
-}
-.song-speed button {
-  min-width: 44px;
-  font-size: 1.2rem;
-}
-.song-speed output {
+  font-size: 12px;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 .song-speed button:disabled {
   opacity: 0.4;
 }
+.song-speed,
 .song-page-skips {
-  position: fixed;
-  z-index: 6;
-  right: calc(12px + env(safe-area-inset-right, 0px));
-  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 6px;
 }
-.song-page-skips button {
-  width: 44px;
-  height: 44px;
-  border: 1px solid var(--site-border);
-  border-radius: 10px;
-  background: var(--site-surface);
-  color: var(--site-accent);
-  font-size: 22px;
-  box-shadow: 0 2px 8px #0002;
-}
 .song-page {
-  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(250px + env(safe-area-inset-bottom, 0px));
 }
 .song-voicings {
   margin: 1rem 0;
