@@ -1,0 +1,32 @@
+{
+  "shelves": [
+    {
+      "id": "living-room-1",
+      "name": "Bookcase shelf with the clock above it",
+      "notes": "First shelf catalogued, from a photo on 2026-11-08. Placeholder name until the shelves get real labels."
+    }
+  ],
+  "books": [
+    { "title": "Gödel, Escher, Bach", "author": "Douglas R. Hofstadter", "shelf": "living-room-1", "position": 1 },
+    { "title": "Thinking in Systems", "author": "Donella H. Meadows", "shelf": "living-room-1", "position": 2 },
+    { "title": "Thinking in Systems", "author": "Donella H. Meadows", "shelf": "living-room-1", "position": 3, "notes": "Second copy" },
+    { "title": "Reinventing Organizations", "author": "Frederic Laloux", "shelf": "living-room-1", "position": 4 },
+    { "title": "The Vital Question", "author": "Nick Lane", "shelf": "living-room-1", "position": 5 },
+    { "title": "Producer to Producer (2nd ed.)", "author": "Maureen A. Ryan", "shelf": "living-room-1", "position": 6 },
+    { "title": "Thinking in Bets", "author": "Annie Duke", "shelf": "living-room-1", "position": 7 },
+    { "title": "Technofeudalism", "author": "Yanis Varoufakis", "shelf": "living-room-1", "position": 8 },
+    { "title": "The Hidden Life of Trees", "author": "Peter Wohlleben", "shelf": "living-room-1", "position": 9 },
+    { "title": "Guns, Germs, and Steel", "author": "Jared Diamond", "shelf": "living-room-1", "position": 10 },
+    { "title": "Sapiens", "author": "Yuval Noah Harari", "shelf": "living-room-1", "position": 11 },
+    { "title": "Debt: The First 5,000 Years", "author": "David Graeber", "shelf": "living-room-1", "position": 12 },
+    { "title": "The Hero with a Thousand Faces", "author": "Joseph Campbell", "shelf": "living-room-1", "position": 13 },
+    { "title": "Winners Take All", "author": "Anand Giridharadas", "shelf": "living-room-1", "position": 14 },
+    { "title": "The Machinery of Life", "author": "David S. Goodsell", "shelf": "living-room-1", "position": 15 },
+    { "title": "Big Magic", "author": "Elizabeth Gilbert", "shelf": "living-room-1", "position": 16 },
+    { "title": "How to Do Nothing", "author": "Jenny Odell", "shelf": "living-room-1", "position": 17 },
+    { "title": "Unidentified (thin blue spine)", "author": null, "shelf": "living-room-1", "position": 18, "notes": "Spine not legible in the photo" },
+    { "title": "Four Thousand Weeks", "author": "Oliver Burkeman", "shelf": "living-room-1", "position": 19 },
+    { "title": "Unidentified (black spine)", "author": null, "shelf": "living-room-1", "position": 20, "notes": "Spine not legible in the photo" },
+    { "title": "대한민국 진화론", "author": "이현정", "shelf": "living-room-1", "position": 21, "notes": "Spine tagline: 삼성전자 최초 여성임원 (first woman executive at Samsung Electronics)" }
+  ]
+}
