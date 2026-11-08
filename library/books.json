@@ -6,7 +6,8 @@
     {
       "id": 1,
       "question": "Move the blue print from column 2 to column 5?",
-      "status": "open"
+      "status": "decided",
+      "answer": "Yes: blue print goes to c5-r1; c2-r1 gets shelving."
     },
     {
       "id": 2,
@@ -327,7 +328,7 @@
       "capacity": null,
       "plan": {
         "label": "Blue print",
-        "intent": "The blue print moves here from column 2. (Open decision 1.)"
+        "intent": "The blue print moves here from column 2."
       }
     },
     {

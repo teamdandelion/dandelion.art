@@ -58,7 +58,7 @@ The fossil and the ukulele already mirror each other at the bottom. The top is l
 
 ### Open decisions
 
-1. Is it OK to move the column 2 print to column 5?
+1. ~~Is it OK to move the column 2 print to column 5?~~ **Decided: yes.** Column 2's top gets shelving.
 2. Where do Palladium and the board games go: the left side, or the center archive?
 3. Do the friend's roughly three shelves of books fit on the center-top shelves?
 4. Three novels are on the spiritual shelf: _It Can't Happen Here_, _The Archer_ and _The Alchemist_. They should move to fiction.
