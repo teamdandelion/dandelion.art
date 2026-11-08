@@ -1,32 +1,837 @@
 {
+  "updated": "2026-11-08",
+  "layout": "Five-column built-in bookcase. Shelf IDs are c<column>-r<row>, with columns numbered left to right and rows top to bottom. Books are listed left to right within each shelf.",
   "shelves": [
     {
-      "id": "living-room-1",
-      "name": "Bookcase shelf with the clock above it",
-      "notes": "First shelf catalogued, from a photo on 2026-11-08. Placeholder name until the shelves get real labels."
+      "id": "c1-r1",
+      "column": 1,
+      "row": 1,
+      "contents": "Framed print (orange frame); might become shelving"
+    },
+    {
+      "id": "c1-r2",
+      "column": 1,
+      "row": 2,
+      "contents": "The Culture: The Drawings, Palladium 1–19, ceramic figures"
+    },
+    {
+      "id": "c1-r3",
+      "column": 1,
+      "row": 3,
+      "contents": "Clock, Klimt puzzle, Splendor + Splendor Duel"
+    },
+    {
+      "id": "c1-r4",
+      "column": 1,
+      "row": 4,
+      "contents": "Mixed nonfiction"
+    },
+    {
+      "id": "c1-r5",
+      "column": 1,
+      "row": 5,
+      "contents": "Photos, candles, gift bag"
+    },
+    {
+      "id": "c2-r1",
+      "column": 2,
+      "row": 1,
+      "contents": "Framed print (blue frame); might become shelving"
+    },
+    {
+      "id": "c2-r2",
+      "column": 2,
+      "row": 2,
+      "contents": "Sci-fi paperbacks"
+    },
+    {
+      "id": "c2-r3",
+      "column": 2,
+      "row": 3,
+      "contents": "Tall bay: fossil (keep)"
+    },
+    {
+      "id": "c3-top",
+      "column": 3,
+      "row": 1,
+      "contents": "Three or four empty high shelves"
+    },
+    {
+      "id": "c3-r4",
+      "column": 3,
+      "row": 4,
+      "contents": "Art books, bookends, notebooks, yearbooks, childhood books"
+    },
+    {
+      "id": "c3-r5",
+      "column": 3,
+      "row": 5,
+      "contents": "Fixed shelf: photo, crystals, candle, small art"
+    },
+    {
+      "id": "c3-r6",
+      "column": 3,
+      "row": 6,
+      "contents": "Bust, blue mask, singing bowl, a few books"
+    },
+    {
+      "id": "c4-r1",
+      "column": 4,
+      "row": 1,
+      "contents": "Friend's books (stored), not catalogued one by one"
+    },
+    {
+      "id": "c4-r2",
+      "column": 4,
+      "row": 2,
+      "contents": "Friend's books (stored), not catalogued one by one"
+    },
+    {
+      "id": "c4-r3",
+      "column": 4,
+      "row": 3,
+      "contents": "Friend's books (stored), not catalogued one by one"
+    },
+    {
+      "id": "c4-r4",
+      "column": 4,
+      "row": 4,
+      "contents": "Buddhism, spirituality, psychology, relationships"
+    },
+    {
+      "id": "c4-r5",
+      "column": 4,
+      "row": 5,
+      "contents": "Tall bay: ukulele (keep)"
+    },
+    {
+      "id": "c5-r1",
+      "column": 5,
+      "row": 1,
+      "contents": "Bottles (could move)"
+    },
+    {
+      "id": "c5-r2",
+      "column": 5,
+      "row": 2,
+      "contents": "Sanderson + Rothfuss"
+    },
+    {
+      "id": "c5-r3",
+      "column": 5,
+      "row": 3,
+      "contents": "Mixed SFF and fiction"
+    },
+    {
+      "id": "c5-r4",
+      "column": 5,
+      "row": 4,
+      "contents": "Dated journals, piano sheet music"
+    },
+    {
+      "id": "c5-r5",
+      "column": 5,
+      "row": 5,
+      "contents": "Glassware, vases"
+    },
+    {
+      "id": "c5-r6",
+      "column": 5,
+      "row": 6,
+      "contents": "Glassware, jars"
     }
   ],
   "books": [
-    { "title": "Gödel, Escher, Bach", "author": "Douglas R. Hofstadter", "shelf": "living-room-1", "position": 1 },
-    { "title": "Thinking in Systems", "author": "Donella H. Meadows", "shelf": "living-room-1", "position": 2 },
-    { "title": "Thinking in Systems", "author": "Donella H. Meadows", "shelf": "living-room-1", "position": 3, "notes": "Second copy" },
-    { "title": "Reinventing Organizations", "author": "Frederic Laloux", "shelf": "living-room-1", "position": 4 },
-    { "title": "The Vital Question", "author": "Nick Lane", "shelf": "living-room-1", "position": 5 },
-    { "title": "Producer to Producer (2nd ed.)", "author": "Maureen A. Ryan", "shelf": "living-room-1", "position": 6 },
-    { "title": "Thinking in Bets", "author": "Annie Duke", "shelf": "living-room-1", "position": 7 },
-    { "title": "Technofeudalism", "author": "Yanis Varoufakis", "shelf": "living-room-1", "position": 8 },
-    { "title": "The Hidden Life of Trees", "author": "Peter Wohlleben", "shelf": "living-room-1", "position": 9 },
-    { "title": "Guns, Germs, and Steel", "author": "Jared Diamond", "shelf": "living-room-1", "position": 10 },
-    { "title": "Sapiens", "author": "Yuval Noah Harari", "shelf": "living-room-1", "position": 11 },
-    { "title": "Debt: The First 5,000 Years", "author": "David Graeber", "shelf": "living-room-1", "position": 12 },
-    { "title": "The Hero with a Thousand Faces", "author": "Joseph Campbell", "shelf": "living-room-1", "position": 13 },
-    { "title": "Winners Take All", "author": "Anand Giridharadas", "shelf": "living-room-1", "position": 14 },
-    { "title": "The Machinery of Life", "author": "David S. Goodsell", "shelf": "living-room-1", "position": 15 },
-    { "title": "Big Magic", "author": "Elizabeth Gilbert", "shelf": "living-room-1", "position": 16 },
-    { "title": "How to Do Nothing", "author": "Jenny Odell", "shelf": "living-room-1", "position": 17 },
-    { "title": "Unidentified (thin blue spine)", "author": null, "shelf": "living-room-1", "position": 18, "notes": "Spine not legible in the photo" },
-    { "title": "Four Thousand Weeks", "author": "Oliver Burkeman", "shelf": "living-room-1", "position": 19 },
-    { "title": "Unidentified (black spine)", "author": null, "shelf": "living-room-1", "position": 20, "notes": "Spine not legible in the photo" },
-    { "title": "대한민국 진화론", "author": "이현정", "shelf": "living-room-1", "position": 21, "notes": "Spine tagline: 삼성전자 최초 여성임원 (first woman executive at Samsung Electronics)" }
+    {
+      "title": "Gödel, Escher, Bach",
+      "author": "Douglas R. Hofstadter",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "Thinking in Systems",
+      "author": "Donella H. Meadows",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "Thinking in Systems",
+      "author": "Donella H. Meadows",
+      "shelf": "c1-r4",
+      "notes": "Second copy"
+    },
+    {
+      "title": "Reinventing Organizations",
+      "author": "Frederic Laloux",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "The Vital Question",
+      "author": "Nick Lane",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "Producer to Producer (2nd ed.)",
+      "author": "Maureen A. Ryan",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "Thinking in Bets",
+      "author": "Annie Duke",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "Technofeudalism",
+      "author": "Yanis Varoufakis",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "The Hidden Life of Trees",
+      "author": "Peter Wohlleben",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "Guns, Germs, and Steel",
+      "author": "Jared Diamond",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "Sapiens",
+      "author": "Yuval Noah Harari",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "Debt: The First 5,000 Years",
+      "author": "David Graeber",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "The Hero with a Thousand Faces",
+      "author": "Joseph Campbell",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "Winners Take All",
+      "author": "Anand Giridharadas",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "The Machinery of Life",
+      "author": "David S. Goodsell",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "Big Magic",
+      "author": "Elizabeth Gilbert",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "How to Do Nothing",
+      "author": "Jenny Odell",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "Unidentified (thin blue spine)",
+      "author": null,
+      "shelf": "c1-r4",
+      "notes": "Spine not legible in the photo"
+    },
+    {
+      "title": "Four Thousand Weeks",
+      "author": "Oliver Burkeman",
+      "shelf": "c1-r4"
+    },
+    {
+      "title": "Unidentified (black spine)",
+      "author": null,
+      "shelf": "c1-r4",
+      "notes": "Spine not legible in the photo"
+    },
+    {
+      "title": "대한민국 진화론",
+      "author": "이현정",
+      "shelf": "c1-r4",
+      "notes": "Spine tagline: 삼성전자 최초 여성임원 (first woman executive at Samsung Electronics)"
+    },
+    {
+      "title": "The Culture: The Drawings",
+      "author": "Iain M. Banks",
+      "shelf": "c1-r2"
+    },
+    {
+      "title": "Palladium (issues 1–19)",
+      "author": null,
+      "shelf": "c1-r2",
+      "notes": "Magazine run; approximate count"
+    },
+    {
+      "title": "Leviathan Wakes",
+      "author": "James S. A. Corey",
+      "shelf": "c2-r2",
+      "series": "The Expanse"
+    },
+    {
+      "title": "Caliban's War",
+      "author": "James S. A. Corey",
+      "shelf": "c2-r2",
+      "series": "The Expanse"
+    },
+    {
+      "title": "Abaddon's Gate",
+      "author": "James S. A. Corey",
+      "shelf": "c2-r2",
+      "series": "The Expanse"
+    },
+    {
+      "title": "Cibola Burn",
+      "author": "James S. A. Corey",
+      "shelf": "c2-r2",
+      "series": "The Expanse"
+    },
+    {
+      "title": "Nemesis Games",
+      "author": "James S. A. Corey",
+      "shelf": "c2-r2",
+      "series": "The Expanse"
+    },
+    {
+      "title": "Babylon's Ashes",
+      "author": "James S. A. Corey",
+      "shelf": "c2-r2",
+      "series": "The Expanse"
+    },
+    {
+      "title": "Persepolis Rising",
+      "author": "James S. A. Corey",
+      "shelf": "c2-r2",
+      "series": "The Expanse"
+    },
+    {
+      "title": "Tiamat's Wrath",
+      "author": "James S. A. Corey",
+      "shelf": "c2-r2",
+      "series": "The Expanse"
+    },
+    {
+      "title": "Leviathan Falls",
+      "author": "James S. A. Corey",
+      "shelf": "c2-r2",
+      "series": "The Expanse"
+    },
+    {
+      "title": "Memory's Legion",
+      "author": "James S. A. Corey",
+      "shelf": "c2-r2",
+      "series": "The Expanse"
+    },
+    {
+      "title": "The Three-Body Problem",
+      "author": "Cixin Liu",
+      "shelf": "c2-r2"
+    },
+    {
+      "title": "Dune",
+      "author": "Frank Herbert",
+      "shelf": "c2-r2",
+      "series": "Dune"
+    },
+    {
+      "title": "God Emperor of Dune",
+      "author": "Frank Herbert",
+      "shelf": "c2-r2",
+      "series": "Dune"
+    },
+    {
+      "title": "Children of Dune",
+      "author": "Frank Herbert",
+      "shelf": "c2-r2",
+      "series": "Dune"
+    },
+    {
+      "title": "Dune Messiah",
+      "author": "Frank Herbert",
+      "shelf": "c2-r2",
+      "series": "Dune"
+    },
+    {
+      "title": "A Fire Upon the Deep",
+      "author": "Vernor Vinge",
+      "shelf": "c2-r2"
+    },
+    {
+      "title": "The Power",
+      "author": "Naomi Alderman",
+      "shelf": "c2-r2"
+    },
+    {
+      "title": "Iron Widow",
+      "author": "Xiran Jay Zhao",
+      "shelf": "c2-r2"
+    },
+    {
+      "title": "Parable of the Talents",
+      "author": "Octavia E. Butler",
+      "shelf": "c2-r2"
+    },
+    {
+      "title": "1984",
+      "author": "George Orwell",
+      "shelf": "c2-r2"
+    },
+    {
+      "title": "The Gods Themselves",
+      "author": "Isaac Asimov",
+      "shelf": "c2-r2"
+    },
+    {
+      "title": "Excession",
+      "author": "Iain M. Banks",
+      "shelf": "c2-r2"
+    },
+    {
+      "title": "Unidentified (black spine)",
+      "author": null,
+      "shelf": "c2-r2",
+      "notes": "Between Excession and The Foundation Trilogy"
+    },
+    {
+      "title": "The Foundation Trilogy",
+      "author": "Isaac Asimov",
+      "shelf": "c2-r2"
+    },
+    {
+      "title": "Reamde",
+      "author": "Neal Stephenson",
+      "shelf": "c2-r2"
+    },
+    {
+      "title": "Accelerando",
+      "author": "Charles Stross",
+      "shelf": "c2-r2"
+    },
+    {
+      "title": "Unidentified (thin white spine)",
+      "author": null,
+      "shelf": "c3-r4"
+    },
+    {
+      "title": "On NFTs",
+      "author": "Robert Alice (ed.)",
+      "shelf": "c3-r4"
+    },
+    {
+      "title": "What Are You Looking At?",
+      "author": "Will Gompertz",
+      "shelf": "c3-r4"
+    },
+    {
+      "title": "High Technology High School yearbooks (2007–2009)",
+      "author": null,
+      "shelf": "c3-r4",
+      "kind": "personal"
+    },
+    {
+      "title": "My Book About Me",
+      "author": "Dr. Seuss & Roy McKie",
+      "shelf": "c3-r4",
+      "kind": "personal"
+    },
+    {
+      "title": "Moonlists",
+      "author": null,
+      "shelf": "c3-r4",
+      "kind": "personal",
+      "notes": "Guided journal"
+    },
+    {
+      "title": "Assorted notebooks and journals",
+      "author": null,
+      "shelf": "c3-r4",
+      "kind": "personal"
+    },
+    {
+      "title": "The Numerical Discourses of the Buddha",
+      "author": "Bhikkhu Bodhi (trans.)",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "Vibrant Matter",
+      "author": "Jane Bennett",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "Opening to Oneness",
+      "author": "Nancy Mujo Baker",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "Zen and the Art of Motorcycle Maintenance",
+      "author": "Robert M. Pirsig",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "Zen and the Art of Saving the Planet",
+      "author": "Thich Nhat Hanh",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "Secure Love",
+      "author": "Julie Menanno",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "Inviting Leadership",
+      "author": "Daniel Mezick & Mark Sheffield",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "The Artist's Way",
+      "author": "Julia Cameron",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "Briefly Perfectly Human",
+      "author": "Alua Arthur",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "No Bad Parts",
+      "author": "Richard C. Schwartz",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "Awakening Joy",
+      "author": "James Baraz",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "The Archer",
+      "author": "Paulo Coelho",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "The Mastery of Love",
+      "author": "Don Miguel Ruiz",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "It Can't Happen Here",
+      "author": "Sinclair Lewis",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "Love in a F*cked-Up World",
+      "author": "Dean Spade",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "The Book of Joy",
+      "author": "Dalai Lama, Desmond Tutu & Douglas Abrams",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "Clarity & Connection",
+      "author": "Yung Pueblo",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "Inward",
+      "author": "Yung Pueblo",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "The Way Forward",
+      "author": "Yung Pueblo",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "Attached",
+      "author": "Amir Levine & Rachel Heller",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "Roots and Currents",
+      "author": "Ajahn Amaro",
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "Seeds of Dhamma",
+      "author": null,
+      "shelf": "c4-r4"
+    },
+    {
+      "title": "About 20 more spines on this shelf, not legible in the photo",
+      "author": null,
+      "shelf": "c4-r4",
+      "notes": "Needs a closer photo"
+    },
+    {
+      "title": "Elantris",
+      "author": "Brandon Sanderson",
+      "shelf": "c5-r2"
+    },
+    {
+      "title": "Mistborn",
+      "author": "Brandon Sanderson",
+      "shelf": "c5-r2",
+      "series": "Mistborn"
+    },
+    {
+      "title": "The Well of Ascension",
+      "author": "Brandon Sanderson",
+      "shelf": "c5-r2",
+      "series": "Mistborn"
+    },
+    {
+      "title": "The Hero of Ages",
+      "author": "Brandon Sanderson",
+      "shelf": "c5-r2",
+      "series": "Mistborn"
+    },
+    {
+      "title": "The Alloy of Law",
+      "author": "Brandon Sanderson",
+      "shelf": "c5-r2",
+      "series": "Mistborn"
+    },
+    {
+      "title": "Shadows of Self",
+      "author": "Brandon Sanderson",
+      "shelf": "c5-r2",
+      "series": "Mistborn"
+    },
+    {
+      "title": "The Bands of Mourning",
+      "author": "Brandon Sanderson",
+      "shelf": "c5-r2",
+      "series": "Mistborn"
+    },
+    {
+      "title": "The Lost Metal",
+      "author": "Brandon Sanderson",
+      "shelf": "c5-r2",
+      "series": "Mistborn"
+    },
+    {
+      "title": "Warbreaker",
+      "author": "Brandon Sanderson",
+      "shelf": "c5-r2"
+    },
+    {
+      "title": "The Way of Kings",
+      "author": "Brandon Sanderson",
+      "shelf": "c5-r2",
+      "series": "The Stormlight Archive"
+    },
+    {
+      "title": "Words of Radiance",
+      "author": "Brandon Sanderson",
+      "shelf": "c5-r2",
+      "series": "The Stormlight Archive"
+    },
+    {
+      "title": "Oathbringer",
+      "author": "Brandon Sanderson",
+      "shelf": "c5-r2",
+      "series": "The Stormlight Archive"
+    },
+    {
+      "title": "Rhythm of War",
+      "author": "Brandon Sanderson",
+      "shelf": "c5-r2",
+      "series": "The Stormlight Archive"
+    },
+    {
+      "title": "Edgedancer",
+      "author": "Brandon Sanderson",
+      "shelf": "c5-r2",
+      "series": "The Stormlight Archive"
+    },
+    {
+      "title": "Dawnshard",
+      "author": "Brandon Sanderson",
+      "shelf": "c5-r2",
+      "series": "The Stormlight Archive"
+    },
+    {
+      "title": "Unidentified (thin, tilted)",
+      "author": null,
+      "shelf": "c5-r2",
+      "notes": "Possibly another Sanderson"
+    },
+    {
+      "title": "The Slow Regard of Silent Things",
+      "author": "Patrick Rothfuss",
+      "shelf": "c5-r2",
+      "series": "The Kingkiller Chronicle"
+    },
+    {
+      "title": "Unidentified Rothfuss (large black)",
+      "author": "Patrick Rothfuss",
+      "shelf": "c5-r2"
+    },
+    {
+      "title": "The Name of the Wind",
+      "author": "Patrick Rothfuss",
+      "shelf": "c5-r2",
+      "series": "The Kingkiller Chronicle"
+    },
+    {
+      "title": "The Wise Man's Fear",
+      "author": "Patrick Rothfuss",
+      "shelf": "c5-r2",
+      "series": "The Kingkiller Chronicle"
+    },
+    {
+      "title": "Unidentified",
+      "author": "Ed Lin",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Kushiel's Dart",
+      "author": "Jacqueline Carey",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "The Alchemist",
+      "author": "Paulo Coelho",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Monk & Robot",
+      "author": "Becky Chambers",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "This Is How You Lose the Time War",
+      "author": "Amal El-Mohtar & Max Gladstone",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "The Midnight Library",
+      "author": "Matt Haig",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Diaspora",
+      "author": "Greg Egan",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "The City We Became",
+      "author": "N. K. Jemisin",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "The World We Make",
+      "author": "N. K. Jemisin",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Lilith's Brood",
+      "author": "Octavia E. Butler",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Fledgling",
+      "author": "Octavia E. Butler",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Wild Seed",
+      "author": "Octavia E. Butler",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Mind of My Mind",
+      "author": "Octavia E. Butler",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Watchmen",
+      "author": "Alan Moore & Dave Gibbons",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Be My Knife",
+      "author": "David Grossman",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Walkaway",
+      "author": "Cory Doctorow",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Light from Uncommon Stars",
+      "author": "Ryka Aoki",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "A Study in Scarlet Women",
+      "author": "Sherry Thomas",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Celestial Bodies",
+      "author": "Jokha Alharthi",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Macbeth",
+      "author": "William Shakespeare",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "The Dandelion Insurrection",
+      "author": "Rivera Sun",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Don't Want You Like a Best Friend",
+      "author": "Emma R. Alban",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "The Song of Achilles",
+      "author": "Madeline Miller",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Interview with the Vampire",
+      "author": "Anne Rice",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Stories of Your Life and Others",
+      "author": "Ted Chiang",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Mexican Gothic",
+      "author": "Silvia Moreno-Garcia",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "Unidentified (orange spine)",
+      "author": "Cory Doctorow",
+      "shelf": "c5-r3"
+    },
+    {
+      "title": "About 8 more spines on this shelf, not legible in the photo",
+      "author": null,
+      "shelf": "c5-r3",
+      "notes": "Needs a closer photo"
+    },
+    {
+      "title": "Dated journals (2021 onward)",
+      "author": null,
+      "shelf": "c5-r4",
+      "kind": "personal"
+    },
+    {
+      "title": "Classical piano sheet music",
+      "author": null,
+      "shelf": "c5-r4",
+      "kind": "music"
+    }
   ]
 }
