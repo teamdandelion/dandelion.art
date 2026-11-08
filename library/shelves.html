@@ -4,30 +4,42 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;1,400&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
 <style>
-  /* Layout: the bookcase drawn as five equal-height columns; tap a shelf to read its titles below (phone) or beside (desktop). */
+  /* Layout: the bookcase drawn to scale in centimetres (one SVG), a height ruler with reach zones on the left; tap a shelf to read it below (phone) or beside (desktop). */
   :root {
     --bg: #eceee9;
     --panel: #f7f8f5;
     --ink: #1f2420;
     --muted: #5d665f;
-    --wood: #8a6a4a;
-    --wood-face: #e2dccf;
+    --wood: #c9a46a;
+    --wood-edge: #a8834c;
+    --wood-back: #e3cb98;
+    --cabinet: #c9ccc6;
     --line: #cfd3cb;
     --accent: #2f5d50;
     --over: #b3261e;
+    --zone-high: rgba(179, 38, 30, 0.10);
+    --zone-eye: rgba(47, 93, 80, 0.10);
+    --obj: #6b5a48;
+    --obj-light: #f2efe8;
     --display: "Spectral", Georgia, "Times New Roman", serif;
     --ui: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #161a18; --panel: #1e2320; --ink: #e6e9e3; --muted: #9aa49c;
-      --wood: #a07d58; --wood-face: #262a26; --line: #343a35; --accent: #8cc4b0; --over: #ff7a6e;
+      --wood: #8c6d40; --wood-edge: #6e5430; --wood-back: #3a3122; --cabinet: #3a3f3b;
+      --line: #343a35; --accent: #8cc4b0; --over: #ff7a6e;
+      --zone-high: rgba(255, 122, 110, 0.10); --zone-eye: rgba(140, 196, 176, 0.10);
+      --obj: #b9a690; --obj-light: #4a4438;
       color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
     --bg: #161a18; --panel: #1e2320; --ink: #e6e9e3; --muted: #9aa49c;
-    --wood: #a07d58; --wood-face: #262a26; --line: #343a35; --accent: #8cc4b0; --over: #ff7a6e;
+    --wood: #8c6d40; --wood-edge: #6e5430; --wood-back: #3a3122; --cabinet: #3a3f3b;
+    --line: #343a35; --accent: #8cc4b0; --over: #ff7a6e;
+    --zone-high: rgba(255, 122, 110, 0.10); --zone-eye: rgba(140, 196, 176, 0.10);
+    --obj: #b9a690; --obj-light: #4a4438;
     color-scheme: dark;
   }
 
@@ -38,7 +50,7 @@
     padding-right: max(16px, env(safe-area-inset-right, 0px));
     padding-block: 20px 48px;
   }
-  .wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 20px; }
+  .wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 18px; }
   header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; }
   h1 { font-family: var(--display); font-weight: 600; font-size: 1.9rem; line-height: 1.1; margin: 0; text-wrap: balance; }
   .sub { color: var(--muted); margin: 4px 0 0; font-size: 0.9rem; }
@@ -48,50 +60,53 @@
     padding: 6px 14px; border-radius: 999px; cursor: pointer;
   }
   .toggle button[aria-pressed="true"] { background: var(--accent); color: var(--bg); }
-  button:focus-visible, .shelf:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   .stats { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
   .stats b { color: var(--ink); }
+  .stats .warn b { color: var(--over); }
 
   .main { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); }
-  @media (min-width: 900px) { .main { grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr); align-items: start; } }
+  @media (min-width: 980px) { .main { grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr); align-items: start; } }
 
-  /* ---- the bookcase ---- */
-  .case {
-    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px;
-    background: var(--wood); padding: 6px; border-radius: 4px;
-    height: clamp(520px, 78vh, 760px);
-  }
-  .col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-  .shelf {
-    position: relative; min-height: 0; background: var(--wood-face); border: 0; padding: 0; margin: 0;
-    font: inherit; color: inherit; text-align: left; display: flex; flex-direction: column; cursor: pointer;
-    overflow: hidden; border-radius: 2px;
-  }
-  .shelf.fixed { cursor: default; }
-  .shelf[aria-current="true"] { box-shadow: inset 0 0 0 2px var(--accent); }
-  .shelf.over { box-shadow: inset 0 0 0 2px var(--over); }
-  .shelf-head { display: flex; justify-content: space-between; gap: 4px; padding: 4px 5px 0; align-items: start; }
-  .shelf-label { font-size: 0.68rem; line-height: 1.2; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-  .shelf-count { font-size: 0.72rem; font-weight: 700; font-variant-numeric: tabular-nums; flex: none; }
-  .shelf.over .shelf-count { color: var(--over); }
-  .objects { flex: 1; display: grid; place-items: center; padding: 4px; font-family: var(--display); font-style: italic; font-size: 0.78rem; color: var(--muted); text-align: center; }
-  .spines { flex: 1; display: flex; align-items: flex-end; gap: 1px; padding: 0 3px; min-height: 0; }
-  .spine { flex: none; border-radius: 1px 1px 0 0; min-width: 2px; }
-  .spine.unknown { background-image: repeating-linear-gradient(135deg, transparent 0 3px, var(--wood-face) 3px 5px); }
-  .spine.moving { opacity: 0.35; }
-  .board { height: 4px; background: var(--wood); flex: none; }
-  .fill { height: 3px; background: var(--line); flex: none; }
-  .fill i { display: block; height: 100%; background: var(--accent); }
-  .shelf.over .fill i { background: var(--over); }
-  .colnum { text-align: center; font-size: 0.7rem; color: var(--bg); font-weight: 700; letter-spacing: 0.08em; }
-  @media (max-width: 520px) { .shelf-label { display: none; } .objects { font-size: 0.66rem; } .case { gap: 4px; padding: 4px; } .col { gap: 4px; } }
+  /* ---- drawing ---- */
+  .scroller { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  svg.case { display: block; width: 100%; height: auto; font-family: var(--ui); }
+  @media (max-width: 600px) { svg.case { min-width: 560px; } }
+  .case text { fill: var(--muted); }
+  .wood { fill: var(--wood); }
+  .wood-edge { fill: var(--wood-edge); }
+  .back { fill: var(--wood-back); }
+  .cabinet { fill: var(--cabinet); }
+  .cab-line { stroke: var(--bg); stroke-width: 0.6; fill: none; }
+  .zone-high { fill: var(--zone-high); }
+  .zone-eye { fill: var(--zone-eye); }
+  .ruler { stroke: var(--muted); stroke-width: 0.35; }
+  .zone-label { font-size: 3.4px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+  .tick { font-size: 3.2px; font-variant-numeric: tabular-nums; }
+  .hit { fill: transparent; cursor: pointer; }
+  .hit:hover { fill: rgba(127, 127, 127, 0.08); }
+  .sel { fill: none; stroke: var(--accent); stroke-width: 1; pointer-events: none; }
+  .overline { fill: none; stroke: var(--over); stroke-width: 0.9; stroke-dasharray: 2 1; pointer-events: none; }
+  .count { font-size: 4.6px; font-weight: 700; fill: var(--ink) !important; font-variant-numeric: tabular-nums; }
+  .count.over { fill: var(--over) !important; }
+  .slabel { font-size: 3.8px; fill: var(--ink) !important; opacity: 0.75; }
+  .spine-tall { stroke: var(--over); stroke-width: 0.6; }
+  .moving { opacity: 0.32; }
+  .obj { fill: var(--obj); }
+  .obj-light { fill: var(--obj-light); stroke: var(--obj); stroke-width: 0.4; }
+  .obj-line { fill: none; stroke: var(--obj); stroke-width: 0.5; }
+  .glass { fill: none; stroke: var(--obj); stroke-width: 0.45; opacity: 0.8; }
+  .colnum { font-size: 3.6px; font-weight: 700; }
 
   /* ---- detail panel ---- */
   .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
   .panel h2 { font-family: var(--display); font-weight: 600; font-size: 1.35rem; margin: 0; line-height: 1.15; }
   .eyebrow { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
   .intent { margin: 0; color: var(--muted); }
+  .dims { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 0.82rem; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .chip { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; border: 1px solid currentColor; }
+  .chip.high { color: var(--over); } .chip.eye { color: var(--accent); } .chip.low { color: var(--muted); }
   .meter { display: grid; gap: 4px; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
   .meter .bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
   .meter .bar i { display: block; height: 100%; background: var(--accent); }
@@ -103,12 +118,13 @@
   .dot { width: 10px; height: 10px; border-radius: 2px; align-self: center; }
   .t { font-family: var(--display); font-size: 1rem; }
   .a { color: var(--muted); font-size: 0.82rem; }
+  .a .bad { color: var(--over); font-weight: 700; }
   .move { font-size: 0.72rem; font-weight: 700; color: var(--accent); white-space: nowrap; font-variant-numeric: tabular-nums; }
   .empty { color: var(--muted); font-style: italic; margin: 0; }
 
   /* ---- legend + decisions ---- */
   .lower { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); }
-  @media (min-width: 900px) { .lower { grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr); } }
+  @media (min-width: 980px) { .lower { grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr); } }
   .legend { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
   .legend h3, .decisions h3 { font-family: var(--display); font-weight: 600; font-size: 1.05rem; margin: 0 0 6px; }
   .legend ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; font-size: 0.85rem; }
@@ -118,6 +134,7 @@
   .pill.open { color: var(--over); }
   .pill.decided { color: var(--accent); }
   .note { color: var(--muted); font-size: 0.82rem; display: block; }
+  .fine { color: var(--muted); font-size: 0.8rem; margin: 0; }
   .error { color: var(--over); }
 </style>
 
@@ -134,7 +151,10 @@
   </header>
   <div class="stats" id="stats"></div>
   <div class="main">
-    <div class="case" id="case" aria-label="Bookcase, five columns"></div>
+    <div>
+      <div class="scroller"><svg class="case" id="case" role="group" aria-label="Bookcase drawn to scale"></svg></div>
+      <p class="fine" id="scale-note"></p>
+    </div>
     <section class="panel" id="panel" aria-live="polite"></section>
   </div>
   <div class="lower">
@@ -151,9 +171,8 @@
     "archive": "#8d6e4c", "collection": "#6c7380", "friend": "#9a9c96", "games": "#a2a05e",
     "scifi": "#d69b32", "fantasy": "#cc643a", "fiction": "#b8466c", "fic-unsorted": "#a88a7a",
   };
-  let data = null;
-  let mode = "plan";
-  let current = null;
+  const ZONES = { high: 190, eye: 120 }; // floor height (cm) of a shelf's base
+  let data = null, mode = "plan", current = null, geo = null;
   try { mode = localStorage.getItem("bookcase-mode") || "plan"; } catch (e) {}
 
   const $ = (id) => document.getElementById(id);
@@ -163,70 +182,253 @@
   const sizeOf = (b) => b.size ?? 1;
   const where = (b) => (mode === "plan" ? b.planShelf : b.shelf);
   const moves = (b) => b.planShelf && b.planShelf !== b.shelf;
+  const hash = (str) => { let h = 0; for (const c of str) h = (h * 31 + c.charCodeAt(0)) | 0; return Math.abs(h); };
+  const zoneOf = (s) => (s.floor >= ZONES.high ? "high" : s.floor >= ZONES.eye ? "eye" : "low");
+  const zoneName = { high: "Step stool", eye: "Eye level", low: "Low" };
+
+  // Lay out every shelf in centimetres: x across, floor = height of its base above the floor.
+  function layout() {
+    const c = data.case, board = c.boardCm;
+    const cols = {};
+    let x = 0;
+    for (const col of c.columns) { cols[col.column] = { x: x + board, w: col.widthCm }; x += board + col.widthCm; }
+    const totalW = x + board;
+    const shelves = {};
+    let top = 0;
+    for (const col of c.columns) {
+      const list = data.shelves.filter((s) => s.column === col.column).sort((a, b) => b.row - a.row); // bottom first
+      let floor = c.baseCm;
+      for (const s of list) {
+        shelves[s.id] = { ...s, x: cols[col.column].x, w: col.widthCm, floor: floor + board, h: s.bayCm - board, clear: s.bayCm - board };
+        floor += s.bayCm;
+      }
+      top = Math.max(top, floor);
+    }
+    return { cols, shelves, totalW, top, base: c.baseCm, board };
+  }
 
   function shelfBooks(id) {
-    const list = data.books.map((b, i) => ({ b, i })).filter(({ b }) => where(b) === id);
-    if (mode === "plan") list.sort((x, y) => (x.b.planOrder ?? 0) - (y.b.planOrder ?? 0));
-    return list.map(({ b }) => b);
+    const list = data.books.filter((b) => where(b) === id);
+    if (mode === "plan") list.sort((x, y) => (x.planOrder ?? 0) - (y.planOrder ?? 0));
+    return list;
   }
-  function stats(books, shelf) {
+  function stats(books, s) {
     const count = books.reduce((n, b) => n + countOf(b), 0);
-    const size = books.reduce((n, b) => n + sizeOf(b), 0);
-    const fill = shelf.capacity ? size / shelf.capacity : 0;
-    return { count, size, fill, friend: books.some((b) => b.kind === "friend") };
+    const usedCm = books.reduce((n, b) => n + sizeOf(b), 0) * data.case.paperbackCm;
+    const tall = books.filter((b) => b.heightCm && b.heightCm > s.clear);
+    return { count, usedCm, fill: usedCm / s.w, tall, friend: books.some((b) => b.kind === "friend") };
   }
-  const label = (s) => (mode === "plan" ? s.plan?.label : s.contents);
-  const countText = (st) => (st.friend && st.count === 0 ? "~" : st.count ? String(st.count) : "");
-  function hash(str) { let h = 0; for (const c of str) h = (h * 31 + c.charCodeAt(0)) | 0; return Math.abs(h); }
+
+  // ---- crude object drawings, each in a box (x, y top-left, w, h) in cm ----
+  const OBJ = {
+    "print-orange": (x, y, w, h) => print(x, y, w, h, "#e8643a"),
+    "print-blue": (x, y, w, h) => print(x, y, w, h, "#5b86d6"),
+    fossil(x, y, w, h) {
+      const cx = x + w * 0.42, b = y + h;
+      return `<path class="obj" d="M${cx - 20} ${b} C${cx - 24} ${b - 18} ${cx - 16} ${b - 30} ${cx - 12} ${b - 44} C${cx - 9} ${b - 56} ${cx + 6} ${b - 58} ${cx + 10} ${b - 46} C${cx + 14} ${b - 34} ${cx + 18} ${b - 18} ${cx + 24} ${b - 8} L${cx + 26} ${b} Z"/>
+        <circle cx="${cx - 2}" cy="${b - 42}" r="4" class="obj-light" /><circle cx="${cx + 5}" cy="${b - 30}" r="3" class="obj-light" />
+        <path class="obj-line" d="M${cx - 14} ${b - 10} q8 -6 16 0 t16 0" />
+        <path class="obj" d="M${cx - 30} ${b} l6 -3 l4 2 l-3 1 z" style="fill:#4a5bd0" />`;
+    },
+    ukulele(x, y, w, h) {
+      const cx = x + w * 0.55, b = y + h - 1;
+      return `<g transform="rotate(-8 ${cx} ${b})">
+        <ellipse cx="${cx}" cy="${b - 11}" rx="11" ry="11" class="obj" style="fill:#9a5a2e" />
+        <ellipse cx="${cx}" cy="${b - 27}" rx="8.5" ry="9" class="obj" style="fill:#9a5a2e" />
+        <circle cx="${cx}" cy="${b - 24}" r="3" fill="#2a1a10" />
+        <rect x="${cx - 1.6}" y="${b - 62}" width="3.2" height="28" class="obj" style="fill:#5a3a22" />
+        <rect x="${cx - 2.6}" y="${b - 69}" width="5.2" height="8" rx="1" class="obj" style="fill:#5a3a22" />
+        <rect x="${cx - 4}" y="${b - 8}" width="8" height="1.6" fill="#2a1a10" /></g>
+        <path class="obj-line" d="M${cx + 9} ${b - 4} C${cx + 18} ${b - 20} ${cx + 16} ${b - 40} ${cx + 4} ${b - 62}" style="stroke:#3a2a1e;stroke-width:1" />`;
+    },
+    bottles(x, y, w, h) {
+      const hs = [26, 31, 30, 27, 29, 28];
+      let s = "", bx = x + 6;
+      hs.forEach((bh, i) => {
+        const bh2 = Math.min(bh, h - 1), bw = 6.5, by = y + h - bh2;
+        s += `<path class="obj" style="fill:${["#6b4a2a", "#3d2b2b", "#4a3020", "#b8822e", "#cfc6a8", "#d8d0bc"][i]};opacity:.85" d="M${bx} ${y + h} v${-bh2 * 0.62} q0 -4 ${bw * 0.32} -6 v${-bh2 * 0.3 + 6} h${bw * 0.36} v${bh2 * 0.3 - 6} q${bw * 0.32} 2 ${bw * 0.32} 6 v${bh2 * 0.62} z"/>`;
+        bx += bw + 2.5;
+      });
+      return s;
+    },
+    jars: (x, y, w, h) => glasses(x + w * 0.62, y, w * 0.36, h, 3),
+    glasses: (x, y, w, h) => glasses(x + 3, y, w - 6, h, 7),
+    vases(x, y, w, h) {
+      return [0.12, 0.42, 0.7].map((f, i) => {
+        const vx = x + w * f, vh = Math.min(h - 2, 14 + i * 2);
+        return `<path class="glass" d="M${vx} ${y + h} q-3 ${-vh * 0.5} 1 ${-vh} h6 q4 ${vh * 0.5} 1 ${vh} z" />`;
+      }).join("");
+    },
+    bust(x, y, w, h) {
+      const cx = x + w * 0.2, b = y + h;
+      return `<path class="obj" style="fill:#2e2a28" d="M${cx - 8} ${b} q0 -10 8 -12 q-6 -4 -5 -12 q1 -9 5 -9 q4 0 5 9 q1 8 -5 12 q8 2 8 12 z" />`;
+    },
+    mask(x, y, w, h) {
+      const cx = x + w * 0.45, b = y + h;
+      return `<rect x="${cx - 7}" y="${b - 26}" width="14" height="24" rx="4" style="fill:#3047a6" /><rect x="${cx - 5}" y="${b - 18}" width="4" height="2" fill="#0d1430" /><rect x="${cx + 1}" y="${b - 18}" width="4" height="2" fill="#0d1430" />`;
+    },
+    bowl(x, y, w, h) {
+      const cx = x + w * 0.68, b = y + h;
+      return `<path class="obj" style="fill:#4a4036" d="M${cx - 7} ${b - 9} h14 q0 8 -7 9 q-7 -1 -7 -9 z" />`;
+    },
+    photo(x, y, w, h) {
+      const b = y + h;
+      return `<rect x="${x + 3}" y="${b - 20}" width="15" height="19" class="obj-light" /><rect x="${x + 5}" y="${b - 18}" width="11" height="15" class="obj" style="opacity:.5" /><rect x="${x + 27}" y="${b - 14}" width="12" height="12" class="obj" style="fill:#222" />`;
+    },
+    crystals(x, y, w, h) {
+      const b = y + h, cx = x + w * 0.62;
+      return `<path class="obj-light" d="M${cx} ${b} l3 -18 l5 0 l3 18 z" /><rect x="${cx + 14}" y="${b - 13}" width="13" height="12" style="fill:#d06a3a" />`;
+    },
+    figures(x, y, w, h) {
+      const b = y + h, fx = x + w - 6;
+      return `<circle cx="${fx}" cy="${b - 6}" r="1.4" style="fill:#7a6ad6" /><rect x="${fx - 1}" y="${b - 4.6}" width="2" height="4.4" style="fill:#7a6ad6" />`;
+    },
+    clock(x, y, w, h) {
+      const b = y + h;
+      return `<circle cx="${x + 9}" cy="${b - 8}" r="6.5" class="obj-light" /><path class="obj-line" d="M${x + 9} ${b - 8} v-4 M${x + 9} ${b - 8} h3" />`;
+    },
+    photos(x, y, w, h) {
+      const b = y + h;
+      return `<rect x="${x + w * 0.56}" y="${b - 12}" width="10" height="11" class="obj-light" /><rect x="${x + w * 0.74}" y="${b - 10}" width="9" height="9" class="obj-light" />`;
+    },
+    candles(x, y, w, h) { const b = y + h; return `<rect x="${x + w * 0.46}" y="${b - 6}" width="4" height="5" class="obj-light" />`; },
+    cloth(x, y, w, h) { const b = y + h; return `<path class="obj-light" d="M${x + w * 0.3} ${b} q4 -7 12 -6 q8 0 10 6 z" />`; },
+    bookends(x, y, w, h) { const b = y + h; return `<rect x="${x + w * 0.42}" y="${b - 10}" width="5" height="9" class="obj" />`; },
+    "books-flat"(x, y, w, h) { const b = y + h; return `<rect x="${x + w * 0.18}" y="${b - 2}" width="20" height="1.6" class="obj-light" /><rect x="${x + w * 0.62}" y="${b - 2}" width="20" height="1.6" class="obj-light" />`; },
+  };
+  function print(x, y, w, h, frame) {
+    const pw = w * 0.92, ph = Math.min(h * 0.82, pw * 1.18), px = x + (w - pw) / 2, py = y + h - ph;
+    let dots = "";
+    for (let i = 0; i < 46; i++) {
+      const r = 0.6 + (hash("d" + i + frame) % 10) / 9;
+      const dx = px + 5 + (hash("x" + i + frame) % 1000) / 1000 * (pw - 10), dy = py + 5 + (hash("y" + i + frame) % 1000) / 1000 * (ph - 10);
+      dots += `<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="${r.toFixed(2)}" fill="${["#e46b4a", "#7b8fd6", "#e7b04a", "#e9a39a"][i % 4]}" />`;
+    }
+    return `<rect x="${px}" y="${py}" width="${pw}" height="${ph}" fill="${frame}" /><rect x="${px + 2.2}" y="${py + 2.2}" width="${pw - 4.4}" height="${ph - 4.4}" fill="#f6f2ea" />${dots}`;
+  }
+  function glasses(x, y, w, h, n) {
+    let s = "";
+    for (let i = 0; i < n; i++) {
+      const gx = x + (i * w) / n, gh = Math.min(h - 3, 10 + (hash("g" + i) % 8));
+      s += `<rect class="glass" x="${gx + 1}" y="${y + h - gh}" width="${w / n - 2.5}" height="${gh}" rx="1" />`;
+    }
+    return s;
+  }
 
   function renderCase() {
-    const cols = [1, 2, 3, 4, 5].map((c) => data.shelves.filter((s) => s.column === c));
-    $("case").innerHTML = cols.map((shelves, ci) => `
-      <div class="col">${shelves.map((s) => {
-        const books = shelfBooks(s.id);
-        const st = stats(books, s);
-        const over = st.fill > 1;
-        const holdsBooks = s.capacity && (books.length || mode === "plan");
-        const body = holdsBooks && books.length
-          ? `<div class="spines">${books.map((b) => {
-              const w = (sizeOf(b) / Math.max(s.capacity, st.size)) * 100;
-              const h = b.kind === "friend" ? 80 : 62 + (hash(b.title) % 30);
-              const cls = ["spine", isUnknown(b) || b.kind === "friend" ? "unknown" : "", mode === "now" && moves(b) ? "moving" : ""].join(" ");
-              return `<span class="${cls}" style="width:calc(${w.toFixed(2)}% - 1px);height:${h}%;background-color:${COLORS[b.section] || "#888"}" title="${esc(b.title)}"></span>`;
-            }).join("")}</div><div class="fill"><i style="width:${Math.min(100, st.fill * 100).toFixed(0)}%"></i></div>`
-          : `<div class="objects">${esc(mode === "plan" ? s.plan?.label : s.contents)}</div>`;
-        const tap = books.length || s.capacity;
-        return `<button type="button" class="shelf ${over ? "over" : ""} ${tap ? "" : "fixed"}" data-id="${s.id}" style="flex:${s.units ?? 1} 1 0"
-          aria-current="${current === s.id}" aria-label="${esc(s.id)}: ${esc(label(s))}, ${st.count} items">
-          <div class="shelf-head"><span class="shelf-label">${holdsBooks && books.length ? esc(label(s)) : ""}</span><span class="shelf-count">${countText(st)}</span></div>
-          ${body}<div class="board"></div></button>`;
-      }).join("")}<div class="colnum">${ci + 1}</div></div>`).join("");
+    geo = layout();
+    const { shelves, totalW, top, base, board } = geo;
+    const Y = (cm) => top - cm; // svg y from height above floor
+    const pad = 26;
+    const crop = 55; // show only the top of the base cabinet
+    const vb = `${-pad} -4 ${totalW + pad + 2} ${top - crop + 4}`;
+    let s = `<defs><pattern id="hatch" width="2.4" height="2.4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="1.2" height="2.4" fill="rgba(255,255,255,.45)" /></pattern></defs>`;
+    // reach zones behind everything
+    s += `<rect class="zone-high" x="${-pad}" y="${Y(top)}" width="${totalW + pad}" height="${top - ZONES.high}" />`;
+    s += `<rect class="zone-eye" x="${-pad}" y="${Y(ZONES.high)}" width="${totalW + pad}" height="${ZONES.high - ZONES.eye}" />`;
+    // ruler
+    s += `<line class="ruler" x1="-6" x2="-6" y1="${Y(crop)}" y2="${Y(top)}" />`;
+    for (let cm = 100; cm <= top; cm += 50) s += `<line class="ruler" x1="-8" x2="-6" y1="${Y(cm)}" y2="${Y(cm)}" /><text class="tick" x="-9" y="${Y(cm) + 1.1}" text-anchor="end">${cm}</text>`;
+    s += `<text class="zone-label" x="${-pad + 1}" y="${Y(top) + 5}">Step stool</text>`;
+    s += `<text class="zone-label" x="${-pad + 1}" y="${Y(ZONES.high) + 5}">Eye level</text>`;
+    s += `<text class="zone-label" x="${-pad + 1}" y="${Y(ZONES.eye) + 5}">Low</text>`;
+    s += `<text class="tick" x="-9" y="${Y(top) - 1}" text-anchor="end">cm</text>`;
+    // base cabinet
+    s += `<rect class="cabinet" x="0" y="${Y(base)}" width="${totalW}" height="${base}" />`;
+    s += `<rect class="wood-edge" x="-1" y="${Y(base)}" width="${totalW + 2}" height="2" />`;
+    for (const [i, col] of data.case.columns.entries()) {
+      const c = geo.cols[col.column];
+      s += `<rect class="cab-line" x="${c.x + 2}" y="${Y(base) + 5}" width="${c.w - 4}" height="${base - 9}" />`;
+      s += `<text class="colnum" x="${c.x + c.w / 2}" y="${Y(base) + 9}" text-anchor="middle">${i + 1}</text>`;
+    }
+    // carcass
+    s += `<rect class="wood" x="0" y="${Y(top)}" width="${totalW}" height="${top - base}" />`;
+    for (const sh of Object.values(shelves)) {
+      const x = sh.x, yTop = Y(sh.floor + sh.h), h = sh.h;
+      s += `<rect class="back" x="${x}" y="${yTop}" width="${sh.w}" height="${h}" />`;
+      s += `<rect class="${zoneOf(sh) === "high" ? "zone-high" : zoneOf(sh) === "eye" ? "zone-eye" : ""}" x="${x}" y="${yTop}" width="${sh.w}" height="${h}" fill="transparent" />`;
+    }
+    // contents
+    for (const sh of Object.values(shelves)) {
+      const x = sh.x, yTop = Y(sh.floor + sh.h), h = sh.h, yBot = Y(sh.floor);
+      const objs = (mode === "plan" ? sh.plan?.objects : sh.objects) || [];
+      for (const o of objs) if (OBJ[o]) s += OBJ[o](x, yTop, sh.w, h);
+      const books = shelfBooks(sh.id);
+      const st = stats(books, sh);
+      const scale = st.usedCm > sh.w - 1 ? (sh.w - 1) / st.usedCm : 1;
+      let bx = x + 0.5;
+      for (const b of books) {
+        const bw = sizeOf(b) * data.case.paperbackCm * scale;
+        const color = COLORS[b.section] || "#888";
+        const cls = mode === "now" && moves(b) ? "moving" : "";
+        if (b.kind === "friend") {
+          const bh = Math.min(h - 1.5, 20);
+          s += `<g class="${cls}"><rect x="${bx}" y="${yBot - bh}" width="${bw}" height="${bh}" fill="${color}" /><rect x="${bx}" y="${yBot - bh}" width="${bw}" height="${bh}" fill="url(#hatch)" /></g>`;
+        } else if ((b.count ?? 1) > 1) {
+          // a run of several spines
+          const n = b.count, each = bw / n;
+          for (let i = 0; i < n; i++) {
+            const bh = Math.min(h - 1, (b.heightCm || 20) - (hash(b.title + i) % 3));
+            s += `<rect class="${cls}" x="${bx + i * each}" y="${yBot - bh}" width="${Math.max(0.3, each - 0.25)}" height="${bh}" fill="${color}" ${isUnknown(b) ? 'opacity=".55"' : ""} />`;
+          }
+        } else {
+          const want = b.heightCm || (sizeOf(b) >= 2 ? 23.5 : 18.5 + (hash(b.title) % 4));
+          const tooTall = b.heightCm && b.heightCm > sh.clear;
+          const bh = Math.min(want, h - 0.6);
+          s += `<rect class="${cls} ${tooTall ? "spine-tall" : ""}" x="${bx}" y="${yBot - bh}" width="${Math.max(0.3, bw - 0.25)}" height="${bh}" fill="${color}" ${isUnknown(b) ? 'opacity=".55"' : ""}><title>${esc(b.title)}</title></rect>`;
+        }
+        bx += bw;
+      }
+      if (st.count || st.friend) {
+        const label = mode === "plan" ? sh.plan?.label : "";
+        s += `<text class="count ${st.fill > 1 ? "over" : ""}" x="${x + sh.w - 1.2}" y="${yTop + 4.2}" text-anchor="end">${st.friend && !st.count ? "~" : st.count}</text>`;
+        if (label && h > 12) s += `<text class="slabel" x="${x + 1.2}" y="${yTop + 4}">${esc(label)}</text>`;
+      } else if (!objs.length && mode === "plan" && sh.plan?.label) {
+        s += `<text class="slabel" x="${x + sh.w / 2}" y="${yTop + h / 2}" text-anchor="middle">${esc(sh.plan.label)}</text>`;
+      }
+      if (st.fill > 1 || st.tall.length) s += `<rect class="overline" x="${x + 0.5}" y="${yTop + 0.5}" width="${sh.w - 1}" height="${h - 1}" />`;
+    }
+    // boards (drawn over contents so books sit on them)
+    for (const sh of Object.values(shelves)) s += `<rect class="wood-edge" x="${sh.x}" y="${Y(sh.floor)}" width="${sh.w}" height="${board}" />`;
+    // hit areas + selection
+    for (const sh of Object.values(shelves)) {
+      const yTop = Y(sh.floor + sh.h);
+      s += `<rect class="hit" data-id="${sh.id}" x="${sh.x}" y="${yTop}" width="${sh.w}" height="${sh.h}" tabindex="0" role="button" aria-label="${esc(sh.id)}"><title>${esc(sh.id)} · ${esc(mode === "plan" ? sh.plan?.label : sh.contents)}</title></rect>`;
+      if (sh.id === current) s += `<rect class="sel" x="${sh.x + 0.5}" y="${yTop + 0.5}" width="${sh.w - 1}" height="${sh.h - 1}" />`;
+    }
+    $("case").setAttribute("viewBox", vb);
+    $("case").innerHTML = s;
+    $("scale-note").textContent = `Drawn to scale in centimetres. ${data.case.note}`;
   }
 
   function renderPanel() {
-    const s = data.shelves.find((x) => x.id === current);
-    if (!s) {
-      $("panel").innerHTML = `<span class="eyebrow">Shelf detail</span><p class="empty">Tap a shelf to list its books in order.</p>`;
+    const sh = geo?.shelves[current];
+    if (!sh) {
+      $("panel").innerHTML = `<span class="eyebrow">Shelf detail</span><p class="empty">Tap a shelf to list its books in order, with its size and how full it is.</p>`;
       return;
     }
-    const books = shelfBooks(s.id);
-    const st = stats(books, s);
+    const books = shelfBooks(sh.id);
+    const st = stats(books, sh);
     const pct = Math.round(st.fill * 100);
-    const meter = s.capacity
-      ? `<div class="meter ${st.fill > 1 ? "over" : ""}"><span>${st.count} ${st.count === 1 ? "item" : "items"} · about ${pct}% full (${st.size.toFixed(0)} of ~${s.capacity} paperback widths)</span><div class="bar"><i style="width:${Math.min(100, pct)}%"></i></div></div>`
+    const z = zoneOf(sh);
+    const meter = books.length
+      ? `<div class="meter ${st.fill > 1 ? "over" : ""}"><span>${st.count || "~"} ${st.count === 1 ? "item" : "items"} · about ${Math.round(st.usedCm)} of ${sh.w} cm used (${pct}%)</span><div class="bar"><i style="width:${Math.min(100, pct)}%"></i></div></div>`
       : "";
     const rows = books.map((b) => {
       const tag = moves(b) ? (mode === "plan" ? `from ${b.shelf}` : `→ ${b.planShelf}`) : "";
       const series = b.series ? ` · ${esc(b.series)}${b.seriesNo ? " " + b.seriesNo : ""}` : "";
       const n = b.count && b.kind !== "friend" ? ` · ${b.count} items` : "";
+      const tall = b.heightCm && b.heightCm > sh.clear ? ` · <span class="bad">${b.heightCm} cm tall, shelf clears ${sh.clear}</span>` : "";
       return `<li><span class="dot" style="background:${COLORS[b.section] || "#888"}"></span>
-        <span><span class="t">${esc(b.title)}</span><br><span class="a">${esc(b.author || "")}${series}${n}</span></span>
+        <span><span class="t">${esc(b.title)}</span><br><span class="a">${esc(b.author || "")}${series}${n}${tall}</span></span>
         <span class="move">${tag}</span></li>`;
     }).join("");
+    const label = mode === "plan" ? sh.plan?.label : sh.contents;
     $("panel").innerHTML = `
-      <span class="eyebrow">${esc(s.id)} · ${mode === "plan" ? "Plan" : "Now"}</span>
-      <h2>${esc(label(s))}</h2>
-      <p class="intent">${esc(mode === "plan" ? s.plan?.intent : "Planned: " + (s.plan?.label || ""))}</p>
+      <span class="eyebrow">${esc(sh.id)} · ${mode === "plan" ? "Plan" : "Now"}</span>
+      <h2>${esc(label)}</h2>
+      <div class="dims"><span class="chip ${z}">${zoneName[z]}</span><span>${sh.w} cm wide × ${sh.clear} cm clear</span><span>base at ${sh.floor} cm</span></div>
+      <p class="intent">${esc(mode === "plan" ? sh.plan?.intent : "Planned: " + (sh.plan?.label || ""))}</p>
       ${meter}
       ${books.length ? `<ol class="titles">${rows}</ol>` : `<p class="empty">No books here.</p>`}`;
   }
@@ -236,9 +438,15 @@
     const total = books.reduce((n, b) => n + countOf(b), 0);
     const moving = books.filter(moves).reduce((n, b) => n + countOf(b), 0);
     const unknown = books.filter(isUnknown).reduce((n, b) => n + countOf(b), 0);
-    const over = data.shelves.filter((s) => s.capacity && stats(shelfBooks(s.id), s).fill > 1).length;
+    let over = 0, tall = 0;
+    for (const sh of Object.values(geo.shelves)) {
+      const st = stats(shelfBooks(sh.id), sh);
+      if (st.fill > 1) over++;
+      tall += st.tall.length;
+    }
     $("stats").innerHTML = `<span><b>${total}</b> items catalogued</span><span><b>${moving}</b> move in the plan</span>
-      <span><b>${unknown}</b> still unidentified</span><span><b>${over}</b> ${over === 1 ? "shelf" : "shelves"} over capacity</span>`;
+      <span><b>${unknown}</b> still unidentified</span><span class="${over ? "warn" : ""}"><b>${over}</b> ${over === 1 ? "shelf" : "shelves"} over full</span>
+      <span class="${tall ? "warn" : ""}"><b>${tall}</b> too tall for ${tall === 1 ? "its" : "their"} shelf</span>`;
     $("sub").textContent = `${data.planStatus === "proposed" ? "Proposed layout, not decided yet" : "Layout"} · catalogue updated ${data.updated}`;
   }
 
@@ -247,31 +455,32 @@
     for (const sec of data.sections) (groups[sec.group] ||= []).push(sec);
     $("legend").innerHTML = Object.entries(groups).map(([g, secs]) => `<div><h3>${esc(g)}</h3><ul>${secs.map((sec) => {
       const items = data.books.filter((b) => b.section === sec.id);
+      if (!items.length) return "";
       const n = items.reduce((k, b) => k + countOf(b), 0);
       const shelves = [...new Set(items.map(where))].join(", ");
       return `<li><span class="dot" style="background:${COLORS[sec.id]}"></span><span>${esc(sec.label)} <span class="note">${esc(shelves)}</span></span><span>${n || "~"}</span></li>`;
     }).join("")}</ul></div>`).join("");
-    $("decisions").innerHTML = `<h3>Open decisions</h3><ol>${data.decisions.map((d) =>
+    $("decisions").innerHTML = `<h3>Decisions</h3><ol>${data.decisions.map((d) =>
       `<li>${esc(d.question)}<span class="pill ${d.status === "open" ? "open" : "decided"}">${esc(d.status)}</span>${d.answer ? `<span class="note">${esc(d.answer)}</span>` : d.proposal ? `<span class="note">${esc(d.proposal)}</span>` : ""}</li>`).join("")}</ol>`;
   }
 
   function render() {
     $("mode-plan").setAttribute("aria-pressed", mode === "plan");
     $("mode-now").setAttribute("aria-pressed", mode === "now");
-    renderStats(); renderCase(); renderPanel(); renderLegend();
+    renderCase(); renderStats(); renderPanel(); renderLegend();
+  }
+  function select(id) {
+    current = id;
+    if (location.hash !== "#" + id) history.replaceState(null, "", "#" + id);
+    render();
+    if (window.matchMedia("(max-width: 979px)").matches) $("panel").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function setMode(m) { mode = m; try { localStorage.setItem("bookcase-mode", m); } catch (e) {} render(); }
   $("mode-plan").addEventListener("click", () => setMode("plan"));
   $("mode-now").addEventListener("click", () => setMode("now"));
-  $("case").addEventListener("click", (e) => {
-    const el = e.target.closest(".shelf");
-    if (!el || el.classList.contains("fixed")) return;
-    current = el.dataset.id;
-    if (location.hash !== "#" + current) history.replaceState(null, "", "#" + current);
-    render();
-    if (window.matchMedia("(max-width: 899px)").matches) $("panel").scrollIntoView({ behavior: "smooth", block: "start" });
-  });
+  $("case").addEventListener("click", (e) => { const el = e.target.closest(".hit"); if (el) select(el.dataset.id); });
+  $("case").addEventListener("keydown", (e) => { const el = e.target.closest(".hit"); if (el && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); select(el.dataset.id); } });
   window.addEventListener("hashchange", () => { current = location.hash.slice(1) || null; if (data) render(); });
 
   fetch("books.json", { cache: "no-store" })

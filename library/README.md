@@ -10,14 +10,16 @@ The catalogue started from photos taken on 2026-11-08. It is not linked from the
 
 ## Shelf coordinates
 
-Shelf IDs are `c<column>-r<row>`. Columns are numbered 1–5 from left to right, and rows are numbered from the top down within each column. Columns have different numbers of rows, and rows are not aligned across columns. The center column's group of empty high shelves is a single entry, `c3-top`.
+Shelf IDs are `c<column>-r<row>`. Columns are numbered 1–5 from left to right, and rows are numbered from the top down within each column. Columns have different numbers of rows, and rows are not aligned across columns. Column 3's three empty high shelves are `c3-r1` to `c3-r3`. The empty cubby above column 4's first row is `c4-top`.
 
 Four spots are fixed:
 
 - **Column 2, tall bottom bay:** the fossil stays here.
 - **Column 4, tall bottom bay:** the ukulele stays here. It mirrors the fossil.
 - **Column 3, glued-in shelf:** it sits too low for the fossil. It is left alone, so no structural changes.
-- **Column 3, top:** three or four empty shelves, originally planned around a TV that will not be installed.
+- **Column 3, top:** three empty shelves (`c3-r1` to `c3-r3`), originally planned around a TV that will not be installed.
+
+The shelf sizes in `books.json` are estimates from the whole-bookcase photo. The bookcase sits on an ~80 cm base cabinet; columns are about 66 cm wide, except column 3 at about 81 cm. Anything with its base above ~190 cm needs a step stool.
 
 ## How it is laid out now
 
@@ -35,16 +37,18 @@ Four spots are fixed:
 
 The fossil and the ukulele already mirror each other at the bottom. The top is lopsided: both prints are on the left and the center is empty. The plan:
 
-|            | Col 1         | Col 2      | Col 3            | Col 4   | Col 5           |
-| ---------- | ------------- | ---------- | ---------------- | ------- | --------------- |
-| **Top**    | Orange print  | Shelving   | Friend's books   | Fiction | Blue print      |
-| **Middle** | Nonfiction    | Nonfiction | Personal archive | Fiction | Fiction         |
-| **Bottom** | Games, photos | Fossil     | Bust, mask, bowl | Ukulele | Bar + glassware |
+|               | Col 1                         | Col 2         | Col 3               | Col 4                       | Col 5            |
+| ------------- | ----------------------------- | ------------- | ------------------- | --------------------------- | ---------------- |
+| **High**      | Orange print                  | Empty bay     | Friend's books (×3) | Personal archive; Palladium | Blue print       |
+| **Eye level** | Nonfiction I–II               | Nonfiction IV | Art books; objects  | Sci-fi; fantasy             | Fantasy; fiction |
+| **Low**       | Nonfiction III; games, photos | Fossil        | Bust, mask, bowl    | Ukulele                     | Bar + glassware  |
 
+- **Reach decides what goes high.** Things pulled rarely, or that guests shouldn't browse, go up: the friend's books, Palladium, and the personal archive (journals, yearbooks, notebooks). The Dharma books sit at eye level.
 - **The friend's books go in the empty center top.** They are high and hard to reach, which suits books kept for someone else. A full row of spines also fills the space the TV left.
 - **The prints go at the two outer ends.** The blue print moves from column 2 to column 5, and column 2's top gets shelves.
 - **The bottles move down with the glassware** in the lower part of column 5.
-- **Column 3, row 4 becomes the personal archive:** yearbooks, childhood books, dated journals, notebooks and art books.
+- **The personal archive goes in `c4-top`** and Palladium in `c4-r1`, both high. `c3-r4` holds the art books and _The Culture: The Drawings_.
+- **Column 2's print bay is left empty** once the print moves. It has room for three new shelves, all above reach.
 - **Nonfiction on the left, fiction on the right.**
 
 ### Ordering within each section
@@ -67,14 +71,15 @@ The fossil and the ukulele already mirror each other at the bottom. The top is l
 
 `books.json` has these parts:
 
-- `shelves`: one entry per shelf, with `id`, `column`, `row` and a short `contents` summary of what is there now. `units` is the shelf's drawn height (tall bays are 2, `c3-top` is 3). `capacity` is a rough guess at how many paperback widths fit (`null` for shelves that hold objects). `plan` has the planned `label` and `intent`.
-- `books`: one entry per item, in left-to-right order on its current shelf. Each has `title`, `author` (`null` if unknown), `shelf` and `section`. Optional fields: `series`, `seriesNo`, `notes`, `count` (for an entry that stands for several items), `size` (width in paperback widths, default 1), and `kind` (`personal`, `music`, `game` or `friend` for items that aren't regular books).
+- `case`: overall dimensions: base cabinet height, board thickness, column widths, and the width of one paperback (`paperbackCm`).
+- `shelves`: one entry per shelf, with `id`, `column`, `row` and a short `contents` summary of what is there now. `bayCm` is the bay's height including the board under it. `objects` names the non-book things drawn on the shelf now; `plan` has the planned `label`, `intent` and `objects`.
+- `books`: one entry per item, in left-to-right order on its current shelf. Each has `title`, `author` (`null` if unknown), `shelf` and `section`. Optional fields: `series`, `seriesNo`, `notes`, `heightCm` (for tall items), `count` (for an entry that stands for several items), `size` (width in paperback widths, default 1), and `kind` (`personal`, `music`, `game` or `friend` for items that aren't regular books).
 - `planShelf` and `planOrder` on each item: where it goes in the proposed layout, and its position from the left.
 - `sections`: the subject sections in shelf order. Nonfiction runs as the topic gradient.
 - `decisions` and `planStatus`: the open questions and whether the plan is decided.
 - `updated`: the date of the last change.
 
-Sizes and capacities are estimates. Correct them as real shelves fill up.
+Sizes and heights are estimates. Correct them with tape-measure numbers.
 
 Books whose spines couldn't be read are entered as `Unidentified (…)` with a note. Columns 4 (row 4) and 5 (row 3) each have a placeholder entry for spines that need a closer photo.
 

@@ -1,6 +1,6 @@
 {
   "updated": "2026-11-08",
-  "layout": "Five-column built-in bookcase. Shelf IDs are c<column>-r<row>, with columns numbered left to right and rows top to bottom. Books are listed left to right within each shelf.",
+  "layout": "Five-column built-in bookcase on a base cabinet. Shelf IDs are c<column>-r<row>, rows counted top-down within each column; c4-top is the empty cubby above column 4's first row. Books are listed left to right within each shelf.",
   "planStatus": "proposed",
   "decisions": [
     {
@@ -13,12 +13,13 @@
       "id": 2,
       "question": "Palladium and the board games: left side, or the center archive?",
       "status": "open",
-      "proposal": "Proposed: Palladium + Culture drawings on c1-r2, games with the photos on c1-r5."
+      "proposal": "Proposed: Palladium high on c4-r1; Culture drawings with the art books on c3-r4; games low on c1-r5."
     },
     {
       "id": 3,
       "question": "Do the friend's ~3 shelves of books fit on the center-top shelves?",
-      "status": "open"
+      "status": "open",
+      "proposal": "Looks like yes: about 200 cm of books (three 66 cm shelves) onto three 81 cm shelves (243 cm)."
     },
     {
       "id": 4,
@@ -27,6 +28,34 @@
       "proposal": "Done in the plan: all three are in Other fiction."
     }
   ],
+  "case": {
+    "note": "Estimated from the whole-bookcase photo (scale from mass-market paperbacks, ~17.5 cm). Replace with tape-measure numbers when available.",
+    "baseCm": 80,
+    "boardCm": 2,
+    "paperbackCm": 2.5,
+    "columns": [
+      {
+        "column": 1,
+        "widthCm": 66
+      },
+      {
+        "column": 2,
+        "widthCm": 66
+      },
+      {
+        "column": 3,
+        "widthCm": 81
+      },
+      {
+        "column": 4,
+        "widthCm": 66
+      },
+      {
+        "column": 5,
+        "widthCm": 66
+      }
+    ]
+  },
   "sections": [
     {
       "id": "nf-life",
@@ -80,7 +109,7 @@
     },
     {
       "id": "collection",
-      "label": "Culture drawings and Palladium",
+      "label": "Palladium",
       "group": "Center"
     },
     {
@@ -120,11 +149,12 @@
       "column": 1,
       "row": 1,
       "contents": "Framed print (orange frame); might become shelving",
-      "units": 1,
-      "capacity": null,
+      "bayCm": 92,
+      "objects": ["print-orange"],
       "plan": {
         "label": "Orange print",
-        "intent": "Stays. Framed print, left bookend of the symmetry."
+        "intent": "Stays. Framed print, left end of the symmetry.",
+        "objects": ["print-orange"]
       }
     },
     {
@@ -132,11 +162,12 @@
       "column": 1,
       "row": 2,
       "contents": "The Culture: The Drawings, Palladium 1–19, ceramic figures",
-      "units": 1,
-      "capacity": 30,
+      "bayCm": 24,
+      "objects": ["figures"],
       "plan": {
-        "label": "Culture drawings + Palladium",
-        "intent": "The Culture: The Drawings, Palladium run, ceramic figures, clock. (Open decision 2.)"
+        "label": "Nonfiction I",
+        "intent": "Life and matter → systems → deep history. Eye level.",
+        "objects": ["figures"]
       }
     },
     {
@@ -144,11 +175,12 @@
       "column": 1,
       "row": 3,
       "contents": "Clock, Klimt puzzle, Splendor + Splendor Duel",
-      "units": 1,
-      "capacity": 30,
+      "bayCm": 22,
+      "objects": ["clock"],
       "plan": {
-        "label": "Nonfiction I",
-        "intent": "Life and matter → systems → deep history."
+        "label": "Nonfiction II",
+        "intent": "Political economy → organizations and decisions → time and creativity.",
+        "objects": ["clock"]
       }
     },
     {
@@ -156,11 +188,12 @@
       "column": 1,
       "row": 4,
       "contents": "Mixed nonfiction",
-      "units": 1,
-      "capacity": 30,
+      "bayCm": 22,
+      "objects": [],
       "plan": {
-        "label": "Nonfiction II",
-        "intent": "Political economy → organizations and decisions → time and creativity."
+        "label": "Nonfiction III",
+        "intent": "Psychology and relationships.",
+        "objects": []
       }
     },
     {
@@ -168,11 +201,12 @@
       "column": 1,
       "row": 5,
       "contents": "Photos, candles, gift bag",
-      "units": 1,
-      "capacity": 30,
+      "bayCm": 27,
+      "objects": ["photos", "candles"],
       "plan": {
         "label": "Games + photos",
-        "intent": "Board games and puzzle, photos, candles."
+        "intent": "Board games and puzzle, photos, candles.",
+        "objects": ["photos"]
       }
     },
     {
@@ -180,11 +214,12 @@
       "column": 2,
       "row": 1,
       "contents": "Framed print (blue frame); might become shelving",
-      "units": 1,
-      "capacity": 30,
+      "bayCm": 92,
+      "objects": ["print-blue"],
       "plan": {
-        "label": "Nonfiction III",
-        "intent": "New shelving where the blue print was. Psychology and relationships."
+        "label": "Empty bay",
+        "intent": "The blue print moves to column 5. Room for three new shelves, all above reach. Growth space.",
+        "objects": []
       }
     },
     {
@@ -192,11 +227,12 @@
       "column": 2,
       "row": 2,
       "contents": "Sci-fi paperbacks",
-      "units": 1,
-      "capacity": 30,
+      "bayCm": 24,
+      "objects": ["figures"],
       "plan": {
         "label": "Nonfiction IV",
-        "intent": "Contemplative and Buddhist, next to the center archive."
+        "intent": "Contemplative and Buddhist, at eye level, next to the center.",
+        "objects": []
       }
     },
     {
@@ -204,23 +240,51 @@
       "column": 2,
       "row": 3,
       "contents": "Tall bay: fossil (keep)",
-      "units": 2,
-      "capacity": null,
+      "bayCm": 71,
+      "objects": ["fossil"],
       "plan": {
         "label": "Fossil",
-        "intent": "Stays."
+        "intent": "Stays.",
+        "objects": ["fossil"]
       }
     },
     {
-      "id": "c3-top",
+      "id": "c3-r1",
       "column": 3,
       "row": 1,
-      "contents": "Three or four empty high shelves",
-      "units": 3,
-      "capacity": 90,
+      "contents": "Empty high shelf",
+      "bayCm": 22,
+      "objects": [],
       "plan": {
         "label": "Friend's books",
-        "intent": "Stored for a friend. High, hard to reach, fills the TV gap. (Open decision 3.)"
+        "intent": "Stored for a friend. Highest shelves; fills the TV gap.",
+        "objects": []
+      }
+    },
+    {
+      "id": "c3-r2",
+      "column": 3,
+      "row": 2,
+      "contents": "Empty high shelf",
+      "bayCm": 19,
+      "objects": [],
+      "plan": {
+        "label": "Friend's books",
+        "intent": "Stored for a friend.",
+        "objects": []
+      }
+    },
+    {
+      "id": "c3-r3",
+      "column": 3,
+      "row": 3,
+      "contents": "Empty high shelf; two books lying flat",
+      "bayCm": 21,
+      "objects": ["books-flat"],
+      "plan": {
+        "label": "Friend's books",
+        "intent": "Stored for a friend.",
+        "objects": []
       }
     },
     {
@@ -228,11 +292,12 @@
       "column": 3,
       "row": 4,
       "contents": "Art books, bookends, notebooks, yearbooks, childhood books",
-      "units": 1,
-      "capacity": 30,
+      "bayCm": 22,
+      "objects": ["bookends"],
       "plan": {
-        "label": "Personal archive",
-        "intent": "Yearbooks, childhood books, dated journals, notebooks, art books."
+        "label": "Art books",
+        "intent": "Art books and The Culture: The Drawings, on display in the center.",
+        "objects": ["bookends"]
       }
     },
     {
@@ -240,11 +305,12 @@
       "column": 3,
       "row": 5,
       "contents": "Fixed shelf: photo, crystals, candle, small art",
-      "units": 1,
-      "capacity": null,
+      "bayCm": 59,
+      "objects": ["photo", "crystals"],
       "plan": {
         "label": "Fixed shelf objects",
-        "intent": "Photo, crystals, candle, small art. Glued in; left alone."
+        "intent": "Photo, crystals, candle, small art. Glued in; left alone.",
+        "objects": ["photo", "crystals"]
       }
     },
     {
@@ -252,11 +318,25 @@
       "column": 3,
       "row": 6,
       "contents": "Bust, blue mask, singing bowl, a few books",
-      "units": 1,
-      "capacity": null,
+      "bayCm": 44,
+      "objects": ["bust", "mask", "bowl"],
       "plan": {
         "label": "Bust, mask, bowl",
-        "intent": "Objects stay."
+        "intent": "Objects stay.",
+        "objects": ["bust", "mask", "bowl"]
+      }
+    },
+    {
+      "id": "c4-top",
+      "column": 4,
+      "row": 0,
+      "contents": "Empty top cubby",
+      "bayCm": 26,
+      "objects": [],
+      "plan": {
+        "label": "Personal archive",
+        "intent": "Journals, yearbooks, notebooks, childhood books. High, so guests don't browse them.",
+        "objects": []
       }
     },
     {
@@ -264,11 +344,12 @@
       "column": 4,
       "row": 1,
       "contents": "Friend's books (stored), not catalogued one by one",
-      "units": 1,
-      "capacity": 30,
+      "bayCm": 23,
+      "objects": [],
       "plan": {
-        "label": "Sci-fi I",
-        "intent": "Sci-fi by author, series together."
+        "label": "Palladium",
+        "intent": "Palladium run. High: rarely pulled.",
+        "objects": []
       }
     },
     {
@@ -276,11 +357,12 @@
       "column": 4,
       "row": 2,
       "contents": "Friend's books (stored), not catalogued one by one",
-      "units": 1,
-      "capacity": 30,
+      "bayCm": 17,
+      "objects": [],
       "plan": {
-        "label": "Sci-fi II",
-        "intent": "Sci-fi continues."
+        "label": "Sci-fi I",
+        "intent": "Short shelf: mass-market paperbacks. Sci-fi by author, series together.",
+        "objects": []
       }
     },
     {
@@ -288,11 +370,12 @@
       "column": 4,
       "row": 3,
       "contents": "Friend's books (stored), not catalogued one by one",
-      "units": 1,
-      "capacity": 30,
+      "bayCm": 24,
+      "objects": ["figures"],
       "plan": {
-        "label": "Sci-fi III",
-        "intent": "Sci-fi continues."
+        "label": "Sci-fi II",
+        "intent": "Sci-fi continues.",
+        "objects": []
       }
     },
     {
@@ -300,11 +383,12 @@
       "column": 4,
       "row": 4,
       "contents": "Buddhism, spirituality, psychology, relationships",
-      "units": 1,
-      "capacity": 30,
+      "bayCm": 24,
+      "objects": [],
       "plan": {
         "label": "Fantasy I",
-        "intent": "Fantasy by author, series together."
+        "intent": "Fantasy by author, series together.",
+        "objects": []
       }
     },
     {
@@ -312,11 +396,12 @@
       "column": 4,
       "row": 5,
       "contents": "Tall bay: ukulele (keep)",
-      "units": 2,
-      "capacity": null,
+      "bayCm": 73,
+      "objects": ["ukulele"],
       "plan": {
         "label": "Ukulele",
-        "intent": "Stays. Mirrors the fossil."
+        "intent": "Stays. Mirrors the fossil.",
+        "objects": ["ukulele"]
       }
     },
     {
@@ -324,11 +409,12 @@
       "column": 5,
       "row": 1,
       "contents": "Bottles (could move)",
-      "units": 1,
-      "capacity": null,
+      "bayCm": 68,
+      "objects": ["bottles", "jars"],
       "plan": {
         "label": "Blue print",
-        "intent": "The blue print moves here from column 2."
+        "intent": "The blue print moves here from column 2.",
+        "objects": ["print-blue"]
       }
     },
     {
@@ -336,11 +422,12 @@
       "column": 5,
       "row": 2,
       "contents": "Sanderson + Rothfuss",
-      "units": 1,
-      "capacity": 30,
+      "bayCm": 24,
+      "objects": [],
       "plan": {
         "label": "Fantasy II",
-        "intent": "Fantasy continues (Sanderson)."
+        "intent": "Sanderson.",
+        "objects": []
       }
     },
     {
@@ -348,11 +435,12 @@
       "column": 5,
       "row": 3,
       "contents": "Mixed SFF and fiction",
-      "units": 1,
-      "capacity": 30,
+      "bayCm": 25,
+      "objects": [],
       "plan": {
         "label": "Other fiction",
-        "intent": "Literary, historical, mystery, romance, myth."
+        "intent": "Literary, historical, mystery, romance, myth.",
+        "objects": []
       }
     },
     {
@@ -360,11 +448,12 @@
       "column": 5,
       "row": 4,
       "contents": "Dated journals, piano sheet music",
-      "units": 1,
-      "capacity": null,
+      "bayCm": 25,
+      "objects": ["cloth"],
       "plan": {
         "label": "Bar",
-        "intent": "Bottles move down here beside the glassware."
+        "intent": "Bottles move down here. Wine bottles are ~32 cm: raise this shelf a few holes.",
+        "objects": ["bottles"]
       }
     },
     {
@@ -372,11 +461,12 @@
       "column": 5,
       "row": 5,
       "contents": "Glassware, vases",
-      "units": 1,
-      "capacity": null,
+      "bayCm": 21,
+      "objects": ["vases"],
       "plan": {
         "label": "Glassware",
-        "intent": "Glassware, vases."
+        "intent": "Glassware, vases.",
+        "objects": ["vases"]
       }
     },
     {
@@ -384,11 +474,12 @@
       "column": 5,
       "row": 6,
       "contents": "Glassware, jars",
-      "units": 1,
-      "capacity": null,
+      "bayCm": 24,
+      "objects": ["glasses"],
       "plan": {
         "label": "Glassware",
-        "intent": "Glassware, jars."
+        "intent": "Glassware, jars.",
+        "objects": ["glasses"]
       }
     }
   ],
@@ -399,7 +490,7 @@
       "shelf": "c1-r4",
       "section": "nf-systems",
       "size": 2.5,
-      "planShelf": "c1-r3",
+      "planShelf": "c1-r2",
       "planOrder": 7
     },
     {
@@ -407,7 +498,7 @@
       "author": "Donella H. Meadows",
       "shelf": "c1-r4",
       "section": "nf-systems",
-      "planShelf": "c1-r3",
+      "planShelf": "c1-r2",
       "planOrder": 5
     },
     {
@@ -416,7 +507,7 @@
       "shelf": "c1-r4",
       "notes": "Second copy",
       "section": "nf-systems",
-      "planShelf": "c1-r3",
+      "planShelf": "c1-r2",
       "planOrder": 6
     },
     {
@@ -424,7 +515,7 @@
       "author": "Frederic Laloux",
       "shelf": "c1-r4",
       "section": "nf-orgs",
-      "planShelf": "c1-r4",
+      "planShelf": "c1-r3",
       "planOrder": 4
     },
     {
@@ -432,7 +523,7 @@
       "author": "Nick Lane",
       "shelf": "c1-r4",
       "section": "nf-life",
-      "planShelf": "c1-r3",
+      "planShelf": "c1-r2",
       "planOrder": 1
     },
     {
@@ -440,7 +531,7 @@
       "author": "Maureen A. Ryan",
       "shelf": "c1-r4",
       "section": "nf-orgs",
-      "planShelf": "c1-r4",
+      "planShelf": "c1-r3",
       "planOrder": 7
     },
     {
@@ -448,7 +539,7 @@
       "author": "Annie Duke",
       "shelf": "c1-r4",
       "section": "nf-orgs",
-      "planShelf": "c1-r4",
+      "planShelf": "c1-r3",
       "planOrder": 6
     },
     {
@@ -456,7 +547,7 @@
       "author": "Yanis Varoufakis",
       "shelf": "c1-r4",
       "section": "nf-politics",
-      "planShelf": "c1-r4",
+      "planShelf": "c1-r3",
       "planOrder": 1
     },
     {
@@ -464,7 +555,7 @@
       "author": "Peter Wohlleben",
       "shelf": "c1-r4",
       "section": "nf-life",
-      "planShelf": "c1-r3",
+      "planShelf": "c1-r2",
       "planOrder": 3
     },
     {
@@ -473,7 +564,7 @@
       "shelf": "c1-r4",
       "section": "nf-history",
       "size": 1.5,
-      "planShelf": "c1-r3",
+      "planShelf": "c1-r2",
       "planOrder": 8
     },
     {
@@ -482,7 +573,7 @@
       "shelf": "c1-r4",
       "section": "nf-history",
       "size": 1.5,
-      "planShelf": "c1-r3",
+      "planShelf": "c1-r2",
       "planOrder": 9
     },
     {
@@ -491,7 +582,7 @@
       "shelf": "c1-r4",
       "section": "nf-history",
       "size": 1.5,
-      "planShelf": "c1-r3",
+      "planShelf": "c1-r2",
       "planOrder": 10
     },
     {
@@ -499,7 +590,7 @@
       "author": "Joseph Campbell",
       "shelf": "c1-r4",
       "section": "nf-history",
-      "planShelf": "c1-r3",
+      "planShelf": "c1-r2",
       "planOrder": 11
     },
     {
@@ -507,7 +598,7 @@
       "author": "Anand Giridharadas",
       "shelf": "c1-r4",
       "section": "nf-politics",
-      "planShelf": "c1-r4",
+      "planShelf": "c1-r3",
       "planOrder": 2
     },
     {
@@ -515,7 +606,7 @@
       "author": "David S. Goodsell",
       "shelf": "c1-r4",
       "section": "nf-life",
-      "planShelf": "c1-r3",
+      "planShelf": "c1-r2",
       "planOrder": 2
     },
     {
@@ -523,7 +614,7 @@
       "author": "Elizabeth Gilbert",
       "shelf": "c1-r4",
       "section": "nf-time",
-      "planShelf": "c1-r4",
+      "planShelf": "c1-r3",
       "planOrder": 10
     },
     {
@@ -531,7 +622,7 @@
       "author": "Jenny Odell",
       "shelf": "c1-r4",
       "section": "nf-time",
-      "planShelf": "c1-r4",
+      "planShelf": "c1-r3",
       "planOrder": 9
     },
     {
@@ -540,15 +631,15 @@
       "shelf": "c1-r4",
       "notes": "Spine not legible in the photo",
       "section": "nf-unsorted",
-      "planShelf": "c1-r3",
-      "planOrder": 12
+      "planShelf": "c1-r4",
+      "planOrder": 7
     },
     {
       "title": "Four Thousand Weeks",
       "author": "Oliver Burkeman",
       "shelf": "c1-r4",
       "section": "nf-time",
-      "planShelf": "c1-r4",
+      "planShelf": "c1-r3",
       "planOrder": 8
     },
     {
@@ -557,8 +648,8 @@
       "shelf": "c1-r4",
       "notes": "Spine not legible in the photo",
       "section": "nf-unsorted",
-      "planShelf": "c1-r3",
-      "planOrder": 13
+      "planShelf": "c1-r4",
+      "planOrder": 8
     },
     {
       "title": "대한민국 진화론",
@@ -566,28 +657,29 @@
       "shelf": "c1-r4",
       "notes": "Spine tagline: 삼성전자 최초 여성임원 (first woman executive at Samsung Electronics)",
       "section": "nf-orgs",
-      "planShelf": "c1-r4",
+      "planShelf": "c1-r3",
       "planOrder": 3
     },
     {
       "title": "The Culture: The Drawings",
       "author": "Iain M. Banks",
       "shelf": "c1-r2",
-      "section": "collection",
+      "section": "archive",
       "size": 1.5,
-      "planShelf": "c1-r2",
-      "planOrder": 1
+      "planShelf": "c3-r4",
+      "planOrder": 1,
+      "heightCm": 26
     },
     {
       "title": "Palladium (issues 1–19)",
       "author": null,
       "shelf": "c1-r2",
-      "notes": "Magazine run; approximate count",
+      "notes": "Magazine run; approximate count. Some issues are tall: height not measured yet",
       "section": "collection",
       "count": 19,
       "size": 8,
-      "planShelf": "c1-r2",
-      "planOrder": 2
+      "planShelf": "c4-r1",
+      "planOrder": 1
     },
     {
       "title": "Leviathan Wakes",
@@ -597,7 +689,7 @@
       "section": "scifi",
       "seriesNo": 1,
       "planShelf": "c4-r2",
-      "planOrder": 1
+      "planOrder": 13
     },
     {
       "title": "Caliban's War",
@@ -607,7 +699,7 @@
       "section": "scifi",
       "seriesNo": 2,
       "planShelf": "c4-r2",
-      "planOrder": 2
+      "planOrder": 14
     },
     {
       "title": "Abaddon's Gate",
@@ -617,7 +709,7 @@
       "section": "scifi",
       "seriesNo": 3,
       "planShelf": "c4-r2",
-      "planOrder": 3
+      "planOrder": 15
     },
     {
       "title": "Cibola Burn",
@@ -627,7 +719,7 @@
       "section": "scifi",
       "seriesNo": 4,
       "planShelf": "c4-r2",
-      "planOrder": 4
+      "planOrder": 16
     },
     {
       "title": "Nemesis Games",
@@ -637,7 +729,7 @@
       "section": "scifi",
       "seriesNo": 5,
       "planShelf": "c4-r2",
-      "planOrder": 5
+      "planOrder": 17
     },
     {
       "title": "Babylon's Ashes",
@@ -647,7 +739,7 @@
       "section": "scifi",
       "seriesNo": 6,
       "planShelf": "c4-r2",
-      "planOrder": 6
+      "planOrder": 18
     },
     {
       "title": "Persepolis Rising",
@@ -657,7 +749,7 @@
       "section": "scifi",
       "seriesNo": 7,
       "planShelf": "c4-r2",
-      "planOrder": 7
+      "planOrder": 19
     },
     {
       "title": "Tiamat's Wrath",
@@ -667,7 +759,7 @@
       "section": "scifi",
       "seriesNo": 8,
       "planShelf": "c4-r2",
-      "planOrder": 8
+      "planOrder": 20
     },
     {
       "title": "Leviathan Falls",
@@ -677,7 +769,7 @@
       "section": "scifi",
       "seriesNo": 9,
       "planShelf": "c4-r2",
-      "planOrder": 9
+      "planOrder": 21
     },
     {
       "title": "Memory's Legion",
@@ -687,7 +779,7 @@
       "section": "scifi",
       "seriesNo": 10,
       "planShelf": "c4-r2",
-      "planOrder": 10
+      "planOrder": 22
     },
     {
       "title": "The Three-Body Problem",
@@ -695,7 +787,7 @@
       "shelf": "c2-r2",
       "section": "scifi",
       "planShelf": "c4-r3",
-      "planOrder": 5
+      "planOrder": 9
     },
     {
       "title": "Dune",
@@ -705,7 +797,7 @@
       "section": "scifi",
       "seriesNo": 1,
       "planShelf": "c4-r3",
-      "planOrder": 1
+      "planOrder": 5
     },
     {
       "title": "God Emperor of Dune",
@@ -715,7 +807,7 @@
       "section": "scifi",
       "seriesNo": 4,
       "planShelf": "c4-r3",
-      "planOrder": 4
+      "planOrder": 8
     },
     {
       "title": "Children of Dune",
@@ -725,7 +817,7 @@
       "section": "scifi",
       "seriesNo": 3,
       "planShelf": "c4-r3",
-      "planOrder": 3
+      "planOrder": 7
     },
     {
       "title": "Dune Messiah",
@@ -735,7 +827,7 @@
       "section": "scifi",
       "seriesNo": 2,
       "planShelf": "c4-r3",
-      "planOrder": 2
+      "planOrder": 6
     },
     {
       "title": "A Fire Upon the Deep",
@@ -743,14 +835,14 @@
       "shelf": "c2-r2",
       "section": "scifi",
       "planShelf": "c4-r3",
-      "planOrder": 10
+      "planOrder": 14
     },
     {
       "title": "The Power",
       "author": "Naomi Alderman",
       "shelf": "c2-r2",
       "section": "scifi",
-      "planShelf": "c4-r1",
+      "planShelf": "c4-r2",
       "planOrder": 1
     },
     {
@@ -759,14 +851,14 @@
       "shelf": "c2-r2",
       "section": "scifi",
       "planShelf": "c4-r3",
-      "planOrder": 11
+      "planOrder": 15
     },
     {
       "title": "Parable of the Talents",
       "author": "Octavia E. Butler",
       "shelf": "c2-r2",
       "section": "scifi",
-      "planShelf": "c4-r1",
+      "planShelf": "c4-r2",
       "planOrder": 9
     },
     {
@@ -775,14 +867,14 @@
       "shelf": "c2-r2",
       "section": "scifi",
       "planShelf": "c4-r3",
-      "planOrder": 7
+      "planOrder": 11
     },
     {
       "title": "The Gods Themselves",
       "author": "Isaac Asimov",
       "shelf": "c2-r2",
       "section": "scifi",
-      "planShelf": "c4-r1",
+      "planShelf": "c4-r2",
       "planOrder": 4
     },
     {
@@ -790,7 +882,7 @@
       "author": "Iain M. Banks",
       "shelf": "c2-r2",
       "section": "scifi",
-      "planShelf": "c4-r1",
+      "planShelf": "c4-r2",
       "planOrder": 5
     },
     {
@@ -800,7 +892,7 @@
       "notes": "Between Excession and The Foundation Trilogy",
       "section": "scifi",
       "planShelf": "c4-r3",
-      "planOrder": 12
+      "planOrder": 16
     },
     {
       "title": "The Foundation Trilogy",
@@ -808,7 +900,7 @@
       "shelf": "c2-r2",
       "section": "scifi",
       "size": 2,
-      "planShelf": "c4-r1",
+      "planShelf": "c4-r2",
       "planOrder": 3
     },
     {
@@ -818,7 +910,7 @@
       "section": "scifi",
       "size": 2,
       "planShelf": "c4-r3",
-      "planOrder": 8
+      "planOrder": 12
     },
     {
       "title": "Accelerando",
@@ -826,7 +918,7 @@
       "shelf": "c2-r2",
       "section": "scifi",
       "planShelf": "c4-r3",
-      "planOrder": 9
+      "planOrder": 13
     },
     {
       "title": "Unidentified (thin white spine)",
@@ -834,7 +926,7 @@
       "shelf": "c3-r4",
       "section": "archive",
       "planShelf": "c3-r4",
-      "planOrder": 1
+      "planOrder": 2
     },
     {
       "title": "On NFTs",
@@ -842,7 +934,7 @@
       "shelf": "c3-r4",
       "section": "archive",
       "planShelf": "c3-r4",
-      "planOrder": 2
+      "planOrder": 3
     },
     {
       "title": "What Are You Looking At?",
@@ -850,7 +942,7 @@
       "shelf": "c3-r4",
       "section": "archive",
       "planShelf": "c3-r4",
-      "planOrder": 3
+      "planOrder": 4
     },
     {
       "title": "High Technology High School yearbooks (2007–2009)",
@@ -859,8 +951,9 @@
       "kind": "personal",
       "section": "archive",
       "size": 3,
-      "planShelf": "c3-r4",
-      "planOrder": 4
+      "planShelf": "c4-top",
+      "planOrder": 1,
+      "heightCm": 29
     },
     {
       "title": "My Book About Me",
@@ -868,8 +961,8 @@
       "shelf": "c3-r4",
       "kind": "personal",
       "section": "archive",
-      "planShelf": "c3-r4",
-      "planOrder": 5
+      "planShelf": "c4-top",
+      "planOrder": 2
     },
     {
       "title": "Moonlists",
@@ -878,8 +971,8 @@
       "kind": "personal",
       "notes": "Guided journal",
       "section": "archive",
-      "planShelf": "c3-r4",
-      "planOrder": 6
+      "planShelf": "c4-top",
+      "planOrder": 3
     },
     {
       "title": "Assorted notebooks and journals",
@@ -888,8 +981,8 @@
       "kind": "personal",
       "section": "archive",
       "size": 4,
-      "planShelf": "c3-r4",
-      "planOrder": 7
+      "planShelf": "c4-top",
+      "planOrder": 4
     },
     {
       "title": "The Numerical Discourses of the Buddha",
@@ -905,7 +998,7 @@
       "author": "Jane Bennett",
       "shelf": "c4-r4",
       "section": "nf-life",
-      "planShelf": "c1-r3",
+      "planShelf": "c1-r2",
       "planOrder": 4
     },
     {
@@ -921,7 +1014,7 @@
       "author": "Robert M. Pirsig",
       "shelf": "c4-r4",
       "section": "nf-time",
-      "planShelf": "c1-r4",
+      "planShelf": "c1-r3",
       "planOrder": 12
     },
     {
@@ -937,7 +1030,7 @@
       "author": "Julie Menanno",
       "shelf": "c4-r4",
       "section": "nf-psych",
-      "planShelf": "c2-r1",
+      "planShelf": "c1-r4",
       "planOrder": 2
     },
     {
@@ -945,7 +1038,7 @@
       "author": "Daniel Mezick & Mark Sheffield",
       "shelf": "c4-r4",
       "section": "nf-orgs",
-      "planShelf": "c1-r4",
+      "planShelf": "c1-r3",
       "planOrder": 5
     },
     {
@@ -953,7 +1046,7 @@
       "author": "Julia Cameron",
       "shelf": "c4-r4",
       "section": "nf-time",
-      "planShelf": "c1-r4",
+      "planShelf": "c1-r3",
       "planOrder": 11
     },
     {
@@ -961,7 +1054,7 @@
       "author": "Alua Arthur",
       "shelf": "c4-r4",
       "section": "nf-psych",
-      "planShelf": "c2-r1",
+      "planShelf": "c1-r4",
       "planOrder": 6
     },
     {
@@ -969,7 +1062,7 @@
       "author": "Richard C. Schwartz",
       "shelf": "c4-r4",
       "section": "nf-psych",
-      "planShelf": "c2-r1",
+      "planShelf": "c1-r4",
       "planOrder": 3
     },
     {
@@ -993,7 +1086,7 @@
       "author": "Don Miguel Ruiz",
       "shelf": "c4-r4",
       "section": "nf-psych",
-      "planShelf": "c2-r1",
+      "planShelf": "c1-r4",
       "planOrder": 5
     },
     {
@@ -1009,7 +1102,7 @@
       "author": "Dean Spade",
       "shelf": "c4-r4",
       "section": "nf-psych",
-      "planShelf": "c2-r1",
+      "planShelf": "c1-r4",
       "planOrder": 4
     },
     {
@@ -1052,7 +1145,7 @@
       "author": "Amir Levine & Rachel Heller",
       "shelf": "c4-r4",
       "section": "nf-psych",
-      "planShelf": "c2-r1",
+      "planShelf": "c1-r4",
       "planOrder": 1
     },
     {
@@ -1079,8 +1172,8 @@
       "section": "nf-unsorted",
       "count": 20,
       "size": 20,
-      "planShelf": "c2-r1",
-      "planOrder": 7
+      "planShelf": "c2-r2",
+      "planOrder": 11
     },
     {
       "title": "Elantris",
@@ -1323,7 +1416,7 @@
       "author": "Becky Chambers",
       "shelf": "c5-r3",
       "section": "scifi",
-      "planShelf": "c4-r1",
+      "planShelf": "c4-r2",
       "planOrder": 11
     },
     {
@@ -1331,8 +1424,8 @@
       "author": "Amal El-Mohtar & Max Gladstone",
       "shelf": "c5-r3",
       "section": "scifi",
-      "planShelf": "c4-r2",
-      "planOrder": 14
+      "planShelf": "c4-r3",
+      "planOrder": 4
     },
     {
       "title": "The Midnight Library",
@@ -1347,8 +1440,8 @@
       "author": "Greg Egan",
       "shelf": "c5-r3",
       "section": "scifi",
-      "planShelf": "c4-r2",
-      "planOrder": 13
+      "planShelf": "c4-r3",
+      "planOrder": 3
     },
     {
       "title": "The City We Became",
@@ -1372,7 +1465,7 @@
       "shelf": "c5-r3",
       "section": "scifi",
       "size": 2,
-      "planShelf": "c4-r1",
+      "planShelf": "c4-r2",
       "planOrder": 7
     },
     {
@@ -1380,7 +1473,7 @@
       "author": "Octavia E. Butler",
       "shelf": "c5-r3",
       "section": "scifi",
-      "planShelf": "c4-r1",
+      "planShelf": "c4-r2",
       "planOrder": 6
     },
     {
@@ -1388,7 +1481,7 @@
       "author": "Octavia E. Butler",
       "shelf": "c5-r3",
       "section": "scifi",
-      "planShelf": "c4-r1",
+      "planShelf": "c4-r2",
       "planOrder": 10
     },
     {
@@ -1396,7 +1489,7 @@
       "author": "Octavia E. Butler",
       "shelf": "c5-r3",
       "section": "scifi",
-      "planShelf": "c4-r1",
+      "planShelf": "c4-r2",
       "planOrder": 8
     },
     {
@@ -1405,7 +1498,8 @@
       "shelf": "c5-r3",
       "section": "scifi",
       "planShelf": "c4-r3",
-      "planOrder": 6
+      "planOrder": 10,
+      "heightCm": 26
     },
     {
       "title": "Be My Knife",
@@ -1420,15 +1514,15 @@
       "author": "Cory Doctorow",
       "shelf": "c5-r3",
       "section": "scifi",
-      "planShelf": "c4-r2",
-      "planOrder": 12
+      "planShelf": "c4-r3",
+      "planOrder": 2
     },
     {
       "title": "Light from Uncommon Stars",
       "author": "Ryka Aoki",
       "shelf": "c5-r3",
       "section": "scifi",
-      "planShelf": "c4-r1",
+      "planShelf": "c4-r2",
       "planOrder": 2
     },
     {
@@ -1492,7 +1586,7 @@
       "author": "Ted Chiang",
       "shelf": "c5-r3",
       "section": "scifi",
-      "planShelf": "c4-r1",
+      "planShelf": "c4-r2",
       "planOrder": 12
     },
     {
@@ -1508,8 +1602,8 @@
       "author": "Cory Doctorow",
       "shelf": "c5-r3",
       "section": "scifi",
-      "planShelf": "c4-r2",
-      "planOrder": 11
+      "planShelf": "c4-r3",
+      "planOrder": 1
     },
     {
       "title": "About 8 more spines on this shelf, not legible in the photo",
@@ -1529,8 +1623,8 @@
       "kind": "personal",
       "section": "archive",
       "size": 4,
-      "planShelf": "c3-r4",
-      "planOrder": 8
+      "planShelf": "c4-top",
+      "planOrder": 5
     },
     {
       "title": "Classical piano sheet music",
@@ -1539,8 +1633,9 @@
       "kind": "music",
       "section": "archive",
       "size": 3,
-      "planShelf": "c3-r4",
-      "planOrder": 9
+      "planShelf": "c4-top",
+      "planOrder": 6,
+      "heightCm": 31
     },
     {
       "title": "Klimt puzzle",
@@ -1578,9 +1673,9 @@
       "shelf": "c4-r1",
       "kind": "friend",
       "section": "friend",
-      "size": 28,
+      "size": 26,
       "notes": "Not catalogued one by one; size is a guess at one full shelf",
-      "planShelf": "c3-top",
+      "planShelf": "c3-r1",
       "planOrder": 1
     },
     {
@@ -1589,10 +1684,10 @@
       "shelf": "c4-r2",
       "kind": "friend",
       "section": "friend",
-      "size": 28,
+      "size": 26,
       "notes": "Not catalogued one by one; size is a guess at one full shelf",
-      "planShelf": "c3-top",
-      "planOrder": 2
+      "planShelf": "c3-r2",
+      "planOrder": 1
     },
     {
       "title": "Friend's books (shelf 3)",
@@ -1600,10 +1695,10 @@
       "shelf": "c4-r3",
       "kind": "friend",
       "section": "friend",
-      "size": 28,
+      "size": 26,
       "notes": "Not catalogued one by one; size is a guess at one full shelf",
-      "planShelf": "c3-top",
-      "planOrder": 3
+      "planShelf": "c3-r3",
+      "planOrder": 1
     }
   ]
 }
