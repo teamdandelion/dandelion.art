@@ -1,0 +1,282 @@
+<meta charset="utf-8">
+<title>Bookcase Planner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,500;0,600;1,400&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+  /* Layout: the bookcase drawn as five equal-height columns; tap a shelf to read its titles below (phone) or beside (desktop). */
+  :root {
+    --bg: #eceee9;
+    --panel: #f7f8f5;
+    --ink: #1f2420;
+    --muted: #5d665f;
+    --wood: #8a6a4a;
+    --wood-face: #e2dccf;
+    --line: #cfd3cb;
+    --accent: #2f5d50;
+    --over: #b3261e;
+    --display: "Spectral", Georgia, "Times New Roman", serif;
+    --ui: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161a18; --panel: #1e2320; --ink: #e6e9e3; --muted: #9aa49c;
+      --wood: #a07d58; --wood-face: #262a26; --line: #343a35; --accent: #8cc4b0; --over: #ff7a6e;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #161a18; --panel: #1e2320; --ink: #e6e9e3; --muted: #9aa49c;
+    --wood: #a07d58; --wood-face: #262a26; --line: #343a35; --accent: #8cc4b0; --over: #ff7a6e;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink); font-family: var(--ui); font-size: 15px; line-height: 1.45;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 20px 48px;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 20px; }
+  header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; }
+  h1 { font-family: var(--display); font-weight: 600; font-size: 1.9rem; line-height: 1.1; margin: 0; text-wrap: balance; }
+  .sub { color: var(--muted); margin: 4px 0 0; font-size: 0.9rem; }
+  .toggle { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--panel); }
+  .toggle button {
+    font: inherit; font-weight: 700; font-size: 0.85rem; border: 0; background: none; color: var(--muted);
+    padding: 6px 14px; border-radius: 999px; cursor: pointer;
+  }
+  .toggle button[aria-pressed="true"] { background: var(--accent); color: var(--bg); }
+  button:focus-visible, .shelf:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .stats { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .stats b { color: var(--ink); }
+
+  .main { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 900px) { .main { grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr); align-items: start; } }
+
+  /* ---- the bookcase ---- */
+  .case {
+    display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px;
+    background: var(--wood); padding: 6px; border-radius: 4px;
+    height: clamp(520px, 78vh, 760px);
+  }
+  .col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .shelf {
+    position: relative; min-height: 0; background: var(--wood-face); border: 0; padding: 0; margin: 0;
+    font: inherit; color: inherit; text-align: left; display: flex; flex-direction: column; cursor: pointer;
+    overflow: hidden; border-radius: 2px;
+  }
+  .shelf.fixed { cursor: default; }
+  .shelf[aria-current="true"] { box-shadow: inset 0 0 0 2px var(--accent); }
+  .shelf.over { box-shadow: inset 0 0 0 2px var(--over); }
+  .shelf-head { display: flex; justify-content: space-between; gap: 4px; padding: 4px 5px 0; align-items: start; }
+  .shelf-label { font-size: 0.68rem; line-height: 1.2; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .shelf-count { font-size: 0.72rem; font-weight: 700; font-variant-numeric: tabular-nums; flex: none; }
+  .shelf.over .shelf-count { color: var(--over); }
+  .objects { flex: 1; display: grid; place-items: center; padding: 4px; font-family: var(--display); font-style: italic; font-size: 0.78rem; color: var(--muted); text-align: center; }
+  .spines { flex: 1; display: flex; align-items: flex-end; gap: 1px; padding: 0 3px; min-height: 0; }
+  .spine { flex: none; border-radius: 1px 1px 0 0; min-width: 2px; }
+  .spine.unknown { background-image: repeating-linear-gradient(135deg, transparent 0 3px, var(--wood-face) 3px 5px); }
+  .spine.moving { opacity: 0.35; }
+  .board { height: 4px; background: var(--wood); flex: none; }
+  .fill { height: 3px; background: var(--line); flex: none; }
+  .fill i { display: block; height: 100%; background: var(--accent); }
+  .shelf.over .fill i { background: var(--over); }
+  .colnum { text-align: center; font-size: 0.7rem; color: var(--bg); font-weight: 700; letter-spacing: 0.08em; }
+  @media (max-width: 520px) { .shelf-label { display: none; } .objects { font-size: 0.66rem; } .case { gap: 4px; padding: 4px; } .col { gap: 4px; } }
+
+  /* ---- detail panel ---- */
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+  .panel h2 { font-family: var(--display); font-weight: 600; font-size: 1.35rem; margin: 0; line-height: 1.15; }
+  .eyebrow { font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .intent { margin: 0; color: var(--muted); }
+  .meter { display: grid; gap: 4px; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+  .meter .bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+  .meter .bar i { display: block; height: 100%; background: var(--accent); }
+  .meter.over .bar i { background: var(--over); }
+  .meter.over { color: var(--over); }
+  ol.titles { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; counter-reset: t; }
+  ol.titles li { display: grid; grid-template-columns: 1.6em 10px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--line); counter-increment: t; }
+  ol.titles li::before { content: counter(t); color: var(--muted); font-size: 0.75rem; text-align: right; font-variant-numeric: tabular-nums; }
+  .dot { width: 10px; height: 10px; border-radius: 2px; align-self: center; }
+  .t { font-family: var(--display); font-size: 1rem; }
+  .a { color: var(--muted); font-size: 0.82rem; }
+  .move { font-size: 0.72rem; font-weight: 700; color: var(--accent); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .empty { color: var(--muted); font-style: italic; margin: 0; }
+
+  /* ---- legend + decisions ---- */
+  .lower { display: grid; gap: 20px; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 900px) { .lower { grid-template-columns: minmax(0, 1.55fr) minmax(300px, 1fr); } }
+  .legend { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .legend h3, .decisions h3 { font-family: var(--display); font-weight: 600; font-size: 1.05rem; margin: 0 0 6px; }
+  .legend ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; font-size: 0.85rem; }
+  .legend li { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
+  .decisions ol { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; font-size: 0.9rem; }
+  .pill { display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 1px 7px; border-radius: 999px; border: 1px solid currentColor; margin-left: 4px; }
+  .pill.open { color: var(--over); }
+  .pill.decided { color: var(--accent); }
+  .note { color: var(--muted); font-size: 0.82rem; display: block; }
+  .error { color: var(--over); }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Bookcase Planner</h1>
+      <p class="sub" id="sub">Loading the catalogue…</p>
+    </div>
+    <div class="toggle" role="group" aria-label="Which layout to show">
+      <button type="button" id="mode-plan" aria-pressed="true">Plan</button>
+      <button type="button" id="mode-now" aria-pressed="false">Now</button>
+    </div>
+  </header>
+  <div class="stats" id="stats"></div>
+  <div class="main">
+    <div class="case" id="case" aria-label="Bookcase, five columns"></div>
+    <section class="panel" id="panel" aria-live="polite"></section>
+  </div>
+  <div class="lower">
+    <section class="legend" id="legend"></section>
+    <section class="decisions" id="decisions"></section>
+  </div>
+</div>
+
+<script>
+(() => {
+  const COLORS = {
+    "nf-life": "#5f9f6a", "nf-systems": "#3f9a8c", "nf-history": "#3a8aa6", "nf-politics": "#4876b6",
+    "nf-orgs": "#5b67bd", "nf-time": "#7660ba", "nf-psych": "#9056ae", "nf-dharma": "#a9529a", "nf-unsorted": "#8a7f93",
+    "archive": "#8d6e4c", "collection": "#6c7380", "friend": "#9a9c96", "games": "#a2a05e",
+    "scifi": "#d69b32", "fantasy": "#cc643a", "fiction": "#b8466c", "fic-unsorted": "#a88a7a",
+  };
+  let data = null;
+  let mode = "plan";
+  let current = null;
+  try { mode = localStorage.getItem("bookcase-mode") || "plan"; } catch (e) {}
+
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const isUnknown = (b) => /^(Unidentified|About )/.test(b.title);
+  const countOf = (b) => (b.kind === "friend" ? 0 : b.count ?? 1);
+  const sizeOf = (b) => b.size ?? 1;
+  const where = (b) => (mode === "plan" ? b.planShelf : b.shelf);
+  const moves = (b) => b.planShelf && b.planShelf !== b.shelf;
+
+  function shelfBooks(id) {
+    const list = data.books.map((b, i) => ({ b, i })).filter(({ b }) => where(b) === id);
+    if (mode === "plan") list.sort((x, y) => (x.b.planOrder ?? 0) - (y.b.planOrder ?? 0));
+    return list.map(({ b }) => b);
+  }
+  function stats(books, shelf) {
+    const count = books.reduce((n, b) => n + countOf(b), 0);
+    const size = books.reduce((n, b) => n + sizeOf(b), 0);
+    const fill = shelf.capacity ? size / shelf.capacity : 0;
+    return { count, size, fill, friend: books.some((b) => b.kind === "friend") };
+  }
+  const label = (s) => (mode === "plan" ? s.plan?.label : s.contents);
+  const countText = (st) => (st.friend && st.count === 0 ? "~" : st.count ? String(st.count) : "");
+  function hash(str) { let h = 0; for (const c of str) h = (h * 31 + c.charCodeAt(0)) | 0; return Math.abs(h); }
+
+  function renderCase() {
+    const cols = [1, 2, 3, 4, 5].map((c) => data.shelves.filter((s) => s.column === c));
+    $("case").innerHTML = cols.map((shelves, ci) => `
+      <div class="col">${shelves.map((s) => {
+        const books = shelfBooks(s.id);
+        const st = stats(books, s);
+        const over = st.fill > 1;
+        const holdsBooks = s.capacity && (books.length || mode === "plan");
+        const body = holdsBooks && books.length
+          ? `<div class="spines">${books.map((b) => {
+              const w = (sizeOf(b) / Math.max(s.capacity, st.size)) * 100;
+              const h = b.kind === "friend" ? 80 : 62 + (hash(b.title) % 30);
+              const cls = ["spine", isUnknown(b) || b.kind === "friend" ? "unknown" : "", mode === "now" && moves(b) ? "moving" : ""].join(" ");
+              return `<span class="${cls}" style="width:calc(${w.toFixed(2)}% - 1px);height:${h}%;background-color:${COLORS[b.section] || "#888"}" title="${esc(b.title)}"></span>`;
+            }).join("")}</div><div class="fill"><i style="width:${Math.min(100, st.fill * 100).toFixed(0)}%"></i></div>`
+          : `<div class="objects">${esc(mode === "plan" ? s.plan?.label : s.contents)}</div>`;
+        const tap = books.length || s.capacity;
+        return `<button type="button" class="shelf ${over ? "over" : ""} ${tap ? "" : "fixed"}" data-id="${s.id}" style="flex:${s.units ?? 1} 1 0"
+          aria-current="${current === s.id}" aria-label="${esc(s.id)}: ${esc(label(s))}, ${st.count} items">
+          <div class="shelf-head"><span class="shelf-label">${holdsBooks && books.length ? esc(label(s)) : ""}</span><span class="shelf-count">${countText(st)}</span></div>
+          ${body}<div class="board"></div></button>`;
+      }).join("")}<div class="colnum">${ci + 1}</div></div>`).join("");
+  }
+
+  function renderPanel() {
+    const s = data.shelves.find((x) => x.id === current);
+    if (!s) {
+      $("panel").innerHTML = `<span class="eyebrow">Shelf detail</span><p class="empty">Tap a shelf to list its books in order.</p>`;
+      return;
+    }
+    const books = shelfBooks(s.id);
+    const st = stats(books, s);
+    const pct = Math.round(st.fill * 100);
+    const meter = s.capacity
+      ? `<div class="meter ${st.fill > 1 ? "over" : ""}"><span>${st.count} ${st.count === 1 ? "item" : "items"} · about ${pct}% full (${st.size.toFixed(0)} of ~${s.capacity} paperback widths)</span><div class="bar"><i style="width:${Math.min(100, pct)}%"></i></div></div>`
+      : "";
+    const rows = books.map((b) => {
+      const tag = moves(b) ? (mode === "plan" ? `from ${b.shelf}` : `→ ${b.planShelf}`) : "";
+      const series = b.series ? ` · ${esc(b.series)}${b.seriesNo ? " " + b.seriesNo : ""}` : "";
+      const n = b.count && b.kind !== "friend" ? ` · ${b.count} items` : "";
+      return `<li><span class="dot" style="background:${COLORS[b.section] || "#888"}"></span>
+        <span><span class="t">${esc(b.title)}</span><br><span class="a">${esc(b.author || "")}${series}${n}</span></span>
+        <span class="move">${tag}</span></li>`;
+    }).join("");
+    $("panel").innerHTML = `
+      <span class="eyebrow">${esc(s.id)} · ${mode === "plan" ? "Plan" : "Now"}</span>
+      <h2>${esc(label(s))}</h2>
+      <p class="intent">${esc(mode === "plan" ? s.plan?.intent : "Planned: " + (s.plan?.label || ""))}</p>
+      ${meter}
+      ${books.length ? `<ol class="titles">${rows}</ol>` : `<p class="empty">No books here.</p>`}`;
+  }
+
+  function renderStats() {
+    const books = data.books.filter((b) => b.kind !== "friend");
+    const total = books.reduce((n, b) => n + countOf(b), 0);
+    const moving = books.filter(moves).reduce((n, b) => n + countOf(b), 0);
+    const unknown = books.filter(isUnknown).reduce((n, b) => n + countOf(b), 0);
+    const over = data.shelves.filter((s) => s.capacity && stats(shelfBooks(s.id), s).fill > 1).length;
+    $("stats").innerHTML = `<span><b>${total}</b> items catalogued</span><span><b>${moving}</b> move in the plan</span>
+      <span><b>${unknown}</b> still unidentified</span><span><b>${over}</b> ${over === 1 ? "shelf" : "shelves"} over capacity</span>`;
+    $("sub").textContent = `${data.planStatus === "proposed" ? "Proposed layout, not decided yet" : "Layout"} · catalogue updated ${data.updated}`;
+  }
+
+  function renderLegend() {
+    const groups = {};
+    for (const sec of data.sections) (groups[sec.group] ||= []).push(sec);
+    $("legend").innerHTML = Object.entries(groups).map(([g, secs]) => `<div><h3>${esc(g)}</h3><ul>${secs.map((sec) => {
+      const items = data.books.filter((b) => b.section === sec.id);
+      const n = items.reduce((k, b) => k + countOf(b), 0);
+      const shelves = [...new Set(items.map(where))].join(", ");
+      return `<li><span class="dot" style="background:${COLORS[sec.id]}"></span><span>${esc(sec.label)} <span class="note">${esc(shelves)}</span></span><span>${n || "~"}</span></li>`;
+    }).join("")}</ul></div>`).join("");
+    $("decisions").innerHTML = `<h3>Open decisions</h3><ol>${data.decisions.map((d) =>
+      `<li>${esc(d.question)}<span class="pill ${d.status === "open" ? "open" : "decided"}">${esc(d.status)}</span>${d.answer ? `<span class="note">${esc(d.answer)}</span>` : d.proposal ? `<span class="note">${esc(d.proposal)}</span>` : ""}</li>`).join("")}</ol>`;
+  }
+
+  function render() {
+    $("mode-plan").setAttribute("aria-pressed", mode === "plan");
+    $("mode-now").setAttribute("aria-pressed", mode === "now");
+    renderStats(); renderCase(); renderPanel(); renderLegend();
+  }
+
+  function setMode(m) { mode = m; try { localStorage.setItem("bookcase-mode", m); } catch (e) {} render(); }
+  $("mode-plan").addEventListener("click", () => setMode("plan"));
+  $("mode-now").addEventListener("click", () => setMode("now"));
+  $("case").addEventListener("click", (e) => {
+    const el = e.target.closest(".shelf");
+    if (!el || el.classList.contains("fixed")) return;
+    current = el.dataset.id;
+    if (location.hash !== "#" + current) history.replaceState(null, "", "#" + current);
+    render();
+    if (window.matchMedia("(max-width: 899px)").matches) $("panel").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  window.addEventListener("hashchange", () => { current = location.hash.slice(1) || null; if (data) render(); });
+
+  fetch("books.json", { cache: "no-store" })
+    .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then((d) => { data = d; current = location.hash.slice(1) || null; render(); })
+    .catch((err) => { $("sub").innerHTML = `<span class="error">Could not load books.json (${esc(err.message)}). Open this page next to books.json.</span>`; });
+})();
+</script>

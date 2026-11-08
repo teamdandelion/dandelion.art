@@ -4,6 +4,7 @@ A catalogue of the books on the five-column built-in bookcase, plus the plan for
 
 - `books.json` is the catalogue: every shelf, and every book on it in left-to-right order.
 - This README explains the shelf numbering, how the bookcase is laid out now, and the organizing plan.
+- `shelves.html` draws the bookcase from `books.json`: the current layout or the plan, a count and fill estimate per shelf, and the titles on a shelf when you tap it. Serve the folder (`python3 -m http.server` in `library/`) and open `shelves.html`. A copy is published as a private claude.ai artifact.
 
 The catalogue started from photos taken on 2026-11-08. It is not linked from the website yet.
 
@@ -64,11 +65,16 @@ The fossil and the ukulele already mirror each other at the bottom. The top is l
 
 ## Data format
 
-`books.json` has three parts:
+`books.json` has these parts:
 
-- `shelves`: one entry per shelf, with `id`, `column`, `row` and a short `contents` summary.
-- `books`: one entry per book, in left-to-right order. Each has `title`, `author` (`null` if unknown) and `shelf`. Optional fields: `series`, `notes`, and `kind` (`personal` or `music` for items that aren't regular books).
+- `shelves`: one entry per shelf, with `id`, `column`, `row` and a short `contents` summary of what is there now. `units` is the shelf's drawn height (tall bays are 2, `c3-top` is 3). `capacity` is a rough guess at how many paperback widths fit (`null` for shelves that hold objects). `plan` has the planned `label` and `intent`.
+- `books`: one entry per item, in left-to-right order on its current shelf. Each has `title`, `author` (`null` if unknown), `shelf` and `section`. Optional fields: `series`, `seriesNo`, `notes`, `count` (for an entry that stands for several items), `size` (width in paperback widths, default 1), and `kind` (`personal`, `music`, `game` or `friend` for items that aren't regular books).
+- `planShelf` and `planOrder` on each item: where it goes in the proposed layout, and its position from the left.
+- `sections`: the subject sections in shelf order. Nonfiction runs as the topic gradient.
+- `decisions` and `planStatus`: the open questions and whether the plan is decided.
 - `updated`: the date of the last change.
+
+Sizes and capacities are estimates. Correct them as real shelves fill up.
 
 Books whose spines couldn't be read are entered as `Unidentified (…)` with a note. Columns 4 (row 4) and 5 (row 3) each have a placeholder entry for spines that need a closer photo.
 

@@ -1,837 +1,1608 @@
 {
   "updated": "2026-11-08",
   "layout": "Five-column built-in bookcase. Shelf IDs are c<column>-r<row>, with columns numbered left to right and rows top to bottom. Books are listed left to right within each shelf.",
+  "planStatus": "proposed",
+  "decisions": [
+    {
+      "id": 1,
+      "question": "Move the blue print from column 2 to column 5?",
+      "status": "open"
+    },
+    {
+      "id": 2,
+      "question": "Palladium and the board games: left side, or the center archive?",
+      "status": "open",
+      "proposal": "Proposed: Palladium + Culture drawings on c1-r2, games with the photos on c1-r5."
+    },
+    {
+      "id": 3,
+      "question": "Do the friend's ~3 shelves of books fit on the center-top shelves?",
+      "status": "open"
+    },
+    {
+      "id": 4,
+      "question": "Move It Can't Happen Here, The Archer and The Alchemist to fiction?",
+      "status": "open",
+      "proposal": "Done in the plan: all three are in Other fiction."
+    }
+  ],
+  "sections": [
+    {
+      "id": "nf-life",
+      "label": "Life and matter",
+      "group": "Nonfiction"
+    },
+    {
+      "id": "nf-systems",
+      "label": "Systems",
+      "group": "Nonfiction"
+    },
+    {
+      "id": "nf-history",
+      "label": "Deep history",
+      "group": "Nonfiction"
+    },
+    {
+      "id": "nf-politics",
+      "label": "Political economy",
+      "group": "Nonfiction"
+    },
+    {
+      "id": "nf-orgs",
+      "label": "Organizations and decisions",
+      "group": "Nonfiction"
+    },
+    {
+      "id": "nf-time",
+      "label": "Time and creativity",
+      "group": "Nonfiction"
+    },
+    {
+      "id": "nf-psych",
+      "label": "Psychology and relationships",
+      "group": "Nonfiction"
+    },
+    {
+      "id": "nf-dharma",
+      "label": "Contemplative and Buddhist",
+      "group": "Nonfiction"
+    },
+    {
+      "id": "nf-unsorted",
+      "label": "Nonfiction, not yet identified",
+      "group": "Nonfiction"
+    },
+    {
+      "id": "archive",
+      "label": "Personal archive and art",
+      "group": "Center"
+    },
+    {
+      "id": "collection",
+      "label": "Culture drawings and Palladium",
+      "group": "Center"
+    },
+    {
+      "id": "friend",
+      "label": "Friend's books",
+      "group": "Center"
+    },
+    {
+      "id": "games",
+      "label": "Games and puzzles",
+      "group": "Center"
+    },
+    {
+      "id": "scifi",
+      "label": "Science fiction",
+      "group": "Fiction"
+    },
+    {
+      "id": "fantasy",
+      "label": "Fantasy",
+      "group": "Fiction"
+    },
+    {
+      "id": "fiction",
+      "label": "Other fiction",
+      "group": "Fiction"
+    },
+    {
+      "id": "fic-unsorted",
+      "label": "Fiction, not yet identified",
+      "group": "Fiction"
+    }
+  ],
   "shelves": [
     {
       "id": "c1-r1",
       "column": 1,
       "row": 1,
-      "contents": "Framed print (orange frame); might become shelving"
+      "contents": "Framed print (orange frame); might become shelving",
+      "units": 1,
+      "capacity": null,
+      "plan": {
+        "label": "Orange print",
+        "intent": "Stays. Framed print, left bookend of the symmetry."
+      }
     },
     {
       "id": "c1-r2",
       "column": 1,
       "row": 2,
-      "contents": "The Culture: The Drawings, Palladium 1–19, ceramic figures"
+      "contents": "The Culture: The Drawings, Palladium 1–19, ceramic figures",
+      "units": 1,
+      "capacity": 30,
+      "plan": {
+        "label": "Culture drawings + Palladium",
+        "intent": "The Culture: The Drawings, Palladium run, ceramic figures, clock. (Open decision 2.)"
+      }
     },
     {
       "id": "c1-r3",
       "column": 1,
       "row": 3,
-      "contents": "Clock, Klimt puzzle, Splendor + Splendor Duel"
+      "contents": "Clock, Klimt puzzle, Splendor + Splendor Duel",
+      "units": 1,
+      "capacity": 30,
+      "plan": {
+        "label": "Nonfiction I",
+        "intent": "Life and matter → systems → deep history."
+      }
     },
     {
       "id": "c1-r4",
       "column": 1,
       "row": 4,
-      "contents": "Mixed nonfiction"
+      "contents": "Mixed nonfiction",
+      "units": 1,
+      "capacity": 30,
+      "plan": {
+        "label": "Nonfiction II",
+        "intent": "Political economy → organizations and decisions → time and creativity."
+      }
     },
     {
       "id": "c1-r5",
       "column": 1,
       "row": 5,
-      "contents": "Photos, candles, gift bag"
+      "contents": "Photos, candles, gift bag",
+      "units": 1,
+      "capacity": 30,
+      "plan": {
+        "label": "Games + photos",
+        "intent": "Board games and puzzle, photos, candles."
+      }
     },
     {
       "id": "c2-r1",
       "column": 2,
       "row": 1,
-      "contents": "Framed print (blue frame); might become shelving"
+      "contents": "Framed print (blue frame); might become shelving",
+      "units": 1,
+      "capacity": 30,
+      "plan": {
+        "label": "Nonfiction III",
+        "intent": "New shelving where the blue print was. Psychology and relationships."
+      }
     },
     {
       "id": "c2-r2",
       "column": 2,
       "row": 2,
-      "contents": "Sci-fi paperbacks"
+      "contents": "Sci-fi paperbacks",
+      "units": 1,
+      "capacity": 30,
+      "plan": {
+        "label": "Nonfiction IV",
+        "intent": "Contemplative and Buddhist, next to the center archive."
+      }
     },
     {
       "id": "c2-r3",
       "column": 2,
       "row": 3,
-      "contents": "Tall bay: fossil (keep)"
+      "contents": "Tall bay: fossil (keep)",
+      "units": 2,
+      "capacity": null,
+      "plan": {
+        "label": "Fossil",
+        "intent": "Stays."
+      }
     },
     {
       "id": "c3-top",
       "column": 3,
       "row": 1,
-      "contents": "Three or four empty high shelves"
+      "contents": "Three or four empty high shelves",
+      "units": 3,
+      "capacity": 90,
+      "plan": {
+        "label": "Friend's books",
+        "intent": "Stored for a friend. High, hard to reach, fills the TV gap. (Open decision 3.)"
+      }
     },
     {
       "id": "c3-r4",
       "column": 3,
       "row": 4,
-      "contents": "Art books, bookends, notebooks, yearbooks, childhood books"
+      "contents": "Art books, bookends, notebooks, yearbooks, childhood books",
+      "units": 1,
+      "capacity": 30,
+      "plan": {
+        "label": "Personal archive",
+        "intent": "Yearbooks, childhood books, dated journals, notebooks, art books."
+      }
     },
     {
       "id": "c3-r5",
       "column": 3,
       "row": 5,
-      "contents": "Fixed shelf: photo, crystals, candle, small art"
+      "contents": "Fixed shelf: photo, crystals, candle, small art",
+      "units": 1,
+      "capacity": null,
+      "plan": {
+        "label": "Fixed shelf objects",
+        "intent": "Photo, crystals, candle, small art. Glued in; left alone."
+      }
     },
     {
       "id": "c3-r6",
       "column": 3,
       "row": 6,
-      "contents": "Bust, blue mask, singing bowl, a few books"
+      "contents": "Bust, blue mask, singing bowl, a few books",
+      "units": 1,
+      "capacity": null,
+      "plan": {
+        "label": "Bust, mask, bowl",
+        "intent": "Objects stay."
+      }
     },
     {
       "id": "c4-r1",
       "column": 4,
       "row": 1,
-      "contents": "Friend's books (stored), not catalogued one by one"
+      "contents": "Friend's books (stored), not catalogued one by one",
+      "units": 1,
+      "capacity": 30,
+      "plan": {
+        "label": "Sci-fi I",
+        "intent": "Sci-fi by author, series together."
+      }
     },
     {
       "id": "c4-r2",
       "column": 4,
       "row": 2,
-      "contents": "Friend's books (stored), not catalogued one by one"
+      "contents": "Friend's books (stored), not catalogued one by one",
+      "units": 1,
+      "capacity": 30,
+      "plan": {
+        "label": "Sci-fi II",
+        "intent": "Sci-fi continues."
+      }
     },
     {
       "id": "c4-r3",
       "column": 4,
       "row": 3,
-      "contents": "Friend's books (stored), not catalogued one by one"
+      "contents": "Friend's books (stored), not catalogued one by one",
+      "units": 1,
+      "capacity": 30,
+      "plan": {
+        "label": "Sci-fi III",
+        "intent": "Sci-fi continues."
+      }
     },
     {
       "id": "c4-r4",
       "column": 4,
       "row": 4,
-      "contents": "Buddhism, spirituality, psychology, relationships"
+      "contents": "Buddhism, spirituality, psychology, relationships",
+      "units": 1,
+      "capacity": 30,
+      "plan": {
+        "label": "Fantasy I",
+        "intent": "Fantasy by author, series together."
+      }
     },
     {
       "id": "c4-r5",
       "column": 4,
       "row": 5,
-      "contents": "Tall bay: ukulele (keep)"
+      "contents": "Tall bay: ukulele (keep)",
+      "units": 2,
+      "capacity": null,
+      "plan": {
+        "label": "Ukulele",
+        "intent": "Stays. Mirrors the fossil."
+      }
     },
     {
       "id": "c5-r1",
       "column": 5,
       "row": 1,
-      "contents": "Bottles (could move)"
+      "contents": "Bottles (could move)",
+      "units": 1,
+      "capacity": null,
+      "plan": {
+        "label": "Blue print",
+        "intent": "The blue print moves here from column 2. (Open decision 1.)"
+      }
     },
     {
       "id": "c5-r2",
       "column": 5,
       "row": 2,
-      "contents": "Sanderson + Rothfuss"
+      "contents": "Sanderson + Rothfuss",
+      "units": 1,
+      "capacity": 30,
+      "plan": {
+        "label": "Fantasy II",
+        "intent": "Fantasy continues (Sanderson)."
+      }
     },
     {
       "id": "c5-r3",
       "column": 5,
       "row": 3,
-      "contents": "Mixed SFF and fiction"
+      "contents": "Mixed SFF and fiction",
+      "units": 1,
+      "capacity": 30,
+      "plan": {
+        "label": "Other fiction",
+        "intent": "Literary, historical, mystery, romance, myth."
+      }
     },
     {
       "id": "c5-r4",
       "column": 5,
       "row": 4,
-      "contents": "Dated journals, piano sheet music"
+      "contents": "Dated journals, piano sheet music",
+      "units": 1,
+      "capacity": null,
+      "plan": {
+        "label": "Bar",
+        "intent": "Bottles move down here beside the glassware."
+      }
     },
     {
       "id": "c5-r5",
       "column": 5,
       "row": 5,
-      "contents": "Glassware, vases"
+      "contents": "Glassware, vases",
+      "units": 1,
+      "capacity": null,
+      "plan": {
+        "label": "Glassware",
+        "intent": "Glassware, vases."
+      }
     },
     {
       "id": "c5-r6",
       "column": 5,
       "row": 6,
-      "contents": "Glassware, jars"
+      "contents": "Glassware, jars",
+      "units": 1,
+      "capacity": null,
+      "plan": {
+        "label": "Glassware",
+        "intent": "Glassware, jars."
+      }
     }
   ],
   "books": [
     {
       "title": "Gödel, Escher, Bach",
       "author": "Douglas R. Hofstadter",
-      "shelf": "c1-r4"
-    },
-    {
-      "title": "Thinking in Systems",
-      "author": "Donella H. Meadows",
-      "shelf": "c1-r4"
+      "shelf": "c1-r4",
+      "section": "nf-systems",
+      "size": 2.5,
+      "planShelf": "c1-r3",
+      "planOrder": 7
     },
     {
       "title": "Thinking in Systems",
       "author": "Donella H. Meadows",
       "shelf": "c1-r4",
-      "notes": "Second copy"
+      "section": "nf-systems",
+      "planShelf": "c1-r3",
+      "planOrder": 5
+    },
+    {
+      "title": "Thinking in Systems",
+      "author": "Donella H. Meadows",
+      "shelf": "c1-r4",
+      "notes": "Second copy",
+      "section": "nf-systems",
+      "planShelf": "c1-r3",
+      "planOrder": 6
     },
     {
       "title": "Reinventing Organizations",
       "author": "Frederic Laloux",
-      "shelf": "c1-r4"
+      "shelf": "c1-r4",
+      "section": "nf-orgs",
+      "planShelf": "c1-r4",
+      "planOrder": 4
     },
     {
       "title": "The Vital Question",
       "author": "Nick Lane",
-      "shelf": "c1-r4"
+      "shelf": "c1-r4",
+      "section": "nf-life",
+      "planShelf": "c1-r3",
+      "planOrder": 1
     },
     {
       "title": "Producer to Producer (2nd ed.)",
       "author": "Maureen A. Ryan",
-      "shelf": "c1-r4"
+      "shelf": "c1-r4",
+      "section": "nf-orgs",
+      "planShelf": "c1-r4",
+      "planOrder": 7
     },
     {
       "title": "Thinking in Bets",
       "author": "Annie Duke",
-      "shelf": "c1-r4"
+      "shelf": "c1-r4",
+      "section": "nf-orgs",
+      "planShelf": "c1-r4",
+      "planOrder": 6
     },
     {
       "title": "Technofeudalism",
       "author": "Yanis Varoufakis",
-      "shelf": "c1-r4"
+      "shelf": "c1-r4",
+      "section": "nf-politics",
+      "planShelf": "c1-r4",
+      "planOrder": 1
     },
     {
       "title": "The Hidden Life of Trees",
       "author": "Peter Wohlleben",
-      "shelf": "c1-r4"
+      "shelf": "c1-r4",
+      "section": "nf-life",
+      "planShelf": "c1-r3",
+      "planOrder": 3
     },
     {
       "title": "Guns, Germs, and Steel",
       "author": "Jared Diamond",
-      "shelf": "c1-r4"
+      "shelf": "c1-r4",
+      "section": "nf-history",
+      "size": 1.5,
+      "planShelf": "c1-r3",
+      "planOrder": 8
     },
     {
       "title": "Sapiens",
       "author": "Yuval Noah Harari",
-      "shelf": "c1-r4"
+      "shelf": "c1-r4",
+      "section": "nf-history",
+      "size": 1.5,
+      "planShelf": "c1-r3",
+      "planOrder": 9
     },
     {
       "title": "Debt: The First 5,000 Years",
       "author": "David Graeber",
-      "shelf": "c1-r4"
+      "shelf": "c1-r4",
+      "section": "nf-history",
+      "size": 1.5,
+      "planShelf": "c1-r3",
+      "planOrder": 10
     },
     {
       "title": "The Hero with a Thousand Faces",
       "author": "Joseph Campbell",
-      "shelf": "c1-r4"
+      "shelf": "c1-r4",
+      "section": "nf-history",
+      "planShelf": "c1-r3",
+      "planOrder": 11
     },
     {
       "title": "Winners Take All",
       "author": "Anand Giridharadas",
-      "shelf": "c1-r4"
+      "shelf": "c1-r4",
+      "section": "nf-politics",
+      "planShelf": "c1-r4",
+      "planOrder": 2
     },
     {
       "title": "The Machinery of Life",
       "author": "David S. Goodsell",
-      "shelf": "c1-r4"
+      "shelf": "c1-r4",
+      "section": "nf-life",
+      "planShelf": "c1-r3",
+      "planOrder": 2
     },
     {
       "title": "Big Magic",
       "author": "Elizabeth Gilbert",
-      "shelf": "c1-r4"
+      "shelf": "c1-r4",
+      "section": "nf-time",
+      "planShelf": "c1-r4",
+      "planOrder": 10
     },
     {
       "title": "How to Do Nothing",
       "author": "Jenny Odell",
-      "shelf": "c1-r4"
+      "shelf": "c1-r4",
+      "section": "nf-time",
+      "planShelf": "c1-r4",
+      "planOrder": 9
     },
     {
       "title": "Unidentified (thin blue spine)",
       "author": null,
       "shelf": "c1-r4",
-      "notes": "Spine not legible in the photo"
+      "notes": "Spine not legible in the photo",
+      "section": "nf-unsorted",
+      "planShelf": "c1-r3",
+      "planOrder": 12
     },
     {
       "title": "Four Thousand Weeks",
       "author": "Oliver Burkeman",
-      "shelf": "c1-r4"
+      "shelf": "c1-r4",
+      "section": "nf-time",
+      "planShelf": "c1-r4",
+      "planOrder": 8
     },
     {
       "title": "Unidentified (black spine)",
       "author": null,
       "shelf": "c1-r4",
-      "notes": "Spine not legible in the photo"
+      "notes": "Spine not legible in the photo",
+      "section": "nf-unsorted",
+      "planShelf": "c1-r3",
+      "planOrder": 13
     },
     {
       "title": "대한민국 진화론",
       "author": "이현정",
       "shelf": "c1-r4",
-      "notes": "Spine tagline: 삼성전자 최초 여성임원 (first woman executive at Samsung Electronics)"
+      "notes": "Spine tagline: 삼성전자 최초 여성임원 (first woman executive at Samsung Electronics)",
+      "section": "nf-orgs",
+      "planShelf": "c1-r4",
+      "planOrder": 3
     },
     {
       "title": "The Culture: The Drawings",
       "author": "Iain M. Banks",
-      "shelf": "c1-r2"
+      "shelf": "c1-r2",
+      "section": "collection",
+      "size": 1.5,
+      "planShelf": "c1-r2",
+      "planOrder": 1
     },
     {
       "title": "Palladium (issues 1–19)",
       "author": null,
       "shelf": "c1-r2",
-      "notes": "Magazine run; approximate count"
+      "notes": "Magazine run; approximate count",
+      "section": "collection",
+      "count": 19,
+      "size": 8,
+      "planShelf": "c1-r2",
+      "planOrder": 2
     },
     {
       "title": "Leviathan Wakes",
       "author": "James S. A. Corey",
       "shelf": "c2-r2",
-      "series": "The Expanse"
+      "series": "The Expanse",
+      "section": "scifi",
+      "seriesNo": 1,
+      "planShelf": "c4-r2",
+      "planOrder": 1
     },
     {
       "title": "Caliban's War",
       "author": "James S. A. Corey",
       "shelf": "c2-r2",
-      "series": "The Expanse"
+      "series": "The Expanse",
+      "section": "scifi",
+      "seriesNo": 2,
+      "planShelf": "c4-r2",
+      "planOrder": 2
     },
     {
       "title": "Abaddon's Gate",
       "author": "James S. A. Corey",
       "shelf": "c2-r2",
-      "series": "The Expanse"
+      "series": "The Expanse",
+      "section": "scifi",
+      "seriesNo": 3,
+      "planShelf": "c4-r2",
+      "planOrder": 3
     },
     {
       "title": "Cibola Burn",
       "author": "James S. A. Corey",
       "shelf": "c2-r2",
-      "series": "The Expanse"
+      "series": "The Expanse",
+      "section": "scifi",
+      "seriesNo": 4,
+      "planShelf": "c4-r2",
+      "planOrder": 4
     },
     {
       "title": "Nemesis Games",
       "author": "James S. A. Corey",
       "shelf": "c2-r2",
-      "series": "The Expanse"
+      "series": "The Expanse",
+      "section": "scifi",
+      "seriesNo": 5,
+      "planShelf": "c4-r2",
+      "planOrder": 5
     },
     {
       "title": "Babylon's Ashes",
       "author": "James S. A. Corey",
       "shelf": "c2-r2",
-      "series": "The Expanse"
+      "series": "The Expanse",
+      "section": "scifi",
+      "seriesNo": 6,
+      "planShelf": "c4-r2",
+      "planOrder": 6
     },
     {
       "title": "Persepolis Rising",
       "author": "James S. A. Corey",
       "shelf": "c2-r2",
-      "series": "The Expanse"
+      "series": "The Expanse",
+      "section": "scifi",
+      "seriesNo": 7,
+      "planShelf": "c4-r2",
+      "planOrder": 7
     },
     {
       "title": "Tiamat's Wrath",
       "author": "James S. A. Corey",
       "shelf": "c2-r2",
-      "series": "The Expanse"
+      "series": "The Expanse",
+      "section": "scifi",
+      "seriesNo": 8,
+      "planShelf": "c4-r2",
+      "planOrder": 8
     },
     {
       "title": "Leviathan Falls",
       "author": "James S. A. Corey",
       "shelf": "c2-r2",
-      "series": "The Expanse"
+      "series": "The Expanse",
+      "section": "scifi",
+      "seriesNo": 9,
+      "planShelf": "c4-r2",
+      "planOrder": 9
     },
     {
       "title": "Memory's Legion",
       "author": "James S. A. Corey",
       "shelf": "c2-r2",
-      "series": "The Expanse"
+      "series": "The Expanse",
+      "section": "scifi",
+      "seriesNo": 10,
+      "planShelf": "c4-r2",
+      "planOrder": 10
     },
     {
       "title": "The Three-Body Problem",
       "author": "Cixin Liu",
-      "shelf": "c2-r2"
+      "shelf": "c2-r2",
+      "section": "scifi",
+      "planShelf": "c4-r3",
+      "planOrder": 5
     },
     {
       "title": "Dune",
       "author": "Frank Herbert",
       "shelf": "c2-r2",
-      "series": "Dune"
+      "series": "Dune",
+      "section": "scifi",
+      "seriesNo": 1,
+      "planShelf": "c4-r3",
+      "planOrder": 1
     },
     {
       "title": "God Emperor of Dune",
       "author": "Frank Herbert",
       "shelf": "c2-r2",
-      "series": "Dune"
+      "series": "Dune",
+      "section": "scifi",
+      "seriesNo": 4,
+      "planShelf": "c4-r3",
+      "planOrder": 4
     },
     {
       "title": "Children of Dune",
       "author": "Frank Herbert",
       "shelf": "c2-r2",
-      "series": "Dune"
+      "series": "Dune",
+      "section": "scifi",
+      "seriesNo": 3,
+      "planShelf": "c4-r3",
+      "planOrder": 3
     },
     {
       "title": "Dune Messiah",
       "author": "Frank Herbert",
       "shelf": "c2-r2",
-      "series": "Dune"
+      "series": "Dune",
+      "section": "scifi",
+      "seriesNo": 2,
+      "planShelf": "c4-r3",
+      "planOrder": 2
     },
     {
       "title": "A Fire Upon the Deep",
       "author": "Vernor Vinge",
-      "shelf": "c2-r2"
+      "shelf": "c2-r2",
+      "section": "scifi",
+      "planShelf": "c4-r3",
+      "planOrder": 10
     },
     {
       "title": "The Power",
       "author": "Naomi Alderman",
-      "shelf": "c2-r2"
+      "shelf": "c2-r2",
+      "section": "scifi",
+      "planShelf": "c4-r1",
+      "planOrder": 1
     },
     {
       "title": "Iron Widow",
       "author": "Xiran Jay Zhao",
-      "shelf": "c2-r2"
+      "shelf": "c2-r2",
+      "section": "scifi",
+      "planShelf": "c4-r3",
+      "planOrder": 11
     },
     {
       "title": "Parable of the Talents",
       "author": "Octavia E. Butler",
-      "shelf": "c2-r2"
+      "shelf": "c2-r2",
+      "section": "scifi",
+      "planShelf": "c4-r1",
+      "planOrder": 9
     },
     {
       "title": "1984",
       "author": "George Orwell",
-      "shelf": "c2-r2"
+      "shelf": "c2-r2",
+      "section": "scifi",
+      "planShelf": "c4-r3",
+      "planOrder": 7
     },
     {
       "title": "The Gods Themselves",
       "author": "Isaac Asimov",
-      "shelf": "c2-r2"
+      "shelf": "c2-r2",
+      "section": "scifi",
+      "planShelf": "c4-r1",
+      "planOrder": 4
     },
     {
       "title": "Excession",
       "author": "Iain M. Banks",
-      "shelf": "c2-r2"
+      "shelf": "c2-r2",
+      "section": "scifi",
+      "planShelf": "c4-r1",
+      "planOrder": 5
     },
     {
       "title": "Unidentified (black spine)",
       "author": null,
       "shelf": "c2-r2",
-      "notes": "Between Excession and The Foundation Trilogy"
+      "notes": "Between Excession and The Foundation Trilogy",
+      "section": "scifi",
+      "planShelf": "c4-r3",
+      "planOrder": 12
     },
     {
       "title": "The Foundation Trilogy",
       "author": "Isaac Asimov",
-      "shelf": "c2-r2"
+      "shelf": "c2-r2",
+      "section": "scifi",
+      "size": 2,
+      "planShelf": "c4-r1",
+      "planOrder": 3
     },
     {
       "title": "Reamde",
       "author": "Neal Stephenson",
-      "shelf": "c2-r2"
+      "shelf": "c2-r2",
+      "section": "scifi",
+      "size": 2,
+      "planShelf": "c4-r3",
+      "planOrder": 8
     },
     {
       "title": "Accelerando",
       "author": "Charles Stross",
-      "shelf": "c2-r2"
+      "shelf": "c2-r2",
+      "section": "scifi",
+      "planShelf": "c4-r3",
+      "planOrder": 9
     },
     {
       "title": "Unidentified (thin white spine)",
       "author": null,
-      "shelf": "c3-r4"
+      "shelf": "c3-r4",
+      "section": "archive",
+      "planShelf": "c3-r4",
+      "planOrder": 1
     },
     {
       "title": "On NFTs",
       "author": "Robert Alice (ed.)",
-      "shelf": "c3-r4"
+      "shelf": "c3-r4",
+      "section": "archive",
+      "planShelf": "c3-r4",
+      "planOrder": 2
     },
     {
       "title": "What Are You Looking At?",
       "author": "Will Gompertz",
-      "shelf": "c3-r4"
+      "shelf": "c3-r4",
+      "section": "archive",
+      "planShelf": "c3-r4",
+      "planOrder": 3
     },
     {
       "title": "High Technology High School yearbooks (2007–2009)",
       "author": null,
       "shelf": "c3-r4",
-      "kind": "personal"
+      "kind": "personal",
+      "section": "archive",
+      "size": 3,
+      "planShelf": "c3-r4",
+      "planOrder": 4
     },
     {
       "title": "My Book About Me",
       "author": "Dr. Seuss & Roy McKie",
       "shelf": "c3-r4",
-      "kind": "personal"
+      "kind": "personal",
+      "section": "archive",
+      "planShelf": "c3-r4",
+      "planOrder": 5
     },
     {
       "title": "Moonlists",
       "author": null,
       "shelf": "c3-r4",
       "kind": "personal",
-      "notes": "Guided journal"
+      "notes": "Guided journal",
+      "section": "archive",
+      "planShelf": "c3-r4",
+      "planOrder": 6
     },
     {
       "title": "Assorted notebooks and journals",
       "author": null,
       "shelf": "c3-r4",
-      "kind": "personal"
+      "kind": "personal",
+      "section": "archive",
+      "size": 4,
+      "planShelf": "c3-r4",
+      "planOrder": 7
     },
     {
       "title": "The Numerical Discourses of the Buddha",
       "author": "Bhikkhu Bodhi (trans.)",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-dharma",
+      "size": 3,
+      "planShelf": "c2-r2",
+      "planOrder": 10
     },
     {
       "title": "Vibrant Matter",
       "author": "Jane Bennett",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-life",
+      "planShelf": "c1-r3",
+      "planOrder": 4
     },
     {
       "title": "Opening to Oneness",
       "author": "Nancy Mujo Baker",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-dharma",
+      "planShelf": "c2-r2",
+      "planOrder": 7
     },
     {
       "title": "Zen and the Art of Motorcycle Maintenance",
       "author": "Robert M. Pirsig",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-time",
+      "planShelf": "c1-r4",
+      "planOrder": 12
     },
     {
       "title": "Zen and the Art of Saving the Planet",
       "author": "Thich Nhat Hanh",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-dharma",
+      "planShelf": "c2-r2",
+      "planOrder": 6
     },
     {
       "title": "Secure Love",
       "author": "Julie Menanno",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-psych",
+      "planShelf": "c2-r1",
+      "planOrder": 2
     },
     {
       "title": "Inviting Leadership",
       "author": "Daniel Mezick & Mark Sheffield",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-orgs",
+      "planShelf": "c1-r4",
+      "planOrder": 5
     },
     {
       "title": "The Artist's Way",
       "author": "Julia Cameron",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-time",
+      "planShelf": "c1-r4",
+      "planOrder": 11
     },
     {
       "title": "Briefly Perfectly Human",
       "author": "Alua Arthur",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-psych",
+      "planShelf": "c2-r1",
+      "planOrder": 6
     },
     {
       "title": "No Bad Parts",
       "author": "Richard C. Schwartz",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-psych",
+      "planShelf": "c2-r1",
+      "planOrder": 3
     },
     {
       "title": "Awakening Joy",
       "author": "James Baraz",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-dharma",
+      "planShelf": "c2-r2",
+      "planOrder": 4
     },
     {
       "title": "The Archer",
       "author": "Paulo Coelho",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "fiction",
+      "planShelf": "c5-r3",
+      "planOrder": 4
     },
     {
       "title": "The Mastery of Love",
       "author": "Don Miguel Ruiz",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-psych",
+      "planShelf": "c2-r1",
+      "planOrder": 5
     },
     {
       "title": "It Can't Happen Here",
       "author": "Sinclair Lewis",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "fiction",
+      "planShelf": "c5-r3",
+      "planOrder": 7
     },
     {
       "title": "Love in a F*cked-Up World",
       "author": "Dean Spade",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-psych",
+      "planShelf": "c2-r1",
+      "planOrder": 4
     },
     {
       "title": "The Book of Joy",
       "author": "Dalai Lama, Desmond Tutu & Douglas Abrams",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-dharma",
+      "planShelf": "c2-r2",
+      "planOrder": 5
     },
     {
       "title": "Clarity & Connection",
       "author": "Yung Pueblo",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-dharma",
+      "size": 0.7,
+      "planShelf": "c2-r2",
+      "planOrder": 1
     },
     {
       "title": "Inward",
       "author": "Yung Pueblo",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-dharma",
+      "size": 0.7,
+      "planShelf": "c2-r2",
+      "planOrder": 2
     },
     {
       "title": "The Way Forward",
       "author": "Yung Pueblo",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-dharma",
+      "size": 0.7,
+      "planShelf": "c2-r2",
+      "planOrder": 3
     },
     {
       "title": "Attached",
       "author": "Amir Levine & Rachel Heller",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-psych",
+      "planShelf": "c2-r1",
+      "planOrder": 1
     },
     {
       "title": "Roots and Currents",
       "author": "Ajahn Amaro",
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-dharma",
+      "planShelf": "c2-r2",
+      "planOrder": 8
     },
     {
       "title": "Seeds of Dhamma",
       "author": null,
-      "shelf": "c4-r4"
+      "shelf": "c4-r4",
+      "section": "nf-dharma",
+      "planShelf": "c2-r2",
+      "planOrder": 9
     },
     {
       "title": "About 20 more spines on this shelf, not legible in the photo",
       "author": null,
       "shelf": "c4-r4",
-      "notes": "Needs a closer photo"
+      "notes": "Needs a closer photo",
+      "section": "nf-unsorted",
+      "count": 20,
+      "size": 20,
+      "planShelf": "c2-r1",
+      "planOrder": 7
     },
     {
       "title": "Elantris",
       "author": "Brandon Sanderson",
-      "shelf": "c5-r2"
+      "shelf": "c5-r2",
+      "section": "fantasy",
+      "size": 1.5,
+      "planShelf": "c5-r2",
+      "planOrder": 1
     },
     {
       "title": "Mistborn",
       "author": "Brandon Sanderson",
       "shelf": "c5-r2",
-      "series": "Mistborn"
+      "series": "Mistborn",
+      "section": "fantasy",
+      "seriesNo": 1,
+      "size": 1.5,
+      "planShelf": "c5-r2",
+      "planOrder": 2
     },
     {
       "title": "The Well of Ascension",
       "author": "Brandon Sanderson",
       "shelf": "c5-r2",
-      "series": "Mistborn"
+      "series": "Mistborn",
+      "section": "fantasy",
+      "seriesNo": 2,
+      "size": 1.5,
+      "planShelf": "c5-r2",
+      "planOrder": 3
     },
     {
       "title": "The Hero of Ages",
       "author": "Brandon Sanderson",
       "shelf": "c5-r2",
-      "series": "Mistborn"
+      "series": "Mistborn",
+      "section": "fantasy",
+      "seriesNo": 3,
+      "size": 1.5,
+      "planShelf": "c5-r2",
+      "planOrder": 4
     },
     {
       "title": "The Alloy of Law",
       "author": "Brandon Sanderson",
       "shelf": "c5-r2",
-      "series": "Mistborn"
+      "series": "Mistborn",
+      "section": "fantasy",
+      "seriesNo": 4,
+      "size": 1.5,
+      "planShelf": "c5-r2",
+      "planOrder": 5
     },
     {
       "title": "Shadows of Self",
       "author": "Brandon Sanderson",
       "shelf": "c5-r2",
-      "series": "Mistborn"
+      "series": "Mistborn",
+      "section": "fantasy",
+      "seriesNo": 5,
+      "size": 1.5,
+      "planShelf": "c5-r2",
+      "planOrder": 6
     },
     {
       "title": "The Bands of Mourning",
       "author": "Brandon Sanderson",
       "shelf": "c5-r2",
-      "series": "Mistborn"
+      "series": "Mistborn",
+      "section": "fantasy",
+      "seriesNo": 6,
+      "size": 1.5,
+      "planShelf": "c5-r2",
+      "planOrder": 7
     },
     {
       "title": "The Lost Metal",
       "author": "Brandon Sanderson",
       "shelf": "c5-r2",
-      "series": "Mistborn"
+      "series": "Mistborn",
+      "section": "fantasy",
+      "seriesNo": 7,
+      "size": 1.5,
+      "planShelf": "c5-r2",
+      "planOrder": 8
     },
     {
       "title": "Warbreaker",
       "author": "Brandon Sanderson",
-      "shelf": "c5-r2"
+      "shelf": "c5-r2",
+      "section": "fantasy",
+      "size": 1.5,
+      "planShelf": "c5-r2",
+      "planOrder": 15
     },
     {
       "title": "The Way of Kings",
       "author": "Brandon Sanderson",
       "shelf": "c5-r2",
-      "series": "The Stormlight Archive"
+      "series": "The Stormlight Archive",
+      "section": "fantasy",
+      "seriesNo": 1,
+      "size": 2.5,
+      "planShelf": "c5-r2",
+      "planOrder": 9
     },
     {
       "title": "Words of Radiance",
       "author": "Brandon Sanderson",
       "shelf": "c5-r2",
-      "series": "The Stormlight Archive"
+      "series": "The Stormlight Archive",
+      "section": "fantasy",
+      "seriesNo": 2,
+      "size": 2.5,
+      "planShelf": "c5-r2",
+      "planOrder": 10
     },
     {
       "title": "Oathbringer",
       "author": "Brandon Sanderson",
       "shelf": "c5-r2",
-      "series": "The Stormlight Archive"
+      "series": "The Stormlight Archive",
+      "section": "fantasy",
+      "seriesNo": 3,
+      "size": 2.5,
+      "planShelf": "c5-r2",
+      "planOrder": 12
     },
     {
       "title": "Rhythm of War",
       "author": "Brandon Sanderson",
       "shelf": "c5-r2",
-      "series": "The Stormlight Archive"
+      "series": "The Stormlight Archive",
+      "section": "fantasy",
+      "seriesNo": 4,
+      "size": 2.5,
+      "planShelf": "c5-r2",
+      "planOrder": 14
     },
     {
       "title": "Edgedancer",
       "author": "Brandon Sanderson",
       "shelf": "c5-r2",
-      "series": "The Stormlight Archive"
+      "series": "The Stormlight Archive",
+      "section": "fantasy",
+      "seriesNo": 2.5,
+      "size": 0.7,
+      "planShelf": "c5-r2",
+      "planOrder": 11
     },
     {
       "title": "Dawnshard",
       "author": "Brandon Sanderson",
       "shelf": "c5-r2",
-      "series": "The Stormlight Archive"
+      "series": "The Stormlight Archive",
+      "section": "fantasy",
+      "seriesNo": 3.5,
+      "size": 0.7,
+      "planShelf": "c5-r2",
+      "planOrder": 13
     },
     {
       "title": "Unidentified (thin, tilted)",
       "author": null,
       "shelf": "c5-r2",
-      "notes": "Possibly another Sanderson"
+      "notes": "Possibly another Sanderson",
+      "section": "fantasy",
+      "planShelf": "c5-r2",
+      "planOrder": 16
     },
     {
       "title": "The Slow Regard of Silent Things",
       "author": "Patrick Rothfuss",
       "shelf": "c5-r2",
-      "series": "The Kingkiller Chronicle"
+      "series": "The Kingkiller Chronicle",
+      "section": "fantasy",
+      "seriesNo": 2.5,
+      "size": 0.7,
+      "planShelf": "c4-r4",
+      "planOrder": 8
     },
     {
       "title": "Unidentified Rothfuss (large black)",
       "author": "Patrick Rothfuss",
-      "shelf": "c5-r2"
+      "shelf": "c5-r2",
+      "section": "fantasy",
+      "size": 2,
+      "planShelf": "c4-r4",
+      "planOrder": 9
     },
     {
       "title": "The Name of the Wind",
       "author": "Patrick Rothfuss",
       "shelf": "c5-r2",
-      "series": "The Kingkiller Chronicle"
+      "series": "The Kingkiller Chronicle",
+      "section": "fantasy",
+      "seriesNo": 1,
+      "size": 2,
+      "planShelf": "c4-r4",
+      "planOrder": 6
     },
     {
       "title": "The Wise Man's Fear",
       "author": "Patrick Rothfuss",
       "shelf": "c5-r2",
-      "series": "The Kingkiller Chronicle"
+      "series": "The Kingkiller Chronicle",
+      "section": "fantasy",
+      "seriesNo": 2,
+      "size": 2,
+      "planShelf": "c4-r4",
+      "planOrder": 7
     },
     {
       "title": "Unidentified",
       "author": "Ed Lin",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "fiction",
+      "planShelf": "c5-r3",
+      "planOrder": 8
     },
     {
       "title": "Kushiel's Dart",
       "author": "Jacqueline Carey",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "fantasy",
+      "planShelf": "c4-r4",
+      "planOrder": 1
     },
     {
       "title": "The Alchemist",
       "author": "Paulo Coelho",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "fiction",
+      "planShelf": "c5-r3",
+      "planOrder": 3
     },
     {
       "title": "Monk & Robot",
       "author": "Becky Chambers",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "scifi",
+      "planShelf": "c4-r1",
+      "planOrder": 11
     },
     {
       "title": "This Is How You Lose the Time War",
       "author": "Amal El-Mohtar & Max Gladstone",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "scifi",
+      "planShelf": "c4-r2",
+      "planOrder": 14
     },
     {
       "title": "The Midnight Library",
       "author": "Matt Haig",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "fiction",
+      "planShelf": "c5-r3",
+      "planOrder": 6
     },
     {
       "title": "Diaspora",
       "author": "Greg Egan",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "scifi",
+      "planShelf": "c4-r2",
+      "planOrder": 13
     },
     {
       "title": "The City We Became",
       "author": "N. K. Jemisin",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "fantasy",
+      "planShelf": "c4-r4",
+      "planOrder": 2
     },
     {
       "title": "The World We Make",
       "author": "N. K. Jemisin",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "fantasy",
+      "planShelf": "c4-r4",
+      "planOrder": 3
     },
     {
       "title": "Lilith's Brood",
       "author": "Octavia E. Butler",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "scifi",
+      "size": 2,
+      "planShelf": "c4-r1",
+      "planOrder": 7
     },
     {
       "title": "Fledgling",
       "author": "Octavia E. Butler",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "scifi",
+      "planShelf": "c4-r1",
+      "planOrder": 6
     },
     {
       "title": "Wild Seed",
       "author": "Octavia E. Butler",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "scifi",
+      "planShelf": "c4-r1",
+      "planOrder": 10
     },
     {
       "title": "Mind of My Mind",
       "author": "Octavia E. Butler",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "scifi",
+      "planShelf": "c4-r1",
+      "planOrder": 8
     },
     {
       "title": "Watchmen",
       "author": "Alan Moore & Dave Gibbons",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "scifi",
+      "planShelf": "c4-r3",
+      "planOrder": 6
     },
     {
       "title": "Be My Knife",
       "author": "David Grossman",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "fiction",
+      "planShelf": "c5-r3",
+      "planOrder": 5
     },
     {
       "title": "Walkaway",
       "author": "Cory Doctorow",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "scifi",
+      "planShelf": "c4-r2",
+      "planOrder": 12
     },
     {
       "title": "Light from Uncommon Stars",
       "author": "Ryka Aoki",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "scifi",
+      "planShelf": "c4-r1",
+      "planOrder": 2
     },
     {
       "title": "A Study in Scarlet Women",
       "author": "Sherry Thomas",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "fiction",
+      "planShelf": "c5-r3",
+      "planOrder": 12
     },
     {
       "title": "Celestial Bodies",
       "author": "Jokha Alharthi",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "fiction",
+      "planShelf": "c5-r3",
+      "planOrder": 2
     },
     {
       "title": "Macbeth",
       "author": "William Shakespeare",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "fiction",
+      "planShelf": "c5-r3",
+      "planOrder": 10
     },
     {
       "title": "The Dandelion Insurrection",
       "author": "Rivera Sun",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "fiction",
+      "planShelf": "c5-r3",
+      "planOrder": 11
     },
     {
       "title": "Don't Want You Like a Best Friend",
       "author": "Emma R. Alban",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "fiction",
+      "planShelf": "c5-r3",
+      "planOrder": 1
     },
     {
       "title": "The Song of Achilles",
       "author": "Madeline Miller",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "fantasy",
+      "planShelf": "c4-r4",
+      "planOrder": 4
     },
     {
       "title": "Interview with the Vampire",
       "author": "Anne Rice",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "fantasy",
+      "planShelf": "c4-r4",
+      "planOrder": 5
     },
     {
       "title": "Stories of Your Life and Others",
       "author": "Ted Chiang",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "scifi",
+      "planShelf": "c4-r1",
+      "planOrder": 12
     },
     {
       "title": "Mexican Gothic",
       "author": "Silvia Moreno-Garcia",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "fiction",
+      "planShelf": "c5-r3",
+      "planOrder": 9
     },
     {
       "title": "Unidentified (orange spine)",
       "author": "Cory Doctorow",
-      "shelf": "c5-r3"
+      "shelf": "c5-r3",
+      "section": "scifi",
+      "planShelf": "c4-r2",
+      "planOrder": 11
     },
     {
       "title": "About 8 more spines on this shelf, not legible in the photo",
       "author": null,
       "shelf": "c5-r3",
-      "notes": "Needs a closer photo"
+      "notes": "Needs a closer photo",
+      "section": "fic-unsorted",
+      "count": 8,
+      "size": 8,
+      "planShelf": "c5-r3",
+      "planOrder": 13
     },
     {
       "title": "Dated journals (2021 onward)",
       "author": null,
       "shelf": "c5-r4",
-      "kind": "personal"
+      "kind": "personal",
+      "section": "archive",
+      "size": 4,
+      "planShelf": "c3-r4",
+      "planOrder": 8
     },
     {
       "title": "Classical piano sheet music",
       "author": null,
       "shelf": "c5-r4",
-      "kind": "music"
+      "kind": "music",
+      "section": "archive",
+      "size": 3,
+      "planShelf": "c3-r4",
+      "planOrder": 9
+    },
+    {
+      "title": "Klimt puzzle",
+      "author": null,
+      "shelf": "c1-r3",
+      "kind": "game",
+      "section": "games",
+      "size": 3,
+      "planShelf": "c1-r5",
+      "planOrder": 1
+    },
+    {
+      "title": "Splendor",
+      "author": null,
+      "shelf": "c1-r3",
+      "kind": "game",
+      "section": "games",
+      "size": 3,
+      "planShelf": "c1-r5",
+      "planOrder": 2
+    },
+    {
+      "title": "Splendor Duel",
+      "author": null,
+      "shelf": "c1-r3",
+      "kind": "game",
+      "section": "games",
+      "size": 2,
+      "planShelf": "c1-r5",
+      "planOrder": 3
+    },
+    {
+      "title": "Friend's books (shelf 1)",
+      "author": null,
+      "shelf": "c4-r1",
+      "kind": "friend",
+      "section": "friend",
+      "size": 28,
+      "notes": "Not catalogued one by one; size is a guess at one full shelf",
+      "planShelf": "c3-top",
+      "planOrder": 1
+    },
+    {
+      "title": "Friend's books (shelf 2)",
+      "author": null,
+      "shelf": "c4-r2",
+      "kind": "friend",
+      "section": "friend",
+      "size": 28,
+      "notes": "Not catalogued one by one; size is a guess at one full shelf",
+      "planShelf": "c3-top",
+      "planOrder": 2
+    },
+    {
+      "title": "Friend's books (shelf 3)",
+      "author": null,
+      "shelf": "c4-r3",
+      "kind": "friend",
+      "section": "friend",
+      "size": 28,
+      "notes": "Not catalogued one by one; size is a guess at one full shelf",
+      "planShelf": "c3-top",
+      "planOrder": 3
     }
   ]
 }
